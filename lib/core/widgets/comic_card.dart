@@ -33,7 +33,7 @@ class ComicCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            comic.title,
+            comic.title ?? '未知標題',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),

@@ -7,9 +7,9 @@ part of 'comic.dart';
 // **************************************************************************
 
 _Comic _$ComicFromJson(Map<String, dynamic> json) => _Comic(
-  comicId: json['id'] as String,
+  comicId: json['id'] as String?,
   providerId: json['provider_id'] as String?,
-  title: json['title'] as String,
+  title: json['title'] as String?,
   coverUrl: json['cover_url'] as String?,
   description: json['description'] as String?,
   tags: (json['tags'] as List<dynamic>?)?.map((e) => e as String).toList(),

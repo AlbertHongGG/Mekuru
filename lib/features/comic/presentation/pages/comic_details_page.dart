@@ -73,7 +73,7 @@ class ComicDetailsPage extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(comic.title, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                Text(comic.title ?? '未知標題', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
                 if (comic.author != null) Text('作者: ${comic.author}', style: const TextStyle(fontSize: 16, color: Colors.grey)),
                 const SizedBox(height: 8),

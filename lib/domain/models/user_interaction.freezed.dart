@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$UserFavorite {
 
-@JsonKey(name: 'provider_id') String get providerId;@JsonKey(name: 'comic_id') String get comicId; Comic? get comic;@JsonKey(name: 'added_at') String get addedAt;@JsonKey(name: 'last_read_at') String? get lastReadAt;@JsonKey(name: 'is_archived') bool? get isArchived;
+@JsonKey(name: 'provider_id') String? get providerId;@JsonKey(name: 'comic_id') String? get comicId; Comic? get comic;@JsonKey(name: 'added_at') String? get addedAt;@JsonKey(name: 'last_read_at') String? get lastReadAt;@JsonKey(name: 'is_archived') bool? get isArchived;
 /// Create a copy of UserFavorite
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -49,7 +49,7 @@ abstract mixin class $UserFavoriteCopyWith<$Res>  {
   factory $UserFavoriteCopyWith(UserFavorite value, $Res Function(UserFavorite) _then) = _$UserFavoriteCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(name: 'provider_id') String providerId,@JsonKey(name: 'comic_id') String comicId, Comic? comic,@JsonKey(name: 'added_at') String addedAt,@JsonKey(name: 'last_read_at') String? lastReadAt,@JsonKey(name: 'is_archived') bool? isArchived
+@JsonKey(name: 'provider_id') String? providerId,@JsonKey(name: 'comic_id') String? comicId, Comic? comic,@JsonKey(name: 'added_at') String? addedAt,@JsonKey(name: 'last_read_at') String? lastReadAt,@JsonKey(name: 'is_archived') bool? isArchived
 });
 
 
@@ -66,13 +66,13 @@ class _$UserFavoriteCopyWithImpl<$Res>
 
 /// Create a copy of UserFavorite
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? providerId = null,Object? comicId = null,Object? comic = freezed,Object? addedAt = null,Object? lastReadAt = freezed,Object? isArchived = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? providerId = freezed,Object? comicId = freezed,Object? comic = freezed,Object? addedAt = freezed,Object? lastReadAt = freezed,Object? isArchived = freezed,}) {
   return _then(UserFavorite(
-providerId: null == providerId ? _self.providerId : providerId // ignore: cast_nullable_to_non_nullable
-as String,comicId: null == comicId ? _self.comicId : comicId // ignore: cast_nullable_to_non_nullable
-as String,comic: freezed == comic ? _self.comic : comic // ignore: cast_nullable_to_non_nullable
-as Comic?,addedAt: null == addedAt ? _self.addedAt : addedAt // ignore: cast_nullable_to_non_nullable
-as String,lastReadAt: freezed == lastReadAt ? _self.lastReadAt : lastReadAt // ignore: cast_nullable_to_non_nullable
+providerId: freezed == providerId ? _self.providerId : providerId // ignore: cast_nullable_to_non_nullable
+as String?,comicId: freezed == comicId ? _self.comicId : comicId // ignore: cast_nullable_to_non_nullable
+as String?,comic: freezed == comic ? _self.comic : comic // ignore: cast_nullable_to_non_nullable
+as Comic?,addedAt: freezed == addedAt ? _self.addedAt : addedAt // ignore: cast_nullable_to_non_nullable
+as String?,lastReadAt: freezed == lastReadAt ? _self.lastReadAt : lastReadAt // ignore: cast_nullable_to_non_nullable
 as String?,isArchived: freezed == isArchived ? _self.isArchived : isArchived // ignore: cast_nullable_to_non_nullable
 as bool?,
   ));
@@ -171,7 +171,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'provider_id')  String providerId, @JsonKey(name: 'comic_id')  String comicId,  Comic? comic, @JsonKey(name: 'added_at')  String addedAt, @JsonKey(name: 'last_read_at')  String? lastReadAt, @JsonKey(name: 'is_archived')  bool? isArchived)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'provider_id')  String? providerId, @JsonKey(name: 'comic_id')  String? comicId,  Comic? comic, @JsonKey(name: 'added_at')  String? addedAt, @JsonKey(name: 'last_read_at')  String? lastReadAt, @JsonKey(name: 'is_archived')  bool? isArchived)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _UserFavorite() when $default != null:
 return $default(_that.providerId,_that.comicId,_that.comic,_that.addedAt,_that.lastReadAt,_that.isArchived);case _:
@@ -192,7 +192,7 @@ return $default(_that.providerId,_that.comicId,_that.comic,_that.addedAt,_that.l
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'provider_id')  String providerId, @JsonKey(name: 'comic_id')  String comicId,  Comic? comic, @JsonKey(name: 'added_at')  String addedAt, @JsonKey(name: 'last_read_at')  String? lastReadAt, @JsonKey(name: 'is_archived')  bool? isArchived)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'provider_id')  String? providerId, @JsonKey(name: 'comic_id')  String? comicId,  Comic? comic, @JsonKey(name: 'added_at')  String? addedAt, @JsonKey(name: 'last_read_at')  String? lastReadAt, @JsonKey(name: 'is_archived')  bool? isArchived)  $default,) {final _that = this;
 switch (_that) {
 case _UserFavorite():
 return $default(_that.providerId,_that.comicId,_that.comic,_that.addedAt,_that.lastReadAt,_that.isArchived);case _:
@@ -212,7 +212,7 @@ return $default(_that.providerId,_that.comicId,_that.comic,_that.addedAt,_that.l
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'provider_id')  String providerId, @JsonKey(name: 'comic_id')  String comicId,  Comic? comic, @JsonKey(name: 'added_at')  String addedAt, @JsonKey(name: 'last_read_at')  String? lastReadAt, @JsonKey(name: 'is_archived')  bool? isArchived)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'provider_id')  String? providerId, @JsonKey(name: 'comic_id')  String? comicId,  Comic? comic, @JsonKey(name: 'added_at')  String? addedAt, @JsonKey(name: 'last_read_at')  String? lastReadAt, @JsonKey(name: 'is_archived')  bool? isArchived)?  $default,) {final _that = this;
 switch (_that) {
 case _UserFavorite() when $default != null:
 return $default(_that.providerId,_that.comicId,_that.comic,_that.addedAt,_that.lastReadAt,_that.isArchived);case _:
@@ -227,13 +227,13 @@ return $default(_that.providerId,_that.comicId,_that.comic,_that.addedAt,_that.l
 @JsonSerializable()
 
 class _UserFavorite implements UserFavorite {
-  const _UserFavorite({@JsonKey(name: 'provider_id') required this.providerId, @JsonKey(name: 'comic_id') required this.comicId, this.comic, @JsonKey(name: 'added_at') required this.addedAt, @JsonKey(name: 'last_read_at') this.lastReadAt, @JsonKey(name: 'is_archived') this.isArchived});
+  const _UserFavorite({@JsonKey(name: 'provider_id') this.providerId, @JsonKey(name: 'comic_id') this.comicId, this.comic, @JsonKey(name: 'added_at') this.addedAt, @JsonKey(name: 'last_read_at') this.lastReadAt, @JsonKey(name: 'is_archived') this.isArchived});
   factory _UserFavorite.fromJson(Map<String, dynamic> json) => _$UserFavoriteFromJson(json);
 
-@override@JsonKey(name: 'provider_id') final  String providerId;
-@override@JsonKey(name: 'comic_id') final  String comicId;
+@override@JsonKey(name: 'provider_id') final  String? providerId;
+@override@JsonKey(name: 'comic_id') final  String? comicId;
 @override final  Comic? comic;
-@override@JsonKey(name: 'added_at') final  String addedAt;
+@override@JsonKey(name: 'added_at') final  String? addedAt;
 @override@JsonKey(name: 'last_read_at') final  String? lastReadAt;
 @override@JsonKey(name: 'is_archived') final  bool? isArchived;
 
@@ -270,7 +270,7 @@ abstract mixin class _$UserFavoriteCopyWith<$Res> implements $UserFavoriteCopyWi
   factory _$UserFavoriteCopyWith(_UserFavorite value, $Res Function(_UserFavorite) _then) = __$UserFavoriteCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: 'provider_id') String providerId,@JsonKey(name: 'comic_id') String comicId, Comic? comic,@JsonKey(name: 'added_at') String addedAt,@JsonKey(name: 'last_read_at') String? lastReadAt,@JsonKey(name: 'is_archived') bool? isArchived
+@JsonKey(name: 'provider_id') String? providerId,@JsonKey(name: 'comic_id') String? comicId, Comic? comic,@JsonKey(name: 'added_at') String? addedAt,@JsonKey(name: 'last_read_at') String? lastReadAt,@JsonKey(name: 'is_archived') bool? isArchived
 });
 
 
@@ -287,13 +287,13 @@ class __$UserFavoriteCopyWithImpl<$Res>
 
 /// Create a copy of UserFavorite
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? providerId = null,Object? comicId = null,Object? comic = freezed,Object? addedAt = null,Object? lastReadAt = freezed,Object? isArchived = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? providerId = freezed,Object? comicId = freezed,Object? comic = freezed,Object? addedAt = freezed,Object? lastReadAt = freezed,Object? isArchived = freezed,}) {
   return _then(_UserFavorite(
-providerId: null == providerId ? _self.providerId : providerId // ignore: cast_nullable_to_non_nullable
-as String,comicId: null == comicId ? _self.comicId : comicId // ignore: cast_nullable_to_non_nullable
-as String,comic: freezed == comic ? _self.comic : comic // ignore: cast_nullable_to_non_nullable
-as Comic?,addedAt: null == addedAt ? _self.addedAt : addedAt // ignore: cast_nullable_to_non_nullable
-as String,lastReadAt: freezed == lastReadAt ? _self.lastReadAt : lastReadAt // ignore: cast_nullable_to_non_nullable
+providerId: freezed == providerId ? _self.providerId : providerId // ignore: cast_nullable_to_non_nullable
+as String?,comicId: freezed == comicId ? _self.comicId : comicId // ignore: cast_nullable_to_non_nullable
+as String?,comic: freezed == comic ? _self.comic : comic // ignore: cast_nullable_to_non_nullable
+as Comic?,addedAt: freezed == addedAt ? _self.addedAt : addedAt // ignore: cast_nullable_to_non_nullable
+as String?,lastReadAt: freezed == lastReadAt ? _self.lastReadAt : lastReadAt // ignore: cast_nullable_to_non_nullable
 as String?,isArchived: freezed == isArchived ? _self.isArchived : isArchived // ignore: cast_nullable_to_non_nullable
 as bool?,
   ));
@@ -318,7 +318,7 @@ $ComicCopyWith<$Res>? get comic {
 /// @nodoc
 mixin _$UserInteraction {
 
-@JsonKey(name: 'provider_id') String get providerId;@JsonKey(name: 'comic_id') String get comicId;@JsonKey(name: 'is_favorite') bool get isFavorite;@JsonKey(name: 'last_read_chapter') String? get lastReadChapter;@JsonKey(name: 'last_read_page') int? get lastReadPage;@JsonKey(name: 'updated_at') String? get updatedAt;
+@JsonKey(name: 'provider_id') String? get providerId;@JsonKey(name: 'comic_id') String? get comicId;@JsonKey(name: 'is_favorite') bool get isFavorite;@JsonKey(name: 'last_read_chapter') String? get lastReadChapter;@JsonKey(name: 'last_read_page') int? get lastReadPage;@JsonKey(name: 'updated_at') String? get updatedAt;
 /// Create a copy of UserInteraction
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -351,7 +351,7 @@ abstract mixin class $UserInteractionCopyWith<$Res>  {
   factory $UserInteractionCopyWith(UserInteraction value, $Res Function(UserInteraction) _then) = _$UserInteractionCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(name: 'provider_id') String providerId,@JsonKey(name: 'comic_id') String comicId,@JsonKey(name: 'is_favorite') bool isFavorite,@JsonKey(name: 'last_read_chapter') String? lastReadChapter,@JsonKey(name: 'last_read_page') int? lastReadPage,@JsonKey(name: 'updated_at') String? updatedAt
+@JsonKey(name: 'provider_id') String? providerId,@JsonKey(name: 'comic_id') String? comicId,@JsonKey(name: 'is_favorite') bool isFavorite,@JsonKey(name: 'last_read_chapter') String? lastReadChapter,@JsonKey(name: 'last_read_page') int? lastReadPage,@JsonKey(name: 'updated_at') String? updatedAt
 });
 
 
@@ -368,11 +368,11 @@ class _$UserInteractionCopyWithImpl<$Res>
 
 /// Create a copy of UserInteraction
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? providerId = null,Object? comicId = null,Object? isFavorite = null,Object? lastReadChapter = freezed,Object? lastReadPage = freezed,Object? updatedAt = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? providerId = freezed,Object? comicId = freezed,Object? isFavorite = null,Object? lastReadChapter = freezed,Object? lastReadPage = freezed,Object? updatedAt = freezed,}) {
   return _then(UserInteraction(
-providerId: null == providerId ? _self.providerId : providerId // ignore: cast_nullable_to_non_nullable
-as String,comicId: null == comicId ? _self.comicId : comicId // ignore: cast_nullable_to_non_nullable
-as String,isFavorite: null == isFavorite ? _self.isFavorite : isFavorite // ignore: cast_nullable_to_non_nullable
+providerId: freezed == providerId ? _self.providerId : providerId // ignore: cast_nullable_to_non_nullable
+as String?,comicId: freezed == comicId ? _self.comicId : comicId // ignore: cast_nullable_to_non_nullable
+as String?,isFavorite: null == isFavorite ? _self.isFavorite : isFavorite // ignore: cast_nullable_to_non_nullable
 as bool,lastReadChapter: freezed == lastReadChapter ? _self.lastReadChapter : lastReadChapter // ignore: cast_nullable_to_non_nullable
 as String?,lastReadPage: freezed == lastReadPage ? _self.lastReadPage : lastReadPage // ignore: cast_nullable_to_non_nullable
 as int?,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
@@ -461,7 +461,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'provider_id')  String providerId, @JsonKey(name: 'comic_id')  String comicId, @JsonKey(name: 'is_favorite')  bool isFavorite, @JsonKey(name: 'last_read_chapter')  String? lastReadChapter, @JsonKey(name: 'last_read_page')  int? lastReadPage, @JsonKey(name: 'updated_at')  String? updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'provider_id')  String? providerId, @JsonKey(name: 'comic_id')  String? comicId, @JsonKey(name: 'is_favorite')  bool isFavorite, @JsonKey(name: 'last_read_chapter')  String? lastReadChapter, @JsonKey(name: 'last_read_page')  int? lastReadPage, @JsonKey(name: 'updated_at')  String? updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _UserInteraction() when $default != null:
 return $default(_that.providerId,_that.comicId,_that.isFavorite,_that.lastReadChapter,_that.lastReadPage,_that.updatedAt);case _:
@@ -482,7 +482,7 @@ return $default(_that.providerId,_that.comicId,_that.isFavorite,_that.lastReadCh
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'provider_id')  String providerId, @JsonKey(name: 'comic_id')  String comicId, @JsonKey(name: 'is_favorite')  bool isFavorite, @JsonKey(name: 'last_read_chapter')  String? lastReadChapter, @JsonKey(name: 'last_read_page')  int? lastReadPage, @JsonKey(name: 'updated_at')  String? updatedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'provider_id')  String? providerId, @JsonKey(name: 'comic_id')  String? comicId, @JsonKey(name: 'is_favorite')  bool isFavorite, @JsonKey(name: 'last_read_chapter')  String? lastReadChapter, @JsonKey(name: 'last_read_page')  int? lastReadPage, @JsonKey(name: 'updated_at')  String? updatedAt)  $default,) {final _that = this;
 switch (_that) {
 case _UserInteraction():
 return $default(_that.providerId,_that.comicId,_that.isFavorite,_that.lastReadChapter,_that.lastReadPage,_that.updatedAt);case _:
@@ -502,7 +502,7 @@ return $default(_that.providerId,_that.comicId,_that.isFavorite,_that.lastReadCh
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'provider_id')  String providerId, @JsonKey(name: 'comic_id')  String comicId, @JsonKey(name: 'is_favorite')  bool isFavorite, @JsonKey(name: 'last_read_chapter')  String? lastReadChapter, @JsonKey(name: 'last_read_page')  int? lastReadPage, @JsonKey(name: 'updated_at')  String? updatedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'provider_id')  String? providerId, @JsonKey(name: 'comic_id')  String? comicId, @JsonKey(name: 'is_favorite')  bool isFavorite, @JsonKey(name: 'last_read_chapter')  String? lastReadChapter, @JsonKey(name: 'last_read_page')  int? lastReadPage, @JsonKey(name: 'updated_at')  String? updatedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _UserInteraction() when $default != null:
 return $default(_that.providerId,_that.comicId,_that.isFavorite,_that.lastReadChapter,_that.lastReadPage,_that.updatedAt);case _:
@@ -517,11 +517,11 @@ return $default(_that.providerId,_that.comicId,_that.isFavorite,_that.lastReadCh
 @JsonSerializable()
 
 class _UserInteraction implements UserInteraction {
-  const _UserInteraction({@JsonKey(name: 'provider_id') required this.providerId, @JsonKey(name: 'comic_id') required this.comicId, @JsonKey(name: 'is_favorite') required this.isFavorite, @JsonKey(name: 'last_read_chapter') this.lastReadChapter, @JsonKey(name: 'last_read_page') this.lastReadPage, @JsonKey(name: 'updated_at') this.updatedAt});
+  const _UserInteraction({@JsonKey(name: 'provider_id') this.providerId, @JsonKey(name: 'comic_id') this.comicId, @JsonKey(name: 'is_favorite') required this.isFavorite, @JsonKey(name: 'last_read_chapter') this.lastReadChapter, @JsonKey(name: 'last_read_page') this.lastReadPage, @JsonKey(name: 'updated_at') this.updatedAt});
   factory _UserInteraction.fromJson(Map<String, dynamic> json) => _$UserInteractionFromJson(json);
 
-@override@JsonKey(name: 'provider_id') final  String providerId;
-@override@JsonKey(name: 'comic_id') final  String comicId;
+@override@JsonKey(name: 'provider_id') final  String? providerId;
+@override@JsonKey(name: 'comic_id') final  String? comicId;
 @override@JsonKey(name: 'is_favorite') final  bool isFavorite;
 @override@JsonKey(name: 'last_read_chapter') final  String? lastReadChapter;
 @override@JsonKey(name: 'last_read_page') final  int? lastReadPage;
@@ -560,7 +560,7 @@ abstract mixin class _$UserInteractionCopyWith<$Res> implements $UserInteraction
   factory _$UserInteractionCopyWith(_UserInteraction value, $Res Function(_UserInteraction) _then) = __$UserInteractionCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: 'provider_id') String providerId,@JsonKey(name: 'comic_id') String comicId,@JsonKey(name: 'is_favorite') bool isFavorite,@JsonKey(name: 'last_read_chapter') String? lastReadChapter,@JsonKey(name: 'last_read_page') int? lastReadPage,@JsonKey(name: 'updated_at') String? updatedAt
+@JsonKey(name: 'provider_id') String? providerId,@JsonKey(name: 'comic_id') String? comicId,@JsonKey(name: 'is_favorite') bool isFavorite,@JsonKey(name: 'last_read_chapter') String? lastReadChapter,@JsonKey(name: 'last_read_page') int? lastReadPage,@JsonKey(name: 'updated_at') String? updatedAt
 });
 
 
@@ -577,11 +577,11 @@ class __$UserInteractionCopyWithImpl<$Res>
 
 /// Create a copy of UserInteraction
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? providerId = null,Object? comicId = null,Object? isFavorite = null,Object? lastReadChapter = freezed,Object? lastReadPage = freezed,Object? updatedAt = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? providerId = freezed,Object? comicId = freezed,Object? isFavorite = null,Object? lastReadChapter = freezed,Object? lastReadPage = freezed,Object? updatedAt = freezed,}) {
   return _then(_UserInteraction(
-providerId: null == providerId ? _self.providerId : providerId // ignore: cast_nullable_to_non_nullable
-as String,comicId: null == comicId ? _self.comicId : comicId // ignore: cast_nullable_to_non_nullable
-as String,isFavorite: null == isFavorite ? _self.isFavorite : isFavorite // ignore: cast_nullable_to_non_nullable
+providerId: freezed == providerId ? _self.providerId : providerId // ignore: cast_nullable_to_non_nullable
+as String?,comicId: freezed == comicId ? _self.comicId : comicId // ignore: cast_nullable_to_non_nullable
+as String?,isFavorite: null == isFavorite ? _self.isFavorite : isFavorite // ignore: cast_nullable_to_non_nullable
 as bool,lastReadChapter: freezed == lastReadChapter ? _self.lastReadChapter : lastReadChapter // ignore: cast_nullable_to_non_nullable
 as String?,lastReadPage: freezed == lastReadPage ? _self.lastReadPage : lastReadPage // ignore: cast_nullable_to_non_nullable
 as int?,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable

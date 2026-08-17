@@ -8,12 +8,12 @@ part of 'user_interaction.dart';
 
 _UserFavorite _$UserFavoriteFromJson(Map<String, dynamic> json) =>
     _UserFavorite(
-      providerId: json['provider_id'] as String,
-      comicId: json['comic_id'] as String,
+      providerId: json['provider_id'] as String?,
+      comicId: json['comic_id'] as String?,
       comic: json['comic'] == null
           ? null
           : Comic.fromJson(json['comic'] as Map<String, dynamic>),
-      addedAt: json['added_at'] as String,
+      addedAt: json['added_at'] as String?,
       lastReadAt: json['last_read_at'] as String?,
       isArchived: json['is_archived'] as bool?,
     );
@@ -30,8 +30,8 @@ Map<String, dynamic> _$UserFavoriteToJson(_UserFavorite instance) =>
 
 _UserInteraction _$UserInteractionFromJson(Map<String, dynamic> json) =>
     _UserInteraction(
-      providerId: json['provider_id'] as String,
-      comicId: json['comic_id'] as String,
+      providerId: json['provider_id'] as String?,
+      comicId: json['comic_id'] as String?,
       isFavorite: json['is_favorite'] as bool,
       lastReadChapter: json['last_read_chapter'] as String?,
       lastReadPage: (json['last_read_page'] as num?)?.toInt(),

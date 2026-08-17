@@ -6,9 +6,9 @@ part 'comic.g.dart';
 @freezed
 abstract class Comic with _$Comic {
   const factory Comic({
-    @JsonKey(name: 'id') required String comicId,
+    @JsonKey(name: 'id') String? comicId,
     @JsonKey(name: 'provider_id') String? providerId,
-    required String title,
+    String? title,
     @JsonKey(name: 'cover_url') String? coverUrl,
     String? description,
     List<String>? tags,

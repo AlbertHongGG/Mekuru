@@ -84,7 +84,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> with SingleTickerProv
     if (_searchQuery.isNotEmpty) {
       final q = _searchQuery.toLowerCase();
       result = result.where((f) {
-        final title = f.comic!.title.toLowerCase();
+        final title = (f.comic!.title ?? '').toLowerCase();
         final author = f.comic!.author?.toLowerCase() ?? '';
         return title.contains(q) || author.contains(q);
       }).toList();
@@ -94,8 +94,8 @@ class _LibraryPageState extends ConsumerState<LibraryPage> with SingleTickerProv
     result = List.from(result); // Copy to sort
     result.sort((a, b) {
       if (sortMode == 'added') {
-        final timeA = DateTime.tryParse(a.addedAt) ?? DateTime.fromMillisecondsSinceEpoch(0);
-        final timeB = DateTime.tryParse(b.addedAt) ?? DateTime.fromMillisecondsSinceEpoch(0);
+        final timeA = DateTime.tryParse(a.addedAt ?? '') ?? DateTime.fromMillisecondsSinceEpoch(0);
+        final timeB = DateTime.tryParse(b.addedAt ?? '') ?? DateTime.fromMillisecondsSinceEpoch(0);
         return timeB.compareTo(timeA);
       } else if (sortMode == 'read') {
         final timeA = a.lastReadAt != null ? (DateTime.tryParse(a.lastReadAt!) ?? DateTime.fromMillisecondsSinceEpoch(0)) : DateTime.fromMillisecondsSinceEpoch(0);
@@ -103,8 +103,8 @@ class _LibraryPageState extends ConsumerState<LibraryPage> with SingleTickerProv
         return timeB.compareTo(timeA);
       } else {
         // updated fallback to added
-        final timeA = DateTime.tryParse(a.addedAt) ?? DateTime.fromMillisecondsSinceEpoch(0);
-        final timeB = DateTime.tryParse(b.addedAt) ?? DateTime.fromMillisecondsSinceEpoch(0);
+        final timeA = DateTime.tryParse(a.addedAt ?? '') ?? DateTime.fromMillisecondsSinceEpoch(0);
+        final timeB = DateTime.tryParse(b.addedAt ?? '') ?? DateTime.fromMillisecondsSinceEpoch(0);
         return timeB.compareTo(timeA);
       }
     });

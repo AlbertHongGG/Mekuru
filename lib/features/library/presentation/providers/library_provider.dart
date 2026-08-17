@@ -46,7 +46,8 @@ class LibraryNotifier extends Notifier<LibraryState> {
       // Fetch full comic data concurrently
       final futures = rawFavorites.map((fav) async {
         try {
-          final comic = await sourceRepo.getComic(fav.providerId, fav.comicId);
+          if (fav.providerId == null || fav.comicId == null) return null;
+          final comic = await sourceRepo.getComic(fav.providerId!, fav.comicId!);
           return fav.copyWith(comic: comic);
         } catch (e) {
           return null; // Ignore errors for individual comics

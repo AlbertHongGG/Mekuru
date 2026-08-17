@@ -1,0 +1,20 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'comic.freezed.dart';
+part 'comic.g.dart';
+
+@freezed
+abstract class Comic with _$Comic {
+  const factory Comic({
+    @JsonKey(name: 'id') required String comicId,
+    @JsonKey(name: 'provider_id') String? providerId,
+    required String title,
+    @JsonKey(name: 'cover_url') String? coverUrl,
+    String? description,
+    List<String>? tags,
+    String? author,
+    @JsonKey(name: 'update_status') String? status,
+  }) = _Comic;
+
+  factory Comic.fromJson(Map<String, dynamic> json) => _$ComicFromJson(json);
+}

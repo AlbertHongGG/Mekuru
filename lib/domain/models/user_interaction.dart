@@ -9,7 +9,7 @@ abstract class UserFavorite with _$UserFavorite {
   const factory UserFavorite({
     @JsonKey(name: 'provider_id') required String providerId,
     @JsonKey(name: 'comic_id') required String comicId,
-    required Comic comic,
+    Comic? comic,
     @JsonKey(name: 'added_at') required String addedAt,
     @JsonKey(name: 'last_read_at') String? lastReadAt,
     @JsonKey(name: 'is_archived') bool? isArchived,

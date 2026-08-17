@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mekuru/data/repositories/comic_source_repository.dart';
+import 'package:mekuru/data/providers/repository_providers.dart';
 import 'package:mekuru/data/repositories/user_interaction_repository.dart';
 import 'package:mekuru/domain/models/page.dart';
 
@@ -37,7 +37,7 @@ class ComicViewerNotifier extends AutoDisposeFamilyNotifier<ComicViewerState, ({
   Future<void> loadPages() async {
     state = state.copyWith(isLoading: true, error: null);
     try {
-      final repo = ref.read(comicSourceRepositoryProvider);
+      final repo = ref.read(comicRepositoryProvider);
       final pages = await repo.getChapterImages(arg.providerId, arg.comicId, arg.chapterId);
 
       state = state.copyWith(

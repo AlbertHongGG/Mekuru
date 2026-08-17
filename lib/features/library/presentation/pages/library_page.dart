@@ -80,12 +80,12 @@ class _LibraryPageState extends ConsumerState<LibraryPage> with SingleTickerProv
 
   Widget _buildGridView(List<UserFavorite> favorites, String sortMode) {
     // 1. Filter
-    var result = favorites;
+    var result = favorites.where((f) => f.comic != null).toList();
     if (_searchQuery.isNotEmpty) {
       final q = _searchQuery.toLowerCase();
       result = result.where((f) {
-        final title = f.comic.title.toLowerCase();
-        final author = f.comic.author?.toLowerCase() ?? '';
+        final title = f.comic!.title.toLowerCase();
+        final author = f.comic!.author?.toLowerCase() ?? '';
         return title.contains(q) || author.contains(q);
       }).toList();
     }
@@ -117,7 +117,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> with SingleTickerProv
       onRefresh: () => ref.read(libraryProvider.notifier).loadLibrary(),
       color: AppColors.primary,
       child: ResponsiveComicGrid(
-        comics: result.map((e) => e.comic).toList(),
+        comics: result.where((e) => e.comic != null).map((e) => e.comic!).toList(),
         onTap: (comic) {
           context.push('/details/${comic.providerId ?? "comicwifi"}/${comic.comicId}');
         },

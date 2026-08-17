@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mekuru/data/repositories/comic_source_repository.dart';
+import 'package:mekuru/data/providers/repository_providers.dart';
 import 'package:mekuru/domain/models/comic.dart';
 
 class ExploreState {
@@ -51,7 +51,7 @@ class ExploreNotifier extends Notifier<ExploreState> {
   Future<void> loadExplore({bool loadMore = false}) async {
     if (state.isLoading || (!state.hasNext && loadMore)) return;
 
-    final repo = ref.read(comicSourceRepositoryProvider);
+    final repo = ref.read(comicRepositoryProvider);
     final nextPage = loadMore ? state.page + 1 : 1;
 
     if (!loadMore) {
@@ -61,7 +61,7 @@ class ExploreNotifier extends Notifier<ExploreState> {
     }
 
     try {
-      final result = await repo.explore(_providerId, page: nextPage);
+      final result = await repo.explore(providerId: _providerId, page: nextPage);
       state = state.copyWith(
         isLoading: false,
         comics: loadMore ? [...state.comics, ...result.comics] : result.comics,
@@ -78,12 +78,12 @@ class ExploreNotifier extends Notifier<ExploreState> {
       return loadExplore();
     }
 
-    final repo = ref.read(comicSourceRepositoryProvider);
+    final repo = ref.read(comicRepositoryProvider);
     
     state = state.copyWith(isLoading: true, comics: [], error: null, searchQuery: query, page: 1, hasNext: false);
 
     try {
-      final result = await repo.search(query, _providerId);
+      final result = await repo.search(query, providerId: _providerId);
       state = state.copyWith(
         isLoading: false,
         comics: result.comics,

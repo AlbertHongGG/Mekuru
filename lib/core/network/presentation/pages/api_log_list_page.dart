@@ -296,7 +296,7 @@ class _ApiLogListPageState extends ConsumerState<ApiLogListPage>
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ApiLogDetailPage(log: log),
+        builder: (context) => ApiLogDetailPage(shallowLog: log),
       ),
     );
   }

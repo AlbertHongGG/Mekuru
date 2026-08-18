@@ -1,4 +1,4 @@
-﻿import 'package:uuid/uuid.dart';
+import 'package:uuid/uuid.dart';
 
 class ApiLogEntry {
   final String id;
@@ -58,6 +58,42 @@ class ApiLogEntry {
       requestTime: requestTime ?? this.requestTime,
       responseTime: responseTime ?? this.responseTime,
       error: error ?? this.error,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'method': method,
+      'url': url,
+      'requestHeaders': requestHeaders,
+      'requestBody': requestBody,
+      'statusCode': statusCode,
+      'responseHeaders': responseHeaders,
+      'responseBody': responseBody,
+      'requestTime': requestTime.toIso8601String(),
+      'responseTime': responseTime?.toIso8601String(),
+      'error': error,
+    };
+  }
+
+  factory ApiLogEntry.fromJson(Map<String, dynamic> json) {
+    return ApiLogEntry(
+      id: json['id'],
+      method: json['method'],
+      url: json['url'],
+      requestHeaders: Map<String, dynamic>.from(json['requestHeaders'] ?? {}),
+      requestBody: json['requestBody'],
+      statusCode: json['statusCode'],
+      responseHeaders: json['responseHeaders'] != null 
+          ? Map<String, dynamic>.from(json['responseHeaders']) 
+          : null,
+      responseBody: json['responseBody'],
+      requestTime: DateTime.parse(json['requestTime']),
+      responseTime: json['responseTime'] != null 
+          ? DateTime.parse(json['responseTime']) 
+          : null,
+      error: json['error'],
     );
   }
 }

@@ -1,20 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mekuru/core/theme/app_colors.dart';
 import 'package:mekuru/core/widgets/json_tree_viewer.dart';
 import '../../models/api_log_entry.dart';
+import '../../providers/api_logger_provider.dart';
 
-class ApiLogDetailPage extends StatelessWidget {
-  final ApiLogEntry log;
+class ApiLogDetailPage extends ConsumerWidget {
+  final ApiLogEntry shallowLog;
 
   const ApiLogDetailPage({
     super.key,
-    required this.log,
+    required this.shallowLog,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    // Lazy-load the full log payload
+    final fullLogAsync = ref.watch(apiLogDetailProvider(shallowLog.id));
     
     return Scaffold(
       backgroundColor: isDark
@@ -28,43 +33,67 @@ class ApiLogDetailPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildUnifiedHeaderBlock(context, isDark),
+                  // Header can be rendered immediately using shallow metadata
+                  _buildUnifiedHeaderBlock(context, isDark, shallowLog),
                   const SizedBox(height: 24),
 
-                  if (log.requestHeaders.isNotEmpty) ...[
-                    JsonTreeViewer(
-                      data: log.requestHeaders,
-                      isDark: isDark,
-                      rootName: 'Request Headers',
-                    ),
-                    const SizedBox(height: 8),
-                  ],
+                  fullLogAsync.when(
+                    data: (fullLog) {
+                      if (fullLog == null) {
+                        return const Center(child: Text('日誌檔案已遺失'));
+                      }
+                      
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (fullLog.requestHeaders.isNotEmpty) ...[
+                            JsonTreeViewer(
+                              data: fullLog.requestHeaders,
+                              isDark: isDark,
+                              rootName: 'Request Headers',
+                            ),
+                            const SizedBox(height: 8),
+                          ],
 
-                  if (log.requestBody != null) ...[
-                    JsonTreeViewer(
-                      data: log.requestBody,
-                      isDark: isDark,
-                      rootName: 'Request Body',
-                    ),
-                    const SizedBox(height: 8),
-                  ],
+                          if (fullLog.requestBody != null) ...[
+                            JsonTreeViewer(
+                              data: fullLog.requestBody,
+                              isDark: isDark,
+                              rootName: 'Request Body',
+                            ),
+                            const SizedBox(height: 8),
+                          ],
 
-                  if (log.responseHeaders != null && log.responseHeaders!.isNotEmpty) ...[
-                    JsonTreeViewer(
-                      data: log.responseHeaders,
-                      isDark: isDark,
-                      rootName: 'Response Headers',
-                    ),
-                    const SizedBox(height: 8),
-                  ],
+                          if (fullLog.responseHeaders != null && fullLog.responseHeaders!.isNotEmpty) ...[
+                            JsonTreeViewer(
+                              data: fullLog.responseHeaders,
+                              isDark: isDark,
+                              rootName: 'Response Headers',
+                            ),
+                            const SizedBox(height: 8),
+                          ],
 
-                  if (log.responseBody != null) ...[
-                    JsonTreeViewer(
-                      data: log.responseBody,
-                      isDark: isDark,
-                      rootName: 'Response Body',
+                          if (fullLog.responseBody != null) ...[
+                            JsonTreeViewer(
+                              data: fullLog.responseBody,
+                              isDark: isDark,
+                              rootName: 'Response Body',
+                            ),
+                          ],
+                        ],
+                      );
+                    },
+                    loading: () => Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(32.0),
+                        child: CircularProgressIndicator(
+                          color: isDark ? Colors.white54 : Colors.black54,
+                          strokeWidth: 2,
+                        ),
+                      ),
                     ),
-                  ],
+                    error: (e, st) => Center(child: Text('解析錯誤: $e')),
+                  ),
                 ],
               ),
             ),
@@ -89,7 +118,7 @@ class ApiLogDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildUnifiedHeaderBlock(BuildContext context, bool isDark) {
+  Widget _buildUnifiedHeaderBlock(BuildContext context, bool isDark, ApiLogEntry log) {
     Color statusColor = Colors.grey;
     if (log.statusCode != null) {
       if (log.statusCode! >= 200 && log.statusCode! < 300) {
@@ -121,7 +150,6 @@ class ApiLogDetailPage extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Solid Method Tag
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
@@ -139,7 +167,6 @@ class ApiLogDetailPage extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               
-              // Status Code
               if (log.statusCode != null)
                 Text(
                   '${log.statusCode}',
@@ -158,7 +185,6 @@ class ApiLogDetailPage extends StatelessWidget {
                 
               const Spacer(),
               
-              // Copy Button
               InkWell(
                 onTap: () {
                   Clipboard.setData(ClipboardData(text: log.url));
@@ -184,7 +210,6 @@ class ApiLogDetailPage extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           
-          // URL
           SelectableText(
             log.url,
             style: TextStyle(
@@ -199,7 +224,6 @@ class ApiLogDetailPage extends StatelessWidget {
           Divider(height: 1, color: isDark ? Colors.white12 : Colors.black12),
           const SizedBox(height: 10),
           
-          // Metadata
           Row(
             children: [
               Text(

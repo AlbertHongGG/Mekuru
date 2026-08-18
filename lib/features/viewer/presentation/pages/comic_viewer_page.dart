@@ -43,8 +43,6 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
   }
 
   void _onScroll() {
-    // Basic tracking of current page based on scroll position
-    // Since images have different heights, this is a rough estimate.
     final position = _scrollController.position.pixels;
     final maxScroll = _scrollController.position.maxScrollExtent;
     final state = ref.read(comicViewerProvider((providerId: widget.providerId, comicId: widget.comicId, chapterId: widget.chapterId)));
@@ -56,7 +54,6 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
     
     if (currentPage != _lastReportedPage) {
       _lastReportedPage = currentPage;
-      // Debounce or send interaction update
       ref.read(comicViewerProvider((providerId: widget.providerId, comicId: widget.comicId, chapterId: widget.chapterId)).notifier)
           .updateReadPage(currentPage);
       setState(() {});
@@ -103,7 +100,6 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
   }
 
   void _navigateToChapter(String chapterId) {
-    // Replace current route with new chapter
     context.pushReplacement('/viewer/${widget.providerId}/${widget.comicId}/$chapterId');
   }
 
@@ -115,22 +111,15 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
     final detailsArg = (providerId: widget.providerId, comicId: widget.comicId);
     final detailsState = ref.watch(comicDetailsProvider(detailsArg));
 
-    // Determine current, prev, next chapter
     String chapterTitle = '載入中...';
     String comicTitle = detailsState.comic?.title ?? '';
     String? prevChapterId;
     String? nextChapterId;
 
     if (detailsState.chapters.isNotEmpty) {
-      // Find current chapter index (assume chapters is chronologically ascending for standard logic)
-      // Usually API returns descending, but let's just find index
       final index = detailsState.chapters.indexWhere((c) => c.id == widget.chapterId);
       if (index != -1) {
         chapterTitle = detailsState.chapters[index].title;
-        // Logic for prev/next depends on how the list is ordered. 
-        // If index 0 is oldest (ascending), prev is index-1.
-        // If index 0 is newest (descending), prev is index+1.
-        // We'll rely on the original chronological order assuming the standard is newest first in detailsState.chapters.
         final isDesc = detailsState.isChapterSortDescending;
         
         final chronologicallyPrevIndex = isDesc ? index + 1 : index - 1;
@@ -144,8 +133,6 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
         }
       }
     }
-
-    
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -221,7 +208,6 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
                   padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
                   child: Row(
                     children: [
-                      // Title Info
                       Expanded(
                         child: Padding(
                           padding: const EdgeInsets.only(left: 8.0),
@@ -245,7 +231,6 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
                           ),
                         ),
                       ),
-                      // Action Buttons
                       IconButton(
                         icon: const Icon(Icons.info_outline_rounded, color: Colors.white),
                         onPressed: () => context.pop(),
@@ -281,41 +266,59 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
                 top: false,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // Page Indicator
-                      if (state.pages.isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 8.0),
-                          child: Text(
-                            '${_lastReportedPage + 1} / ${state.pages.length}',
-                            style: const TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                      // Navigation Row
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          TextButton.icon(
+                      Expanded(
+                        flex: 1,
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: TextButton.icon(
                             onPressed: prevChapterId != null ? () => _navigateToChapter(prevChapterId!) : null,
                             icon: const Icon(Icons.skip_previous_rounded),
                             label: const Text('上一話'),
                             style: TextButton.styleFrom(
                               foregroundColor: Colors.white,
                               disabledForegroundColor: Colors.white30,
+                              padding: const EdgeInsets.symmetric(horizontal: 4),
                             ),
                           ),
-                          TextButton.icon(
-                            onPressed: nextChapterId != null ? () => _navigateToChapter(nextChapterId!) : null,
-                            label: const Text('下一話'),
-                            icon: const Icon(Icons.skip_next_rounded),
-                            style: TextButton.styleFrom(
-                              foregroundColor: Colors.white,
-                              disabledForegroundColor: Colors.white30,
+                        ),
+                      ),
+                      Expanded(
+                        flex: 1,
+                        child: Center(
+                          child: state.pages.isNotEmpty
+                              ? Text(
+                                  '${_lastReportedPage + 1} / ${state.pages.length}',
+                                  style: const TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Outfit',
+                                  ),
+                                )
+                              : const SizedBox.shrink(),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 1,
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: Directionality(
+                            textDirection: TextDirection.rtl,
+                            child: TextButton.icon(
+                              onPressed: nextChapterId != null ? () => _navigateToChapter(nextChapterId!) : null,
+                              label: const Text('下一話'),
+                              icon: const Icon(Icons.skip_next_rounded),
+                              style: TextButton.styleFrom(
+                                foregroundColor: Colors.white,
+                                disabledForegroundColor: Colors.white30,
+                                padding: const EdgeInsets.symmetric(horizontal: 4),
+                              ),
                             ),
                           ),
-                        ],
+                        ),
                       ),
                     ],
                   ),

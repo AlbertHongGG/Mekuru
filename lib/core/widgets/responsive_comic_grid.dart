@@ -25,7 +25,8 @@ class ResponsiveComicGrid extends StatelessWidget {
       controller: controller,
       slivers: [
         SliverPadding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+          // Unified padding for the entire list
+          padding: EdgeInsets.only(left: 12, right: 12, top: 12, bottom: hasNext ? 24 : 12),
           sliver: SliverGrid(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
@@ -35,34 +36,22 @@ class ResponsiveComicGrid extends StatelessWidget {
             ),
             delegate: SliverChildBuilderDelegate(
               (context, index) {
-                final comic = comics[index];
-                return ComicCard(
-                  comic: comic,
-                  onTap: () => onTap(comic),
-                );
+                // Unified polymorphic builder sink
+                if (index < comics.length) {
+                  final comic = comics[index];
+                  return ComicCard(
+                    comic: comic,
+                    onTap: () => onTap(comic),
+                  );
+                } else {
+                  return const _ShimmerComicCard();
+                }
               },
-              childCount: comics.length,
+              // Total count includes both data items and loading skeletons
+              childCount: comics.length + (hasNext ? 4 : 0),
             ),
           ),
         ),
-        if (hasNext)
-          SliverPadding(
-            padding: const EdgeInsets.only(left: 12, right: 12, bottom: 24),
-            sliver: SliverGrid(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 0.75,
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 12,
-              ),
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  return const _ShimmerComicCard();
-                },
-                childCount: 4, // Show 4 skeleton cards
-              ),
-            ),
-          ),
       ],
     );
   }

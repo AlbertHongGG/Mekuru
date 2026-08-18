@@ -39,7 +39,7 @@ class ComicDetailsPage extends ConsumerWidget {
                   providerId: providerId,
                   comicId: comicId,
                   chapters: bottomState.chapters,
-                  lastReadChapterId: bottomState.interaction?.lastReadChapter,
+                  lastReadChapterId: bottomState.interaction?.lastReadChapterId,
                   isSortDescending: bottomState.isChapterSortDescending,
                   onToggleSort: () => bottomNotifier.toggleChapterSort(),
                 ),
@@ -72,11 +72,11 @@ class ComicDetailsPage extends ConsumerWidget {
             children: [
               const Icon(Icons.error_outline, size: 48, color: Colors.red),
               const SizedBox(height: 16),
-              Text('發生錯誤: ${state.error ?? "找不到漫畫資料"}'),
+              Text('錯誤: ${state.error ?? "無法載入漫畫資訊"}'),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () => notifier.loadDetails(),
-                child: const Text('重試'),
+                child: const Text('重新載入'),
               ),
             ],
           ),
@@ -86,7 +86,7 @@ class ComicDetailsPage extends ConsumerWidget {
 
     final comic = state.comic!;
     final isFavorite = state.interaction?.isFavorite ?? false;
-    final lastReadChapterId = state.interaction?.lastReadChapter;
+    final lastReadChapterId = state.interaction?.lastReadChapterId;
 
     return Scaffold(
       body: CustomScrollView(
@@ -177,7 +177,7 @@ class ComicDetailsPage extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    comic.title ?? '無標題',
+                    comic.title ?? '未知漫畫',
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -238,9 +238,10 @@ class ComicDetailsPage extends ConsumerWidget {
             children: [
               Expanded(
                 child: ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (state.chapters.isEmpty) return;
-                    String targetChapterId = state.chapters.last.id; // Default to oldest/first chapter
+                    // Default to oldest/first chapter: if sort descending, it's the last element. Else, it's the first.
+                    String targetChapterId = state.isChapterSortDescending ? state.chapters.last.id : state.chapters.first.id;
                     
                     if (lastReadChapterId != null) {
                       // Validate if chapter still exists
@@ -248,7 +249,9 @@ class ComicDetailsPage extends ConsumerWidget {
                       if (exists) targetChapterId = lastReadChapterId;
                     }
                     
-                    context.push('/viewer/$providerId/$comicId/$targetChapterId');
+                    await context.push('/viewer/$providerId/$comicId/$targetChapterId');
+                    // Refresh when returning from viewer
+                    notifier.refreshInteraction();
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,

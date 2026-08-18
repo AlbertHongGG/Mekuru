@@ -1,38 +1,119 @@
-import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mekuru/core/network/api_client.dart';
-import 'package:mekuru/domain/models/user_interaction.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:mekuru/domain/models/local_comic_record.dart';
+import 'package:mekuru/domain/models/comic.dart';
+import 'package:mekuru/domain/models/chapter.dart';
+import 'package:mekuru/features/settings/presentation/providers/settings_provider.dart';
 
 class UserInteractionRepository {
-  final Dio _dio;
+  final Box<LocalComicRecord> _box;
+  final Ref _ref;
 
-  UserInteractionRepository(this._dio);
+  UserInteractionRepository(this._box, this._ref);
 
-  Future<List<UserFavorite>> getFavorites() async {
-    final response = await _dio.get('/api/v1/user/favorites');
-    final data = response.data as List;
-    return data.map((json) => UserFavorite.fromJson(json)).toList();
+  String get _currentMode => _ref.read(settingsProvider).dataSourceMode;
+
+  String _genId(String dataSourceMode, String providerId, String comicId) {
+    return '${dataSourceMode}_${providerId}_$comicId';
   }
 
-  Future<void> markRead(String providerId, String comicId, {String? chapterId, int? pageIndex}) async {
-    await _dio.post('/api/v1/user/interactions/$providerId/$comicId/read', data: {
-      if (chapterId != null) 'chapter_id': chapterId,
-      if (pageIndex != null) 'page_index': pageIndex,
-    });
+  Future<List<LocalComicRecord>> getFavorites() async {
+    final mode = _currentMode;
+    return _box.values
+        .where((r) => r.dataSourceMode == mode && r.isFavorite)
+        .toList()
+      ..sort((a, b) => (b.favoriteAt ?? b.updatedAt).compareTo(a.favoriteAt ?? a.updatedAt));
+  }
+  
+  Future<List<LocalComicRecord>> getHistory() async {
+    final mode = _currentMode;
+    return _box.values
+        .where((r) => r.dataSourceMode == mode)
+        .toList()
+      ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
   }
 
-  Future<UserInteraction> getInteraction(String providerId, String comicId) async {
-    final response = await _dio.get('/api/v1/user/interactions/$providerId/$comicId');
-    return UserInteraction.fromJson(response.data);
+  Future<void> markRead({
+    required String providerId,
+    required String comicId,
+    required Comic comic,
+    required String chapterId,
+    required String chapterTitle,
+    int? pageIndex,
+  }) async {
+    final mode = _currentMode;
+    final id = _genId(mode, providerId, comicId);
+    
+    final existing = _box.get(id);
+    final now = DateTime.now();
+
+    final record = existing != null
+        ? existing.copyWith(
+            title: comic.title ?? '',
+            coverUrl: comic.coverUrl ?? '',
+            lastReadChapterId: chapterId,
+            lastReadChapterTitle: chapterTitle,
+            lastReadPageIndex: pageIndex ?? existing.lastReadPageIndex,
+            updatedAt: now,
+          )
+        : LocalComicRecord(
+            id: id,
+            dataSourceMode: mode,
+            providerId: providerId,
+            comicId: comic.comicId ?? '',
+            title: comic.title ?? '',
+            coverUrl: comic.coverUrl ?? '',
+            lastReadChapterId: chapterId,
+            lastReadChapterTitle: chapterTitle,
+            lastReadPageIndex: pageIndex,
+            updatedAt: now,
+            isFavorite: false,
+          );
+
+    await _box.put(id, record);
   }
 
-  Future<void> toggleFavorite(String providerId, String comicId, bool isFavorite) async {
-    await _dio.post('/api/v1/user/interactions/$providerId/$comicId/favorite', data: {
-      'is_favorite': isFavorite,
-    });
+  Future<LocalComicRecord?> getInteraction(String providerId, String comicId) async {
+    final id = _genId(_currentMode, providerId, comicId);
+    return _box.get(id);
+  }
+
+  Future<void> toggleFavorite({
+    required String providerId,
+    required String comicId,
+    required Comic comic,
+    required bool isFavorite,
+  }) async {
+    final mode = _currentMode;
+    final id = _genId(mode, providerId, comicId);
+    final existing = _box.get(id);
+    final now = DateTime.now();
+
+    final record = existing != null
+        ? existing.copyWith(
+            isFavorite: isFavorite,
+            favoriteAt: isFavorite ? now : null,
+            title: comic.title ?? '',
+            coverUrl: comic.coverUrl ?? '',
+            updatedAt: now,
+          )
+        : LocalComicRecord(
+            id: id,
+            dataSourceMode: mode,
+            providerId: providerId,
+            comicId: comic.comicId ?? '',
+            title: comic.title ?? '',
+            coverUrl: comic.coverUrl ?? '',
+            isFavorite: isFavorite,
+            favoriteAt: isFavorite ? now : null,
+            updatedAt: now,
+          );
+
+    await _box.put(id, record);
   }
 }
 
 final userInteractionRepositoryProvider = Provider<UserInteractionRepository>((ref) {
-  return UserInteractionRepository(ref.watch(dioProvider));
+  final box = Hive.box<LocalComicRecord>('comic_records');
+  return UserInteractionRepository(box, ref);
 });

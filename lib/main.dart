@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:mekuru/domain/models/local_comic_record.dart';
 import 'package:mekuru/core/theme/app_theme.dart';
 import 'package:mekuru/features/settings/presentation/providers/settings_provider.dart';
 import 'package:mekuru/features/settings/presentation/pages/settings_page.dart';
@@ -11,13 +12,16 @@ import 'package:mekuru/features/explore/presentation/pages/explore_page.dart';
 import 'package:mekuru/features/archive/presentation/pages/archive_page.dart';
 import 'package:mekuru/features/comic/presentation/pages/comic_details_page.dart';
 import 'package:mekuru/features/viewer/presentation/pages/comic_viewer_page.dart';
+import 'package:mekuru/core/notifications/presentation/widgets/global_notification_overlay.dart';
 
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
+  Hive.registerAdapter(LocalComicRecordAdapter());
   await Hive.openBox('settings');
   await Hive.openBox('tags');
+  await Hive.openBox<LocalComicRecord>('comic_records');
 
   runApp(const ProviderScope(child: MekuruApp()));
 }
@@ -85,6 +89,11 @@ class MekuruApp extends ConsumerWidget {
       themeMode: settings.themeMode,
       routerConfig: router,
       debugShowCheckedModeBanner: false,
+      builder: (context, child) {
+        return GlobalNotificationOverlay(
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
     );
   }
 }

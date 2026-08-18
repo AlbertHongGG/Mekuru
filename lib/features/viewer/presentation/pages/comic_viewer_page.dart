@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:extended_image/extended_image.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mekuru/core/theme/app_colors.dart';
-import 'package:mekuru/features/viewer/presentation/providers/comic_viewer_provider.dart';
 import 'package:mekuru/features/comic/presentation/providers/comic_details_provider.dart';
-import 'package:mekuru/features/comic/presentation/widgets/chapter_list_bottom_sheet.dart';
+import 'package:mekuru/features/viewer/presentation/providers/comic_viewer_provider.dart';
+import 'package:extended_image/extended_image.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class ComicViewerPage extends ConsumerStatefulWidget {
   final String providerId;
@@ -27,31 +27,42 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
   bool _showUI = false;
   bool _hasAutoShownUIAtBottom = false;
 
-  final ScrollController _scrollController = ScrollController();
+  final ItemScrollController _itemScrollController = ItemScrollController();
+  final ItemPositionsListener _itemPositionsListener = ItemPositionsListener.create();
+  
   int _lastReportedPage = 0;
+  bool _initializedIndex = false;
 
   @override
   void initState() {
     super.initState();
-    _scrollController.addListener(_onScroll);
+    _itemPositionsListener.itemPositions.addListener(_onScroll);
   }
 
   @override
   void dispose() {
-    _scrollController.removeListener(_onScroll);
-    _scrollController.dispose();
+    _itemPositionsListener.itemPositions.removeListener(_onScroll);
     super.dispose();
   }
 
   void _onScroll() {
-    final position = _scrollController.position.pixels;
-    final maxScroll = _scrollController.position.maxScrollExtent;
-    final state = ref.read(comicViewerProvider((providerId: widget.providerId, comicId: widget.comicId, chapterId: widget.chapterId)));
-    
-    if (state.pages.isEmpty || maxScroll <= 0) return;
+    final positions = _itemPositionsListener.itemPositions.value;
+    if (positions.isEmpty) return;
 
-    // Auto-show UI when reaching the bottom (highly user-friendly UX pattern)
-    if (position >= maxScroll - 20) {
+    final state = ref.read(comicViewerProvider((providerId: widget.providerId, comicId: widget.comicId, chapterId: widget.chapterId)));
+    if (state.pages.isEmpty) return;
+
+    int minIndex = positions.first.index;
+    for (final pos in positions) {
+      if (pos.itemLeadingEdge < 0.5 && pos.index > minIndex) {
+         // rough heuristic to find the prominent item
+         minIndex = pos.index;
+      }
+    }
+    
+    // Auto-show UI at bottom
+    final lastPos = positions.where((p) => p.index == state.pages.length - 1).firstOrNull;
+    if (lastPos != null && lastPos.itemTrailingEdge <= 1.05) {
       if (!_hasAutoShownUIAtBottom && !_showUI) {
         setState(() {
           _showUI = true;
@@ -59,16 +70,13 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
         });
       }
     } else {
-      _hasAutoShownUIAtBottom = false; // Reset when scrolling up
+      _hasAutoShownUIAtBottom = false;
     }
     
-    final progress = position / maxScroll;
-    final currentPage = (progress * state.pages.length).clamp(0, state.pages.length - 1).floor();
-    
-    if (currentPage != _lastReportedPage) {
-      _lastReportedPage = currentPage;
+    if (minIndex != _lastReportedPage) {
+      _lastReportedPage = minIndex;
       ref.read(comicViewerProvider((providerId: widget.providerId, comicId: widget.comicId, chapterId: widget.chapterId)).notifier)
-          .updateReadPage(currentPage);
+          .updateReadPage(minIndex);
       setState(() {});
     }
   }
@@ -89,22 +97,66 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (ctx) {
-        return Consumer(
-          builder: (context, ref, _) {
-            final currentState = ref.watch(comicDetailsProvider((providerId: widget.providerId, comicId: widget.comicId)));
-            final notifier = ref.read(comicDetailsProvider((providerId: widget.providerId, comicId: widget.comicId)).notifier);
-
-            return FractionallySizedBox(
-              heightFactor: 0.75,
-              child: ChapterListBottomSheet(
-                providerId: widget.providerId,
-                comicId: widget.comicId,
-                chapters: currentState.chapters,
-                lastReadChapterId: widget.chapterId,
-                isSortDescending: currentState.isChapterSortDescending,
-                onToggleSort: () => notifier.toggleChapterSort(),
-              ),
+      builder: (context) {
+        return DraggableScrollableSheet(
+          initialChildSize: 0.6,
+          maxChildSize: 0.9,
+          minChildSize: 0.4,
+          expand: false,
+          builder: (context, scrollController) {
+            final chapters = detailsState.chapters;
+            return Column(
+              children: [
+                Container(
+                  margin: const EdgeInsets.only(top: 12, bottom: 8),
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withValues(alpha: 0.3),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('章節列表', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      IconButton(
+                        icon: const Icon(Icons.close_rounded),
+                        onPressed: () => Navigator.pop(context),
+                      )
+                    ],
+                  ),
+                ),
+                const Divider(height: 1),
+                Expanded(
+                  child: ListView.builder(
+                    controller: scrollController,
+                    itemCount: chapters.length,
+                    itemBuilder: (context, index) {
+                      final chapter = chapters[index];
+                      final isCurrent = chapter.id == widget.chapterId;
+                      return ListTile(
+                        title: Text(
+                          chapter.title,
+                          style: TextStyle(
+                            fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
+                            color: isCurrent ? AppColors.primary : null,
+                          ),
+                        ),
+                        trailing: isCurrent ? const Icon(Icons.check_circle_rounded, color: AppColors.primary) : null,
+                        onTap: () {
+                          Navigator.pop(context);
+                          if (!isCurrent) {
+                            _navigateToChapter(chapter.id);
+                          }
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
             );
           },
         );
@@ -147,6 +199,13 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
       }
     }
 
+    if (!_initializedIndex && state.pages.isNotEmpty && state.initialPageIndex > 0) {
+       _lastReportedPage = state.initialPageIndex;
+       _initializedIndex = true;
+    } else if (!_initializedIndex && state.pages.isNotEmpty) {
+       _initializedIndex = true;
+    }
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
@@ -161,9 +220,10 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
                     : InteractiveViewer(
                         minScale: 1.0,
                         maxScale: 3.0,
-                        child: ListView.builder(
-                          controller: _scrollController,
-                          padding: EdgeInsets.zero,
+                        child: ScrollablePositionedList.builder(
+                          itemScrollController: _itemScrollController,
+                          itemPositionsListener: _itemPositionsListener,
+                          initialScrollIndex: state.initialPageIndex < state.pages.length ? state.initialPageIndex : 0,
                           itemCount: state.pages.length,
                           itemBuilder: (context, index) {
                             final page = state.pages[index];

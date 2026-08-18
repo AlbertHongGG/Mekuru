@@ -3,7 +3,8 @@ import 'package:mekuru/data/providers/repository_providers.dart';
 import 'package:mekuru/data/repositories/user_interaction_repository.dart';
 import 'package:mekuru/domain/models/comic.dart';
 import 'package:mekuru/domain/models/chapter.dart';
-import 'package:mekuru/domain/models/user_interaction.dart';
+import 'package:mekuru/core/notifications/presentation/controllers/notification_controller.dart';
+import 'package:mekuru/domain/models/local_comic_record.dart';
 import 'package:mekuru/features/library/presentation/providers/library_provider.dart';
 
 
@@ -11,7 +12,7 @@ class ComicDetailsState {
   final bool isLoading;
   final Comic? comic;
   final List<Chapter> chapters;
-  final UserInteraction? interaction;
+  final LocalComicRecord? interaction;
   final String? error;
   final bool isChapterSortDescending;
 
@@ -28,7 +29,7 @@ class ComicDetailsState {
     bool? isLoading,
     Comic? comic,
     List<Chapter>? chapters,
-    UserInteraction? interaction,
+    LocalComicRecord? interaction,
     String? error,
     bool? isChapterSortDescending,
   }) {
@@ -61,7 +62,7 @@ class ComicDetailsNotifier extends AutoDisposeFamilyNotifier<ComicDetailsState, 
         sourceRepo.getChapters(arg.providerId, arg.comicId),
       ]);
 
-      UserInteraction? interaction;
+      LocalComicRecord? interaction;
       try {
         interaction = await interactionRepo.getInteraction(arg.providerId, arg.comicId);
       } catch (_) {
@@ -76,6 +77,7 @@ class ComicDetailsNotifier extends AutoDisposeFamilyNotifier<ComicDetailsState, 
       );
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
+      ref.read(notificationProvider.notifier).showError('漫畫加載失敗，請檢查網路');
     }
   }
 
@@ -87,16 +89,37 @@ class ComicDetailsNotifier extends AutoDisposeFamilyNotifier<ComicDetailsState, 
     final interactionRepo = ref.read(userInteractionRepositoryProvider);
     final isFavorite = state.interaction?.isFavorite ?? false;
     final newFavoriteStatus = !isFavorite;
+    final comic = state.comic;
+    if (comic == null) return;
 
     try {
-      await interactionRepo.toggleFavorite(arg.providerId, arg.comicId, newFavoriteStatus);
+      await interactionRepo.toggleFavorite(
+        providerId: arg.providerId, 
+        comicId: arg.comicId,
+        comic: comic, 
+        isFavorite: newFavoriteStatus
+      );
       // Re-fetch interaction
       final interaction = await interactionRepo.getInteraction(arg.providerId, arg.comicId);
       state = state.copyWith(interaction: interaction);
       ref.invalidate(libraryProvider);
+      
+      final notif = ref.read(notificationProvider.notifier);
+      if (newFavoriteStatus) {
+        notif.showSuccess('已加入書庫');
+      } else {
+        notif.showInfo('已從書庫移除');
+      }
     } catch (e) {
-      // Handle error gracefully
+      ref.read(notificationProvider.notifier).showError('操作失敗: $e');
     }
+  }
+  Future<void> refreshInteraction() async {
+    try {
+      final interactionRepo = ref.read(userInteractionRepositoryProvider);
+      final interaction = await interactionRepo.getInteraction(arg.providerId, arg.comicId);
+      state = state.copyWith(interaction: interaction);
+    } catch (_) {}
   }
 }
 

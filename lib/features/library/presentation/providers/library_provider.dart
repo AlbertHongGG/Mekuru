@@ -1,11 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mekuru/data/providers/repository_providers.dart';
 import 'package:mekuru/data/repositories/user_interaction_repository.dart';
-import 'package:mekuru/domain/models/user_interaction.dart';
+import 'package:mekuru/domain/models/local_comic_record.dart';
+import 'package:mekuru/features/settings/presentation/providers/settings_provider.dart';
 
 class LibraryState {
   final bool isLoading;
-  final List<UserFavorite> favorites;
+  final List<LocalComicRecord> favorites;
   final String? error;
 
   LibraryState({
@@ -16,7 +16,7 @@ class LibraryState {
 
   LibraryState copyWith({
     bool? isLoading,
-    List<UserFavorite>? favorites,
+    List<LocalComicRecord>? favorites,
     String? error,
   }) {
     return LibraryState(
@@ -30,6 +30,9 @@ class LibraryState {
 class LibraryNotifier extends Notifier<LibraryState> {
   @override
   LibraryState build() {
+    // Watch settings to auto-refresh library when mode changes
+    ref.watch(settingsProvider);
+    
     Future.microtask(() => loadLibrary());
     return LibraryState();
   }
@@ -38,28 +41,15 @@ class LibraryNotifier extends Notifier<LibraryState> {
     state = state.copyWith(isLoading: true, error: null);
     try {
       final interactionRepo = ref.read(userInteractionRepositoryProvider);
-      final sourceRepo = ref.read(comicRepositoryProvider);
 
-      // Fetch raw interactions
-      final rawFavorites = await interactionRepo.getFavorites();
-
-      // Fetch full comic data concurrently
-      final futures = rawFavorites.map((fav) async {
-        try {
-          if (fav.providerId == null || fav.comicId == null) return null;
-          final comic = await sourceRepo.getComic(fav.providerId!, fav.comicId!);
-          return fav.copyWith(comic: comic);
-        } catch (e) {
-          return null; // Ignore errors for individual comics
-        }
-      });
-
-      final results = await Future.wait(futures);
-      final validFavorites = results.whereType<UserFavorite>().toList();
+      // Instantly load from local DB.
+      // Thanks to the Local DB architecture, we don't need to fetch comic details from API.
+      // And the interactionRepo automatically filters by the current dataSourceMode.
+      final records = await interactionRepo.getFavorites();
 
       state = state.copyWith(
         isLoading: false,
-        favorites: validFavorites,
+        favorites: records,
       );
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());

@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:mekuru/data/providers/repository_providers.dart';
+import 'package:mekuru/core/notifications/presentation/controllers/notification_controller.dart';
 import 'package:mekuru/domain/models/comic.dart';
 
 class ExploreState {
@@ -112,6 +113,7 @@ class ExploreNotifier extends Notifier<ExploreState> {
   void clearTags() {
     state = state.copyWith(activeTags: {});
     _tagsBox.put('activeTags', <String>[]);
+    ref.read(notificationProvider.notifier).showInfo('已重置標籤過濾');
   }
 
   Future<void> loadExplore({bool loadMore = false}) async {
@@ -139,6 +141,7 @@ class ExploreNotifier extends Notifier<ExploreState> {
       );
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
+      ref.read(notificationProvider.notifier).showError('探索加載失敗: $e');
     }
   }
 
@@ -164,6 +167,7 @@ class ExploreNotifier extends Notifier<ExploreState> {
       );
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
+      ref.read(notificationProvider.notifier).showError('探索加載失敗: $e');
     }
   }
 }

@@ -322,56 +322,41 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Expanded(
-                        flex: 1,
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: TextButton.icon(
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
+                        child: state.pages.isNotEmpty
+                            ? Text(
+                                '${_lastReportedPage + 1} / ${state.pages.length}',
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'Outfit',
+                                ),
+                              )
+                            : const SizedBox.shrink(),
+                      ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
                             onPressed: prevChapterId != null ? () => _navigateToChapter(prevChapterId!) : null,
-                            icon: const Icon(Icons.skip_previous_rounded),
-                            label: const Text('上一話'),
-                            style: TextButton.styleFrom(
-                              foregroundColor: Colors.white,
-                              disabledForegroundColor: Colors.white30,
-                              padding: const EdgeInsets.symmetric(horizontal: 4),
-                            ),
+                            icon: const Icon(Icons.chevron_left_rounded),
+                            color: Colors.white,
+                            disabledColor: Colors.white30,
+                            iconSize: 32,
+                            padding: const EdgeInsets.all(8),
                           ),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 1,
-                        child: Center(
-                          child: state.pages.isNotEmpty
-                              ? Text(
-                                  '${_lastReportedPage + 1} / ${state.pages.length}',
-                                  style: const TextStyle(
-                                    color: Colors.white70,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: 'Outfit',
-                                  ),
-                                )
-                              : const SizedBox.shrink(),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 1,
-                        child: Align(
-                          alignment: Alignment.centerRight,
-                          child: Directionality(
-                            textDirection: TextDirection.rtl,
-                            child: TextButton.icon(
-                              onPressed: nextChapterId != null ? () => _navigateToChapter(nextChapterId!) : null,
-                              label: const Text('下一話'),
-                              icon: const Icon(Icons.skip_next_rounded),
-                              style: TextButton.styleFrom(
-                                foregroundColor: Colors.white,
-                                disabledForegroundColor: Colors.white30,
-                                padding: const EdgeInsets.symmetric(horizontal: 4),
-                              ),
-                            ),
+                          const SizedBox(width: 8),
+                          IconButton(
+                            onPressed: nextChapterId != null ? () => _navigateToChapter(nextChapterId!) : null,
+                            icon: const Icon(Icons.chevron_right_rounded),
+                            color: Colors.white,
+                            disabledColor: Colors.white30,
+                            iconSize: 32,
+                            padding: const EdgeInsets.all(8),
                           ),
-                        ),
+                        ],
                       ),
                     ],
                   ),

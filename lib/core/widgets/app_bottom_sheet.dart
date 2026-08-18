@@ -98,7 +98,7 @@ class AppBottomSheet extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 16),
         // Items
         ...items.map((item) {
           final isSelected = selectedValue == item.value;
@@ -106,7 +106,7 @@ class AppBottomSheet extends StatelessWidget {
             onTap: () => onItemSelected(item.value),
             borderRadius: BorderRadius.circular(12),
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+              padding: EdgeInsets.symmetric(vertical: item.subtitle != null ? 16 : 10, horizontal: 8),
               child: Row(
                 children: [
                   Container(

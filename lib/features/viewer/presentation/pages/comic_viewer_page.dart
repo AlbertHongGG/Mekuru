@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mekuru/core/theme/app_colors.dart';
 import 'package:mekuru/features/comic/presentation/providers/comic_details_provider.dart';
+import 'package:mekuru/features/comic/presentation/widgets/chapter_list_bottom_sheet.dart';
 import 'package:mekuru/features/viewer/presentation/providers/comic_viewer_provider.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
@@ -89,74 +90,42 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
 
   void _showChapterDrawer(ComicDetailsState detailsState) {
     if (detailsState.chapters.isEmpty) return;
+    
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
+      backgroundColor: Colors.transparent,
       builder: (context) {
-        return DraggableScrollableSheet(
-          initialChildSize: 0.6,
-          maxChildSize: 0.9,
-          minChildSize: 0.4,
-          expand: false,
-          builder: (context, scrollController) {
-            final chapters = detailsState.chapters;
-            return Column(
-              children: [
-                Container(
-                  margin: const EdgeInsets.only(top: 12, bottom: 8),
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.withValues(alpha: 0.3),
-                    borderRadius: BorderRadius.circular(2),
-                  ),
+        return Consumer(
+          builder: (context, ref, _) {
+            final bottomState = ref.watch(comicDetailsProvider((providerId: widget.providerId, comicId: widget.comicId)));
+            final bottomNotifier = ref.read(comicDetailsProvider((providerId: widget.providerId, comicId: widget.comicId)).notifier);
+            
+            return Container(
+              height: MediaQuery.of(context).size.height * 0.7,
+              padding: const EdgeInsets.only(top: 24),
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              child: SafeArea(
+                child: ChapterListBottomSheet(
+                  providerId: widget.providerId,
+                  comicId: widget.comicId,
+                  chapters: bottomState.chapters,
+                  lastReadChapterId: bottomState.interaction?.lastReadChapterId,
+                  isSortDescending: bottomState.isChapterSortDescending,
+                  onToggleSort: () => bottomNotifier.toggleChapterSort(),
+                  onChapterTap: (chapter) {
+                    Navigator.pop(context);
+                    if (chapter.id != widget.chapterId) {
+                      _navigateToChapter(chapter.id);
+                    }
+                  },
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text('章節列表', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                      IconButton(
-                        icon: const Icon(Icons.close_rounded),
-                        onPressed: () => Navigator.pop(context),
-                      )
-                    ],
-                  ),
-                ),
-                const Divider(height: 1),
-                Expanded(
-                  child: ListView.builder(
-                    controller: scrollController,
-                    itemCount: chapters.length,
-                    itemBuilder: (context, index) {
-                      final chapter = chapters[index];
-                      final isCurrent = chapter.id == widget.chapterId;
-                      return ListTile(
-                        title: Text(
-                          chapter.title,
-                          style: TextStyle(
-                            fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
-                            color: isCurrent ? AppColors.primary : null,
-                          ),
-                        ),
-                        trailing: isCurrent ? const Icon(Icons.check_circle_rounded, color: AppColors.primary) : null,
-                        onTap: () {
-                          Navigator.pop(context);
-                          if (!isCurrent) {
-                            _navigateToChapter(chapter.id);
-                          }
-                        },
-                      );
-                    },
-                  ),
-                ),
-              ],
+              ),
             );
           },
         );
@@ -185,10 +154,21 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
       final index = detailsState.chapters.indexWhere((c) => c.id == widget.chapterId);
       if (index != -1) {
         chapterTitle = detailsState.chapters[index].title;
-        final isDesc = detailsState.isChapterSortDescending;
+        // Detect intrinsic sort direction robustly
+        bool isNativeDescending = false; // Default to Ascending if unknown
+        if (detailsState.chapters.length > 1) {
+          final chaptersWithNumbers = detailsState.chapters.where((c) => RegExp(r'\d+').hasMatch(c.title)).toList();
+          if (chaptersWithNumbers.length > 1) {
+            final int1 = int.parse(RegExp(r'\d+').firstMatch(chaptersWithNumbers.first.title)!.group(0)!);
+            final int2 = int.parse(RegExp(r'\d+').firstMatch(chaptersWithNumbers.last.title)!.group(0)!);
+            if (int1 > int2) {
+              isNativeDescending = true;
+            }
+          }
+        }
         
-        final chronologicallyPrevIndex = isDesc ? index + 1 : index - 1;
-        final chronologicallyNextIndex = isDesc ? index - 1 : index + 1;
+        final chronologicallyPrevIndex = isNativeDescending ? index + 1 : index - 1;
+        final chronologicallyNextIndex = isNativeDescending ? index - 1 : index + 1;
 
         if (chronologicallyPrevIndex >= 0 && chronologicallyPrevIndex < detailsState.chapters.length) {
           prevChapterId = detailsState.chapters[chronologicallyPrevIndex].id;

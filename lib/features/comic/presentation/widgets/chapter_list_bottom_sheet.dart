@@ -10,6 +10,7 @@ class ChapterListBottomSheet extends StatelessWidget {
   final String? lastReadChapterId;
   final bool isSortDescending;
   final VoidCallback onToggleSort;
+  final void Function(Chapter)? onChapterTap;
 
   const ChapterListBottomSheet({
     super.key,
@@ -19,6 +20,7 @@ class ChapterListBottomSheet extends StatelessWidget {
     required this.lastReadChapterId,
     required this.isSortDescending,
     required this.onToggleSort,
+    this.onChapterTap,
   });
 
   @override
@@ -26,9 +28,25 @@ class ChapterListBottomSheet extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final secondaryTextColor = isDark ? Colors.white54 : Colors.black54;
 
+    // Detect intrinsic sort direction robustly
+    bool isNativeDescending = false;
+    if (chapters.length > 1) {
+      final chaptersWithNumbers = chapters.where((c) => RegExp(r'\d+').hasMatch(c.title)).toList();
+      if (chaptersWithNumbers.length > 1) {
+        final int1 = int.parse(RegExp(r'\d+').firstMatch(chaptersWithNumbers.first.title)!.group(0)!);
+        final int2 = int.parse(RegExp(r'\d+').firstMatch(chaptersWithNumbers.last.title)!.group(0)!);
+        if (int1 > int2) {
+          isNativeDescending = true;
+        }
+      }
+    }
+
     // Apply Sorting Locally
     final displayChapters = List<Chapter>.from(chapters);
-    final sortedChapters = isSortDescending ? displayChapters : displayChapters.reversed.toList();
+    // If the user wants Descending but native is Ascending, we reverse.
+    // If the user wants Ascending but native is Descending, we reverse.
+    final shouldReverse = isSortDescending != isNativeDescending;
+    final sortedChapters = shouldReverse ? displayChapters.reversed.toList() : displayChapters;
 
     return Column(
       children: [
@@ -144,7 +162,11 @@ class ChapterListBottomSheet extends StatelessWidget {
                         child: InkWell(
                           borderRadius: BorderRadius.circular(12),
                           onTap: () {
-                            context.push('/viewer/$providerId/$comicId/${chapter.id}');
+                            if (onChapterTap != null) {
+                              onChapterTap!(chapter);
+                            } else {
+                              context.push('/viewer/$providerId/$comicId/${chapter.id}');
+                            }
                           },
                           child: Container(
                             padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),

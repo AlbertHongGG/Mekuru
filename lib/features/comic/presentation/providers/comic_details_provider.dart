@@ -62,18 +62,16 @@ class ComicDetailsNotifier extends AutoDisposeFamilyNotifier<ComicDetailsState, 
         sourceRepo.getChapters(arg.providerId, arg.comicId),
       ]);
 
-      LocalComicRecord? interaction;
-      try {
-        interaction = await interactionRepo.getInteraction(arg.providerId, arg.comicId);
-      } catch (_) {
-        // Not favorited yet
-      }
+      // Start watching the interaction stream
+      final sub = interactionRepo.watchInteraction(arg.providerId, arg.comicId).listen((record) {
+        state = state.copyWith(interaction: record);
+      });
+      ref.onDispose(() => sub.cancel());
 
       state = state.copyWith(
         isLoading: false,
         comic: responses[0] as Comic,
         chapters: responses[1] as List<Chapter>,
-        interaction: interaction,
       );
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
@@ -114,13 +112,7 @@ class ComicDetailsNotifier extends AutoDisposeFamilyNotifier<ComicDetailsState, 
       ref.read(notificationProvider.notifier).showError('操作失敗: $e');
     }
   }
-  Future<void> refreshInteraction() async {
-    try {
-      final interactionRepo = ref.read(userInteractionRepositoryProvider);
-      final interaction = await interactionRepo.getInteraction(arg.providerId, arg.comicId);
-      state = state.copyWith(interaction: interaction);
-    } catch (_) {}
-  }
+
 }
 
 final comicDetailsProvider = NotifierProvider.autoDispose.family<ComicDetailsNotifier, ComicDetailsState, ({String providerId, String comicId})>(() {

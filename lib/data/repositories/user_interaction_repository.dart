@@ -78,6 +78,14 @@ class UserInteractionRepository {
     return _box.get(id);
   }
 
+  Stream<LocalComicRecord?> watchInteraction(String providerId, String comicId) async* {
+    final id = _genId(_currentMode, providerId, comicId);
+    yield _box.get(id);
+    await for (final event in _box.watch(key: id)) {
+      yield event.value as LocalComicRecord?;
+    }
+  }
+
   Future<void> toggleFavorite({
     required String providerId,
     required String comicId,

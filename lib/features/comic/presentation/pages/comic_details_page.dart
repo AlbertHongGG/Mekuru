@@ -42,6 +42,10 @@ class ComicDetailsPage extends ConsumerWidget {
                   lastReadChapterId: bottomState.interaction?.lastReadChapterId,
                   isSortDescending: bottomState.isChapterSortDescending,
                   onToggleSort: () => bottomNotifier.toggleChapterSort(),
+                  onChapterTap: (chapter) async {
+                    Navigator.pop(context);
+                    await context.push('/viewer/$providerId/$comicId/${chapter.id}');
+                  },
                 ),
               ),
             );
@@ -241,7 +245,16 @@ class ComicDetailsPage extends ConsumerWidget {
                   onPressed: () async {
                     if (state.chapters.isEmpty) return;
                     // Default to oldest/first chapter: if sort descending, it's the last element. Else, it's the first.
-                    String targetChapterId = state.isChapterSortDescending ? state.chapters.last.id : state.chapters.first.id;
+                    bool isNativeDescending = false;
+                    if (state.chapters.length > 1) {
+                      final chaptersWithNumbers = state.chapters.where((c) => RegExp(r'\d+').hasMatch(c.title)).toList();
+                      if (chaptersWithNumbers.length > 1) {
+                        final int1 = int.parse(RegExp(r'\d+').firstMatch(chaptersWithNumbers.first.title)!.group(0)!);
+                        final int2 = int.parse(RegExp(r'\d+').firstMatch(chaptersWithNumbers.last.title)!.group(0)!);
+                        if (int1 > int2) isNativeDescending = true;
+                      }
+                    }
+                    String targetChapterId = isNativeDescending ? state.chapters.last.id : state.chapters.first.id;
                     
                     if (lastReadChapterId != null) {
                       // Validate if chapter still exists
@@ -250,8 +263,6 @@ class ComicDetailsPage extends ConsumerWidget {
                     }
                     
                     await context.push('/viewer/$providerId/$comicId/$targetChapterId');
-                    // Refresh when returning from viewer
-                    notifier.refreshInteraction();
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,

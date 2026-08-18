@@ -89,7 +89,7 @@ class _JsonNodeRendererState extends State<_JsonNodeRenderer> {
       return Container(
         margin: const EdgeInsets.only(bottom: 8),
         decoration: BoxDecoration(
-          color: widget.isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.02),
+          color: widget.isDark ? Colors.white.withValues(alpha: 0.05) : Colors.white,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(color: widget.isDark ? Colors.white12 : Colors.black12),
         ),
@@ -239,7 +239,7 @@ class _JsonNodeRendererState extends State<_JsonNodeRenderer> {
           margin: const EdgeInsets.only(top: 4, bottom: 4),
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: widget.isDark ? const Color(0xFF1E1E1E) : const Color(0xFFF8FAFC),
+            color: widget.isDark ? const Color(0xFF1E1E1E) : Colors.white,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: widget.isDark ? Colors.white24 : Colors.black12),
           ),

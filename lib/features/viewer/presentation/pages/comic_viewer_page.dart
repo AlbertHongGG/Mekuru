@@ -7,6 +7,7 @@ import 'package:mekuru/features/comic/presentation/providers/comic_details_provi
 import 'package:mekuru/features/comic/presentation/widgets/chapter_list_bottom_sheet.dart';
 import 'package:mekuru/features/viewer/presentation/providers/comic_viewer_provider.dart';
 import 'package:extended_image/extended_image.dart';
+import 'package:mekuru/features/viewer/presentation/widgets/webtoon_image_placeholder.dart';
 import 'package:mekuru/core/widgets/app_bottom_sheet.dart';
 
 class ComicViewerPage extends ConsumerStatefulWidget {
@@ -233,10 +234,7 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
                                       loadStateChanged: (ExtendedImageState imgState) {
                                         switch (imgState.extendedImageLoadState) {
                                           case LoadState.loading:
-                                            return const SizedBox(
-                                              height: 100,
-                                              child: Center(child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2)),
-                                            );
+                                            return WebtoonImagePlaceholder(index: i);
                                           case LoadState.completed:
                                             return null; 
                                           case LoadState.failed:

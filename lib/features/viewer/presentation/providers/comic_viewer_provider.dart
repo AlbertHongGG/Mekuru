@@ -9,26 +9,30 @@ class ComicViewerState {
   final bool isLoading;
   final List<ComicPage> pages;
   final String? error;
-  final int initialPageIndex;
+  final int initialAnchorIndex;
+  final double initialAnchorOffset;
 
   ComicViewerState({
     this.isLoading = true,
     this.pages = const [],
     this.error,
-    this.initialPageIndex = 0,
+    this.initialAnchorIndex = 0,
+    this.initialAnchorOffset = 0.0,
   });
 
   ComicViewerState copyWith({
     bool? isLoading,
     List<ComicPage>? pages,
     String? error,
-    int? initialPageIndex,
+    int? initialAnchorIndex,
+    double? initialAnchorOffset,
   }) {
     return ComicViewerState(
       isLoading: isLoading ?? this.isLoading,
       pages: pages ?? this.pages,
-      error: error,
-      initialPageIndex: initialPageIndex ?? this.initialPageIndex,
+      error: error ?? this.error,
+      initialAnchorIndex: initialAnchorIndex ?? this.initialAnchorIndex,
+      initialAnchorOffset: initialAnchorOffset ?? this.initialAnchorOffset,
     );
   }
 }
@@ -51,28 +55,33 @@ class ComicViewerNotifier extends AutoDisposeFamilyNotifier<ComicViewerState, ({
       final comic = detailsState.comic;
       final chapter = detailsState.chapters.firstWhere((c) => c.id == arg.chapterId);
 
-      int initPage = 0;
+      int initAnchorIndex = 0;
+      double initAnchorOffset = 0.0;
       try {
         final interaction = await interactionRepo.getInteraction(arg.providerId, arg.comicId);
         if (interaction != null && interaction.lastReadChapterId == arg.chapterId) {
-          initPage = interaction.lastReadPageIndex ?? 0;
+          int packed = interaction.lastReadPageIndex ?? 0;
+          initAnchorIndex = packed ~/ 1000000;
+          initAnchorOffset = (packed % 1000000).toDouble();
         }
       } catch (_) {}
 
       state = state.copyWith(
         isLoading: false,
         pages: pages,
-        initialPageIndex: initPage,
+        initialAnchorIndex: initAnchorIndex,
+        initialAnchorOffset: initAnchorOffset,
       );
-      
+
       if (comic != null) {
+        int packed = (initAnchorIndex * 1000000) + initAnchorOffset.toInt();
         interactionRepo.markRead(
           providerId: arg.providerId,
           comicId: arg.comicId,
           comic: comic,
           chapterId: arg.chapterId,
           chapterTitle: chapter.title,
-          pageIndex: initPage, // Mark read right away with the initial page
+          pageIndex: packed, 
         );
       }
       
@@ -82,20 +91,21 @@ class ComicViewerNotifier extends AutoDisposeFamilyNotifier<ComicViewerState, ({
     }
   }
 
-  Future<void> updateReadPage(int pageIndex) async {
+  Future<void> updateProgress(int anchorIndex, double anchorOffset) async {
     try {
       final interactionRepo = ref.read(userInteractionRepositoryProvider);
       final detailsState = ref.read(comicDetailsProvider((providerId: arg.providerId, comicId: arg.comicId)));
       final comic = detailsState.comic;
       final chapter = detailsState.chapters.firstWhere((c) => c.id == arg.chapterId);
       if (comic != null) {
+        int packed = (anchorIndex * 1000000) + anchorOffset.toInt();
         interactionRepo.markRead(
           providerId: arg.providerId,
           comicId: arg.comicId,
           comic: comic,
           chapterId: arg.chapterId,
           chapterTitle: chapter.title,
-          pageIndex: pageIndex,
+          pageIndex: packed,
         );
       }
     } catch (_) {}

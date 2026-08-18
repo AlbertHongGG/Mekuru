@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -6,7 +7,7 @@ import 'package:mekuru/features/comic/presentation/providers/comic_details_provi
 import 'package:mekuru/features/comic/presentation/widgets/chapter_list_bottom_sheet.dart';
 import 'package:mekuru/features/viewer/presentation/providers/comic_viewer_provider.dart';
 import 'package:extended_image/extended_image.dart';
-import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+import 'package:mekuru/core/widgets/app_bottom_sheet.dart';
 
 class ComicViewerPage extends ConsumerStatefulWidget {
   final String providerId;
@@ -26,114 +27,114 @@ class ComicViewerPage extends ConsumerStatefulWidget {
 
 class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
   bool _showUI = false;
-  bool _hasAutoShownUIAtBottom = false;
-
-  final ItemScrollController _itemScrollController = ItemScrollController();
-  final ItemPositionsListener _itemPositionsListener = ItemPositionsListener.create();
   
-  int _lastReportedPage = 0;
-  bool _initializedIndex = false;
+  ScrollController? _scrollController;
+  final ValueNotifier<double> _progressNotifier = ValueNotifier<double>(0.0);
+  
+  Timer? _debounceTimer;
+  
+  // Radar system keys
+  final GlobalKey _viewportKey = GlobalKey();
+  List<GlobalKey> _sliverKeys = [];
+  List<GlobalKey> _itemKeys = [];
+  
+  bool _initialized = false;
+  int _lastSavedPacked = -1;
 
   @override
   void initState() {
     super.initState();
-    _itemPositionsListener.itemPositions.addListener(_onScroll);
   }
 
   @override
   void dispose() {
-    _itemPositionsListener.itemPositions.removeListener(_onScroll);
+    _debounceTimer?.cancel();
+    _saveProgress(); // GUARANTEED PERSISTENCE ON EXIT
+    _scrollController?.dispose();
+    _progressNotifier.dispose();
     super.dispose();
   }
+  
+  int _currentAnchorIndex = 0;
+  double _currentAnchorOffset = 0.0;
 
-  void _onScroll() {
-    final positions = _itemPositionsListener.itemPositions.value;
-    if (positions.isEmpty) return;
-
-    final state = ref.read(comicViewerProvider((providerId: widget.providerId, comicId: widget.comicId, chapterId: widget.chapterId)));
-    if (state.pages.isEmpty) return;
-
-    int minIndex = positions.first.index;
-    for (final pos in positions) {
-      if (pos.itemLeadingEdge < 0.5 && pos.index > minIndex) {
-         // rough heuristic to find the prominent item
-         minIndex = pos.index;
-      }
-    }
+  void _calculateCurrentAnchor() {
+    if (_itemKeys.isEmpty) return;
     
-    // Auto-show UI at bottom
-    final lastPos = positions.where((p) => p.index == state.pages.length - 1).firstOrNull;
-    if (lastPos != null && lastPos.itemTrailingEdge <= 1.05) {
-      if (!_hasAutoShownUIAtBottom && !_showUI) {
-        setState(() {
-          _showUI = true;
-          _hasAutoShownUIAtBottom = true;
-        });
-      }
-    } else {
-      _hasAutoShownUIAtBottom = false;
-    }
+    final viewportContext = _viewportKey.currentContext;
+    if (viewportContext == null) return;
     
-    if (minIndex != _lastReportedPage) {
-      _lastReportedPage = minIndex;
-      ref.read(comicViewerProvider((providerId: widget.providerId, comicId: widget.comicId, chapterId: widget.chapterId)).notifier)
-          .updateReadPage(minIndex);
-      setState(() {});
+    final viewportBox = viewportContext.findRenderObject() as RenderBox?;
+    if (viewportBox == null) return;
+
+    for (int i = 0; i < _itemKeys.length; i++) {
+      final key = _itemKeys[i];
+      if (key.currentContext != null) {
+        final renderBox = key.currentContext!.findRenderObject() as RenderBox?;
+        if (renderBox != null) {
+          final position = renderBox.localToGlobal(Offset.zero, ancestor: viewportBox);
+          final top = position.dy;
+          final bottom = top + renderBox.size.height;
+          
+          if (bottom > 0) { 
+            _currentAnchorIndex = i;
+            _currentAnchorOffset = top < 0 ? -top : 0.0;
+            break;
+          }
+        }
+      }
     }
   }
 
+  void _saveProgress() {
+    int packed = (_currentAnchorIndex * 1000000) + _currentAnchorOffset.toInt();
+    if (packed != _lastSavedPacked) {
+      _lastSavedPacked = packed;
+      ref.read(comicViewerProvider((providerId: widget.providerId, comicId: widget.comicId, chapterId: widget.chapterId)).notifier)
+          .updateProgress(_currentAnchorIndex, _currentAnchorOffset);
+    }
+  }
+
+  bool _onScrollNotification(ScrollNotification notification) {
+    if (_scrollController == null || !_scrollController!.hasClients) return false;
+    
+    // 1. Instantly calculate visual anchor on every frame (O(N) where N is only loaded slivers - extremely fast)
+    _calculateCurrentAnchor();
+    
+    // 2. UI Progress calculation
+    final offset = _scrollController!.offset;
+    final minOffset = _scrollController!.position.minScrollExtent;
+    final maxOffset = _scrollController!.position.maxScrollExtent;
+    final totalRange = maxOffset - minOffset;
+    
+    if (totalRange > 0) {
+       double percentage = ((offset - minOffset) / totalRange).clamp(0.0, 1.0);
+       _progressNotifier.value = percentage;
+    }
+
+    // 3. Debounce the actual Hive DB write
+    if (notification is ScrollEndNotification) {
+      _saveProgress();
+    } else {
+      _debounceTimer?.cancel();
+      _debounceTimer = Timer(const Duration(milliseconds: 800), () {
+        _saveProgress();
+      });
+    }
+    return false;
+  }
+  
   void _toggleUI() {
+    if (_scrollController != null && _scrollController!.hasClients && _scrollController!.position.isScrollingNotifier.value) {
+      return;
+    }
     setState(() {
       _showUI = !_showUI;
     });
   }
 
-  void _showChapterDrawer(ComicDetailsState detailsState) {
-    if (detailsState.chapters.isEmpty) return;
-    
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) {
-        return Consumer(
-          builder: (context, ref, _) {
-            final bottomState = ref.watch(comicDetailsProvider((providerId: widget.providerId, comicId: widget.comicId)));
-            final bottomNotifier = ref.read(comicDetailsProvider((providerId: widget.providerId, comicId: widget.comicId)).notifier);
-            
-            return Container(
-              height: MediaQuery.of(context).size.height * 0.7,
-              padding: const EdgeInsets.only(top: 24),
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-              ),
-              child: SafeArea(
-                child: ChapterListBottomSheet(
-                  providerId: widget.providerId,
-                  comicId: widget.comicId,
-                  chapters: bottomState.chapters,
-                  lastReadChapterId: bottomState.interaction?.lastReadChapterId,
-                  isSortDescending: bottomState.isChapterSortDescending,
-                  onToggleSort: () => bottomNotifier.toggleChapterSort(),
-                  onChapterTap: (chapter) {
-                    Navigator.pop(context);
-                    if (chapter.id != widget.chapterId) {
-                      _navigateToChapter(chapter.id);
-                    }
-                  },
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
   void _navigateToChapter(String chapterId) {
+    _saveProgress(); // Save before navigating away
     context.pushReplacement('/viewer/${widget.providerId}/${widget.comicId}/$chapterId');
   }
 
@@ -154,8 +155,7 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
       final index = detailsState.chapters.indexWhere((c) => c.id == widget.chapterId);
       if (index != -1) {
         chapterTitle = detailsState.chapters[index].title;
-        // Detect intrinsic sort direction robustly
-        bool isNativeDescending = false; // Default to Ascending if unknown
+        bool isNativeDescending = false; 
         if (detailsState.chapters.length > 1) {
           final chaptersWithNumbers = detailsState.chapters.where((c) => RegExp(r'\d+').hasMatch(c.title)).toList();
           if (chaptersWithNumbers.length > 1) {
@@ -179,11 +179,22 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
       }
     }
 
-    if (!_initializedIndex && state.pages.isNotEmpty && state.initialPageIndex > 0) {
-       _lastReportedPage = state.initialPageIndex;
-       _initializedIndex = true;
-    } else if (!_initializedIndex && state.pages.isNotEmpty) {
-       _initializedIndex = true;
+    if (!_initialized && state.pages.isNotEmpty) {
+      // Generate keys for the radar system
+      _sliverKeys = List.generate(state.pages.length, (_) => GlobalKey());
+      _itemKeys = List.generate(state.pages.length, (_) => GlobalKey());
+      
+      int targetIndex = state.initialAnchorIndex;
+      if (targetIndex >= state.pages.length) targetIndex = state.pages.length - 1;
+      if (targetIndex < 0) targetIndex = 0;
+      
+      _scrollController = ScrollController(initialScrollOffset: state.initialAnchorOffset);
+      _initialized = true;
+      
+      // Calculate initial percentage UI 
+      if (state.pages.length > 1) {
+         _progressNotifier.value = targetIndex / (state.pages.length - 1);
+      }
     }
 
     return Scaffold(
@@ -197,51 +208,60 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
                 ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
                 : state.error != null
                     ? Center(child: Text('錯誤: ${state.error}', style: const TextStyle(color: Colors.white)))
-                    : InteractiveViewer(
-                        minScale: 1.0,
-                        maxScale: 3.0,
-                        child: ScrollablePositionedList.builder(
-                          itemScrollController: _itemScrollController,
-                          itemPositionsListener: _itemPositionsListener,
-                          initialScrollIndex: state.initialPageIndex < state.pages.length ? state.initialPageIndex : 0,
-                          itemCount: state.pages.length,
-                          itemBuilder: (context, index) {
-                            final page = state.pages[index];
-                            return ExtendedImage.network(
-                              page.imageUrl,
-                              fit: BoxFit.contain,
-                              cache: true,
-                              clearMemoryCacheIfFailed: true,
-                              loadStateChanged: (ExtendedImageState imgState) {
-                                switch (imgState.extendedImageLoadState) {
-                                  case LoadState.loading:
-                                    return const SizedBox(
-                                      height: 300,
-                                      child: Center(child: CircularProgressIndicator(color: AppColors.primary)),
-                                    );
-                                  case LoadState.completed:
-                                    return null;
-                                  case LoadState.failed:
-                                    return SizedBox(
-                                      height: 300,
-                                      child: Center(
-                                        child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            const Icon(Icons.broken_image, color: Colors.white54, size: 48),
-                                            const SizedBox(height: 8),
-                                            TextButton(
-                                              onPressed: () => imgState.reLoadImage(),
-                                              child: const Text('重新載入', style: TextStyle(color: Colors.white)),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                }
-                              },
-                            );
-                          },
+                    : NotificationListener<ScrollNotification>(
+                        onNotification: _onScrollNotification,
+                        child: CustomScrollView(
+                          key: _viewportKey,
+                          controller: _scrollController,
+                          cacheExtent: 5000.0, 
+                          physics: const ClampingScrollPhysics(),
+                          center: state.pages.isNotEmpty && _sliverKeys.isNotEmpty 
+                              ? _sliverKeys[state.initialAnchorIndex < state.pages.length ? state.initialAnchorIndex : 0]
+                              : null,
+                          slivers: [
+                            if (state.pages.isNotEmpty)
+                              for (int i = 0; i < state.pages.length; i++)
+                                SliverToBoxAdapter(
+                                  key: _sliverKeys[i], // Center anchor key
+                                  child: Container(
+                                    key: _itemKeys[i], // Position radar key
+                                    child: ExtendedImage.network(
+                                      state.pages[i].imageUrl,
+                                      fit: BoxFit.fitWidth, 
+                                      cache: true,
+                                      clearMemoryCacheIfFailed: true,
+                                      loadStateChanged: (ExtendedImageState imgState) {
+                                        switch (imgState.extendedImageLoadState) {
+                                          case LoadState.loading:
+                                            return const SizedBox(
+                                              height: 100,
+                                              child: Center(child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2)),
+                                            );
+                                          case LoadState.completed:
+                                            return null; 
+                                          case LoadState.failed:
+                                            return SizedBox(
+                                              height: 200,
+                                              child: Center(
+                                                child: Column(
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  children: [
+                                                    const Icon(Icons.broken_image, color: Colors.white54, size: 48),
+                                                    const SizedBox(height: 8),
+                                                    TextButton(
+                                                      onPressed: () => imgState.reLoadImage(),
+                                                      child: const Text('重新載入', style: TextStyle(color: Colors.white)),
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                            );
+                                        }
+                                      },
+                                    ),
+                                  ),
+                                ),
+                          ],
                         ),
                       ),
           ),
@@ -258,46 +278,76 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
               child: SafeArea(
                 bottom: false,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
                   child: Row(
                     children: [
+                      IconButton(
+                        icon: const Icon(Icons.arrow_back, color: Colors.white),
+                        onPressed: () => context.pop(),
+                      ),
+                      const SizedBox(width: 8),
                       Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 8.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                comicTitle,
-                                style: const TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.bold),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              comicTitle,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'Outfit',
                               ),
-                              Text(
-                                chapterTitle,
-                                style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Text(
+                              chapterTitle,
+                              style: const TextStyle(
+                                color: Colors.white70,
+                                fontSize: 14,
+                                fontFamily: 'Outfit',
                               ),
-                            ],
-                          ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.info_outline_rounded, color: Colors.white),
-                        onPressed: () => context.pop(),
-                        tooltip: '返回簡介',
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.home_rounded, color: Colors.white),
-                        onPressed: () => context.go('/explore'),
-                        tooltip: '回首頁',
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.format_list_bulleted_rounded, color: Colors.white),
-                        onPressed: () => _showChapterDrawer(detailsState),
-                        tooltip: '章節列表',
+                        icon: const Icon(Icons.menu, color: Colors.white),
+                        onPressed: () {
+                          final isDark = Theme.of(context).brightness == Brightness.dark;
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            backgroundColor: Colors.transparent,
+                            builder: (context) {
+                              return Container(
+                                height: MediaQuery.of(context).size.height * 0.7,
+                                padding: const EdgeInsets.only(top: 24),
+                                decoration: BoxDecoration(
+                                  color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+                                  borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                                ),
+                                child: SafeArea(
+                                  child: ChapterListBottomSheet(
+                                    providerId: widget.providerId,
+                                    comicId: widget.comicId,
+                                    chapters: detailsState.chapters,
+                                    lastReadChapterId: widget.chapterId,
+                                    isSortDescending: detailsState.isChapterSortDescending,
+                                    onToggleSort: () => ref.read(comicDetailsProvider((providerId: widget.providerId, comicId: widget.comicId)).notifier).toggleChapterSort(),
+                                    onChapterTap: (chapter) {
+                                      Navigator.pop(context);
+                                      _navigateToChapter(chapter.id);
+                                    },
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        },
                       ),
                     ],
                   ),
@@ -310,7 +360,7 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
           AnimatedPositioned(
             duration: const Duration(milliseconds: 200),
             curve: Curves.easeInOut,
-            bottom: _showUI ? 0 : -120,
+            bottom: _showUI ? 0 : -100,
             left: 0,
             right: 0,
             child: Container(
@@ -318,43 +368,50 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
               child: SafeArea(
                 top: false,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 8.0),
+                      // Bottom Left: Progress Percentage
+                      Container(
+                        constraints: const BoxConstraints(minWidth: 50),
                         child: state.pages.isNotEmpty
-                            ? Text(
-                                '${_lastReportedPage + 1} / ${state.pages.length}',
-                                style: const TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.bold,
-                                  fontFamily: 'Outfit',
-                                ),
+                            ? ValueListenableBuilder<double>(
+                                valueListenable: _progressNotifier,
+                                builder: (context, progress, child) {
+                                  final percentStr = (progress * 100).toStringAsFixed(0);
+                                  return Text(
+                                    '$percentStr%',
+                                    style: const TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
+                                      fontFamily: 'Outfit',
+                                    ),
+                                  );
+                                },
                               )
                             : const SizedBox.shrink(),
                       ),
+                      
+                      // Bottom Right: Chapter Navigation Icons
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           IconButton(
+                            icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
                             onPressed: prevChapterId != null ? () => _navigateToChapter(prevChapterId!) : null,
-                            icon: const Icon(Icons.chevron_left_rounded),
-                            color: Colors.white,
-                            disabledColor: Colors.white30,
-                            iconSize: 32,
-                            padding: const EdgeInsets.all(8),
+                            color: prevChapterId != null ? Colors.white : Colors.white30,
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: 32),
                           IconButton(
+                            icon: const Icon(Icons.chevron_right, color: Colors.white, size: 28),
                             onPressed: nextChapterId != null ? () => _navigateToChapter(nextChapterId!) : null,
-                            icon: const Icon(Icons.chevron_right_rounded),
-                            color: Colors.white,
-                            disabledColor: Colors.white30,
-                            iconSize: 32,
-                            padding: const EdgeInsets.all(8),
+                            color: nextChapterId != null ? Colors.white : Colors.white30,
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
                           ),
                         ],
                       ),

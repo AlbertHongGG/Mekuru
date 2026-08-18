@@ -5,6 +5,8 @@ import 'package:mekuru/core/theme/app_colors.dart';
 import 'package:mekuru/core/widgets/responsive_comic_grid.dart';
 import 'package:mekuru/domain/models/user_interaction.dart';
 import 'package:mekuru/features/library/presentation/providers/library_provider.dart';
+import 'package:mekuru/core/widgets/search_dialog.dart';
+import 'package:mekuru/core/widgets/app_bottom_sheet.dart';
 
 class LibraryPage extends ConsumerStatefulWidget {
   const LibraryPage({super.key});
@@ -13,15 +15,26 @@ class LibraryPage extends ConsumerStatefulWidget {
   ConsumerState<LibraryPage> createState() => _LibraryPageState();
 }
 
-class _LibraryPageState extends ConsumerState<LibraryPage> with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+class _LibraryPageState extends ConsumerState<LibraryPage> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
+  String _currentSortMode = 'added';
+  
+  final Map<String, String> _sortLabels = {
+    'added': '近期加入',
+    'updated': '最近更新',
+    'read': '近期看過',
+  };
+  
+  final Map<String, IconData> _sortIcons = {
+    'added': Icons.add,
+    'updated': Icons.local_fire_department,
+    'read': Icons.schedule,
+  };
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
     _searchController.addListener(() {
       setState(() {
         _searchQuery = _searchController.text.trim();
@@ -31,50 +44,86 @@ class _LibraryPageState extends ConsumerState<LibraryPage> with SingleTickerProv
 
   @override
   void dispose() {
-    _tabController.dispose();
     _searchController.dispose();
     super.dispose();
   }
 
+  void _showSortBottomSheet() {
+    AppBottomSheet.show(
+      context: context,
+      title: '排序方式',
+      items: [
+        AppBottomSheetItemData(
+          title: '近期加入',
+          leadingIcon: Icons.add,
+          value: 'added',
+        ),
+        AppBottomSheetItemData(
+          title: '最近更新',
+          leadingIcon: Icons.local_fire_department,
+          value: 'updated',
+        ),
+        AppBottomSheetItemData(
+          title: '近期看過',
+          leadingIcon: Icons.schedule,
+          value: 'read',
+        ),
+      ],
+      selectedValue: _currentSortMode,
+      onItemSelected: (val) {
+        setState(() {
+          _currentSortMode = val;
+        });
+      },
+    );
+  }
+
+  @override
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final state = ref.watch(libraryProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: TextField(
-          controller: _searchController,
-          decoration: InputDecoration(
-            hintText: '在書庫中搜尋...',
-            prefixIcon: const Icon(Icons.search),
-            border: InputBorder.none,
-            contentPadding: const EdgeInsets.symmetric(vertical: 15),
+        title: Text(_searchQuery.isNotEmpty ? '搜尋: $_searchQuery' : '書庫'),
+        centerTitle: false,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.filter_list_rounded),
+            onPressed: _showSortBottomSheet,
           ),
-        ),
-        bottom: TabBar(
-          controller: _tabController,
-          indicatorColor: AppColors.primary,
-          labelColor: AppColors.primary,
-          unselectedLabelColor: Colors.grey,
-          tabs: const [
-            Tab(icon: Icon(Icons.add, size: 18), text: '近期加入'),
-            Tab(icon: Icon(Icons.local_fire_department, size: 18), text: '最近更新'),
-            Tab(icon: Icon(Icons.schedule, size: 18), text: '近期看過'),
-          ],
-        ),
+          IconButton(
+            icon: Icon(_searchQuery.isNotEmpty ? Icons.close_rounded : Icons.search_rounded),
+            onPressed: () {
+              if (_searchQuery.isNotEmpty) {
+                _searchController.clear();
+              } else {
+                showDialog(
+                  context: context,
+                  builder: (_) => SearchDialog(
+                    initialQuery: _searchQuery,
+                    hintText: '在書庫中搜尋...',
+                    onSearch: (query) {
+                      _searchController.text = query;
+                    },
+                    onClear: () {
+                      _searchController.clear();
+                    },
+                  ),
+                );
+              }
+            },
+          ),
+        ],
       ),
-      body: state.isLoading && state.favorites.isEmpty
-          ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
-          : state.error != null
-              ? Center(child: Text('發生錯誤: ${state.error}'))
-              : TabBarView(
-                  controller: _tabController,
-                  children: [
-                    _buildGridView(state.favorites, 'added'),
-                    _buildGridView(state.favorites, 'updated'),
-                    _buildGridView(state.favorites, 'read'),
-                  ],
-                ),
+      body: SafeArea(
+        child: state.isLoading && state.favorites.isEmpty
+            ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
+            : state.error != null
+                ? Center(child: Text('發生錯誤: ${state.error}'))
+                : _buildGridView(state.favorites, _currentSortMode),
+      ),
     );
   }
 

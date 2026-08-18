@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mekuru/core/theme/app_colors.dart';
 import 'package:mekuru/core/widgets/responsive_comic_grid.dart';
 import 'package:mekuru/features/explore/presentation/providers/explore_provider.dart';
+import 'package:mekuru/core/widgets/search_dialog.dart';
 
 class ExplorePage extends ConsumerStatefulWidget {
   const ExplorePage({super.key});
@@ -42,19 +43,26 @@ class _ExplorePageState extends ConsumerState<ExplorePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: TextField(
-          controller: _searchController,
-          decoration: InputDecoration(
-            hintText: '搜尋漫畫來源...',
-            border: InputBorder.none,
-            hintStyle: TextStyle(color: Colors.grey.shade400),
-          ),
-          onSubmitted: (val) => notifier.search(val),
-        ),
+        title: Text(state.searchQuery.isNotEmpty ? '搜尋: ${state.searchQuery}' : '探索'),
+        centerTitle: false,
         actions: [
           IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () => notifier.search(_searchController.text),
+            icon: Icon(state.searchQuery.isNotEmpty ? Icons.close_rounded : Icons.search_rounded),
+            onPressed: () {
+              if (state.searchQuery.isNotEmpty) {
+                notifier.search('');
+              } else {
+                showDialog(
+                  context: context,
+                  builder: (_) => SearchDialog(
+                    initialQuery: state.searchQuery,
+                    hintText: '在探索中搜尋...',
+                    onSearch: (query) => notifier.search(query),
+                    onClear: () => notifier.search(''),
+                  ),
+                );
+              }
+            },
           ),
         ],
       ),

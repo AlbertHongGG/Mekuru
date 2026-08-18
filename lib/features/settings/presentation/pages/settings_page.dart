@@ -8,6 +8,7 @@ import 'package:mekuru/core/theme/app_colors.dart';
 import 'package:mekuru/core/widgets/immersive_scaffold.dart';
 import 'package:mekuru/core/widgets/premium_config_header.dart';
 import 'package:mekuru/core/widgets/app_switch.dart';
+import 'package:mekuru/core/widgets/app_bottom_sheet.dart';
 import 'package:mekuru/core/notifications/presentation/screens/system_log_viewer_screen.dart';
 
 class SettingsPage extends ConsumerWidget {
@@ -73,159 +74,26 @@ class SettingsPage extends ConsumerWidget {
   }
 
   void _showModeBottomSheet(BuildContext context, WidgetRef ref, String currentMode) {
-    showModalBottomSheet(
+    AppBottomSheet.show(
       context: context,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) {
-        final theme = Theme.of(ctx);
-        final isDark = theme.brightness == Brightness.dark;
-        final secondaryTextColor = isDark ? Colors.white54 : Colors.black54;
-
-        return Padding(
-          padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
-          child: ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-                  border: Border(top: BorderSide(color: isDark ? Colors.white12 : Colors.black.withValues(alpha: 0.05))),
-                ),
-                child: SafeArea(
-                  top: false,
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 48,
-                          height: 5,
-                          margin: const EdgeInsets.only(bottom: 16),
-                          decoration: BoxDecoration(
-                            color: isDark ? Colors.white24 : Colors.black12,
-                            borderRadius: BorderRadius.circular(2.5),
-                          ),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              '選擇資料來源',
-                              style: TextStyle(
-                                fontFamily: 'Outfit',
-                                fontSize: 13,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 2.0,
-                                color: secondaryTextColor,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 24),
-                        InkWell(
-                          onTap: () {
-                            ref.read(settingsProvider.notifier).updateDataSourceMode('source');
-                            Navigator.pop(context);
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
-                            child: Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.primary.withValues(alpha: 0.1),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Icon(Icons.cloud_outlined, color: AppColors.primary, size: 20),
-                                ),
-                                const SizedBox(width: 16),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Provider Source',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600,
-                                          color: isDark ? Colors.white : Colors.black87,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        '直接請求菮箽 Comic API',
-                                        style: TextStyle(
-                                          fontSize: 13,
-                                          color: secondaryTextColor,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                if (currentMode == 'source')
-                                  const Icon(Icons.check_circle, color: AppColors.primary, size: 24),
-                              ],
-                            ),
-                          ),
-                        ),
-                        InkWell(
-                          onTap: () {
-                            ref.read(settingsProvider.notifier).updateDataSourceMode('db');
-                            Navigator.pop(context);
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
-                            child: Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.primary.withValues(alpha: 0.1),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Icon(Icons.storage_outlined, color: AppColors.primary, size: 20),
-                                ),
-                                const SizedBox(width: 16),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'DB Server',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600,
-                                          color: isDark ? Colors.white : Colors.black87,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        '從本地竭 Library API 取得資斉',
-                                        style: TextStyle(
-                                          fontSize: 13,
-                                          color: secondaryTextColor,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                if (currentMode == 'db')
-                                  const Icon(Icons.check_circle, color: AppColors.primary, size: 24),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        );
+      title: '選擇資料來源',
+      items: [
+        AppBottomSheetItemData(
+          title: 'Provider Source',
+          subtitle: '直接請求遠端 Comic API',
+          leadingIcon: Icons.cloud_outlined,
+          value: 'source',
+        ),
+        AppBottomSheetItemData(
+          title: 'DB Server',
+          subtitle: '從本地端 Library API 取得資料',
+          leadingIcon: Icons.storage_outlined,
+          value: 'db',
+        ),
+      ],
+      selectedValue: currentMode,
+      onItemSelected: (val) {
+        ref.read(settingsProvider.notifier).updateDataSourceMode(val);
       },
     );
   }

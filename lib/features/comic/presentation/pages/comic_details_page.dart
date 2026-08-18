@@ -94,6 +94,18 @@ class ComicDetailsPage extends ConsumerWidget {
           SliverAppBar(
             expandedHeight: 300,
             pinned: true,
+            leading: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Material(
+                color: Colors.black.withValues(alpha: 0.4),
+                shape: const CircleBorder(),
+                clipBehavior: Clip.antiAlias,
+                child: IconButton(
+                  icon: const Icon(Icons.arrow_back_rounded, color: Colors.white, size: 22),
+                  onPressed: () => context.pop(),
+                ),
+              ),
+            ),
             flexibleSpace: FlexibleSpaceBar(
               background: comic.coverUrl != null
                   ? Stack(
@@ -103,6 +115,26 @@ class ComicDetailsPage extends ConsumerWidget {
                           comic.coverUrl!,
                           fit: BoxFit.cover,
                         ),
+                        // Top gradient to protect icons
+                        Positioned(
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          height: 120,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Colors.black.withValues(alpha: 0.6),
+                                  Colors.transparent,
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        // Bottom gradient for blending
                         Container(
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
@@ -120,12 +152,21 @@ class ComicDetailsPage extends ConsumerWidget {
                   : const Center(child: Icon(Icons.image_not_supported, size: 64)),
             ),
             actions: [
-              IconButton(
-                icon: Icon(
-                  isFavorite ? Icons.favorite : Icons.favorite_border,
-                  color: isFavorite ? Colors.redAccent : Colors.white,
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Material(
+                  color: Colors.black.withValues(alpha: 0.4),
+                  shape: const CircleBorder(),
+                  clipBehavior: Clip.antiAlias,
+                  child: IconButton(
+                    icon: Icon(
+                      isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                      color: isFavorite ? Colors.redAccent : Colors.white,
+                      size: 22,
+                    ),
+                    onPressed: () => notifier.toggleFavorite(),
+                  ),
                 ),
-                onPressed: () => notifier.toggleFavorite(),
               ),
             ],
           ),

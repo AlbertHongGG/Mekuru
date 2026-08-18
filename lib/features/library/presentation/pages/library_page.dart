@@ -134,8 +134,8 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
       final q = _searchQuery.toLowerCase();
       result = result.where((f) {
         final title = (f.comic!.title ?? '').toLowerCase();
-        final author = f.comic!.author?.toLowerCase() ?? '';
-        return title.contains(q) || author.contains(q);
+        
+        return title.contains(q);
       }).toList();
     }
 

@@ -4,6 +4,8 @@ import 'package:mekuru/data/repositories/user_interaction_repository.dart';
 import 'package:mekuru/domain/models/comic.dart';
 import 'package:mekuru/domain/models/chapter.dart';
 import 'package:mekuru/domain/models/user_interaction.dart';
+import 'package:mekuru/features/library/presentation/providers/library_provider.dart';
+
 
 class ComicDetailsState {
   final bool isLoading;
@@ -11,6 +13,7 @@ class ComicDetailsState {
   final List<Chapter> chapters;
   final UserInteraction? interaction;
   final String? error;
+  final bool isChapterSortDescending;
 
   ComicDetailsState({
     this.isLoading = true,
@@ -18,6 +21,7 @@ class ComicDetailsState {
     this.chapters = const [],
     this.interaction,
     this.error,
+    this.isChapterSortDescending = true,
   });
 
   ComicDetailsState copyWith({
@@ -26,6 +30,7 @@ class ComicDetailsState {
     List<Chapter>? chapters,
     UserInteraction? interaction,
     String? error,
+    bool? isChapterSortDescending,
   }) {
     return ComicDetailsState(
       isLoading: isLoading ?? this.isLoading,
@@ -33,6 +38,7 @@ class ComicDetailsState {
       chapters: chapters ?? this.chapters,
       interaction: interaction ?? this.interaction,
       error: error,
+      isChapterSortDescending: isChapterSortDescending ?? this.isChapterSortDescending,
     );
   }
 }
@@ -73,6 +79,10 @@ class ComicDetailsNotifier extends AutoDisposeFamilyNotifier<ComicDetailsState, 
     }
   }
 
+    void toggleChapterSort() {
+    state = state.copyWith(isChapterSortDescending: !state.isChapterSortDescending);
+  }
+
   Future<void> toggleFavorite() async {
     final interactionRepo = ref.read(userInteractionRepositoryProvider);
     final isFavorite = state.interaction?.isFavorite ?? false;
@@ -83,6 +93,7 @@ class ComicDetailsNotifier extends AutoDisposeFamilyNotifier<ComicDetailsState, 
       // Re-fetch interaction
       final interaction = await interactionRepo.getInteraction(arg.providerId, arg.comicId);
       state = state.copyWith(interaction: interaction);
+      ref.invalidate(libraryProvider);
     } catch (e) {
       // Handle error gracefully
     }

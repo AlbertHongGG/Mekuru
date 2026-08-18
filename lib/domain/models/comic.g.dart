@@ -13,7 +13,6 @@ _Comic _$ComicFromJson(Map<String, dynamic> json) => _Comic(
   coverUrl: json['cover_url'] as String?,
   description: json['description'] as String?,
   tags: (json['tags'] as List<dynamic>?)?.map((e) => e as String).toList(),
-  author: json['author'] as String?,
   status: json['update_status'] as String?,
 );
 
@@ -24,6 +23,5 @@ Map<String, dynamic> _$ComicToJson(_Comic instance) => <String, dynamic>{
   'cover_url': instance.coverUrl,
   'description': instance.description,
   'tags': instance.tags,
-  'author': instance.author,
   'update_status': instance.status,
 };

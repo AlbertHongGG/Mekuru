@@ -4,7 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mekuru/core/theme/app_colors.dart';
 import 'package:mekuru/core/widgets/responsive_comic_grid.dart';
 import 'package:mekuru/features/explore/presentation/providers/explore_provider.dart';
+import 'package:mekuru/domain/models/comic.dart';
 import 'package:mekuru/core/widgets/search_dialog.dart';
+import 'package:mekuru/core/widgets/app_multi_select_bottom_sheet.dart';
 
 class ExplorePage extends ConsumerStatefulWidget {
   const ExplorePage({super.key});
@@ -14,8 +16,8 @@ class ExplorePage extends ConsumerStatefulWidget {
 }
 
 class _ExplorePageState extends ConsumerState<ExplorePage> {
-  final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -25,8 +27,9 @@ class _ExplorePageState extends ConsumerState<ExplorePage> {
 
   @override
   void dispose() {
-    _searchController.dispose();
+    _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -41,11 +44,83 @@ class _ExplorePageState extends ConsumerState<ExplorePage> {
     final state = ref.watch(exploreProvider);
     final notifier = ref.read(exploreProvider.notifier);
 
+    // Apply client-side tag filtering
+    List<Comic> displayComics = state.comics;
+    if (state.activeTags.isNotEmpty) {
+      displayComics = displayComics.where((comic) {
+        if (comic.tags == null) return state.isExcludeMode; // If no tags, include if excluding, exclude if including
+        
+        if (state.isExcludeMode) {
+          // EXCLUDE logic: comic must NOT have ANY of the active tags
+          return !state.activeTags.any((tag) => comic.tags!.contains(tag));
+        } else {
+          // INCLUDE logic: comic must have ALL active tags
+          return state.activeTags.any((tag) => comic.tags!.contains(tag));
+        }
+      }).toList();
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(state.searchQuery.isNotEmpty ? '搜尋: ${state.searchQuery}' : '探索'),
         centerTitle: false,
         actions: [
+          IconButton(
+            icon: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                const Icon(Icons.filter_list_rounded),
+                if (state.activeTags.isNotEmpty)
+                  Positioned(
+                    right: -2,
+                    top: -2,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: state.isExcludeMode ? Colors.redAccent : AppColors.primary,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Text(
+                        '${state.activeTags.length}',
+                        style: const TextStyle(fontSize: 8, color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            onPressed: () {
+              final isDark = Theme.of(context).brightness == Brightness.dark;
+              showModalBottomSheet(
+                context: context,
+                backgroundColor: Colors.transparent,
+                isScrollControlled: true,
+                builder: (context) => Consumer(
+                  builder: (context, ref, _) {
+                    final bottomState = ref.watch(exploreProvider);
+                    final bottomNotifier = ref.read(exploreProvider.notifier);
+                    return Container(
+                      padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+                      decoration: BoxDecoration(
+                        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+                        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                      ),
+                      child: SafeArea(
+                        child: AppMultiSelectBottomSheet(
+                          title: '標籤過濾',
+                          items: bottomState.knownTags,
+                          selectedItems: bottomState.activeTags,
+                          isExcludeMode: bottomState.isExcludeMode,
+                          onToggleItem: (tag) => bottomNotifier.toggleTag(tag),
+                          onToggleMode: () => bottomNotifier.toggleExcludeMode(),
+                          onClearAll: () => bottomNotifier.clearTags(),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              );
+            },
+          ),
           IconButton(
             icon: Icon(state.searchQuery.isNotEmpty ? Icons.close_rounded : Icons.search_rounded),
             onPressed: () {
@@ -57,8 +132,14 @@ class _ExplorePageState extends ConsumerState<ExplorePage> {
                   builder: (_) => SearchDialog(
                     initialQuery: state.searchQuery,
                     hintText: '在探索中搜尋...',
-                    onSearch: (query) => notifier.search(query),
-                    onClear: () => notifier.search(''),
+                    onSearch: (query) {
+                      _searchController.text = query;
+                      notifier.search(query);
+                    },
+                    onClear: () {
+                      _searchController.clear();
+                      notifier.search('');
+                    },
                   ),
                 );
               }
@@ -66,11 +147,11 @@ class _ExplorePageState extends ConsumerState<ExplorePage> {
           ),
         ],
       ),
-      body: _buildBody(state),
+      body: _buildBody(state, displayComics, notifier),
     );
   }
 
-  Widget _buildBody(ExploreState state) {
+  Widget _buildBody(ExploreState state, List<Comic> displayComics, ExploreNotifier notifier) {
     if (state.error != null) {
       return Center(
         child: Column(
@@ -81,7 +162,7 @@ class _ExplorePageState extends ConsumerState<ExplorePage> {
             Text('發生錯誤: ${state.error}'),
             const SizedBox(height: 16),
             ElevatedButton(
-              onPressed: () => ref.read(exploreProvider.notifier).loadExplore(),
+              onPressed: () => notifier.loadExplore(),
               child: const Text('重試'),
             ),
           ],
@@ -89,21 +170,22 @@ class _ExplorePageState extends ConsumerState<ExplorePage> {
       );
     }
 
-    if (state.isLoading && state.comics.isEmpty) {
+    if (state.isLoading && displayComics.isEmpty) {
       return const Center(child: CircularProgressIndicator(color: AppColors.primary));
     }
 
-    if (state.comics.isEmpty) {
-      return const Center(child: Text('找不到相關漫畫'));
+    if (displayComics.isEmpty) {
+      return const Center(child: Text('沒有找到相關漫畫'));
     }
 
     return RefreshIndicator(
-      onRefresh: () => ref.read(exploreProvider.notifier).loadExplore(),
       color: AppColors.primary,
+      onRefresh: () => notifier.loadExplore(),
       child: ResponsiveComicGrid(
         controller: _scrollController,
-        comics: state.comics,
+        comics: displayComics,
         hasNext: state.hasNext,
+        
         onTap: (comic) {
           context.push('/details/${comic.providerId ?? "comicwifi"}/${comic.comicId}');
         },

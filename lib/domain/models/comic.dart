@@ -12,7 +12,6 @@ abstract class Comic with _$Comic {
     @JsonKey(name: 'cover_url') String? coverUrl,
     String? description,
     List<String>? tags,
-    String? author,
     @JsonKey(name: 'update_status') String? status,
   }) = _Comic;
 

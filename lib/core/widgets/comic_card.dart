@@ -40,7 +40,7 @@ class ComicCard extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            (comic.tags != null && comic.tags!.isNotEmpty) ? comic.tags!.first : (comic.author ?? ''),
+            (comic.tags != null && comic.tags!.isNotEmpty) ? comic.tags!.first : '',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(color: Colors.grey, fontSize: 12),

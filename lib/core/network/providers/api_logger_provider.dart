@@ -21,6 +21,14 @@ class ApiLoggerNotifier extends StateNotifier<List<ApiLogEntry>> {
     ];
   }
 
+  void removeLog(String id) {
+    state = state.where((l) => l.id != id).toList();
+  }
+
+  void clearLogsByMethod(String method) {
+    state = state.where((l) => l.method.toUpperCase() != method.toUpperCase()).toList();
+  }
+
   void clearLogs() {
     state = [];
   }

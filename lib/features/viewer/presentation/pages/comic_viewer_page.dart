@@ -25,6 +25,7 @@ class ComicViewerPage extends ConsumerStatefulWidget {
 
 class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
   bool _showUI = false;
+  bool _hasAutoShownUIAtBottom = false;
 
   final ScrollController _scrollController = ScrollController();
   int _lastReportedPage = 0;
@@ -48,6 +49,18 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
     final state = ref.read(comicViewerProvider((providerId: widget.providerId, comicId: widget.comicId, chapterId: widget.chapterId)));
     
     if (state.pages.isEmpty || maxScroll <= 0) return;
+
+    // Auto-show UI when reaching the bottom (highly user-friendly UX pattern)
+    if (position >= maxScroll - 20) {
+      if (!_hasAutoShownUIAtBottom && !_showUI) {
+        setState(() {
+          _showUI = true;
+          _hasAutoShownUIAtBottom = true;
+        });
+      }
+    } else {
+      _hasAutoShownUIAtBottom = false; // Reset when scrolling up
+    }
     
     final progress = position / maxScroll;
     final currentPage = (progress * state.pages.length).clamp(0, state.pages.length - 1).floor();

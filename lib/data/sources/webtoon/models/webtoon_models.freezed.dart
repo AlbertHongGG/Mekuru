@@ -1096,42 +1096,42 @@ $WtSearchSectionCopyWith<$Res> get webtoonSearch {
 
 
 /// @nodoc
-mixin _$WtGenre {
+mixin _$WtTrendingTitleItem {
 
- String get displayName;
-/// Create a copy of WtGenre
+ int get titleNo; String get title; String get posterThumbnail; String? get genreDisplayName;
+/// Create a copy of WtTrendingTitleItem
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-$WtGenreCopyWith<WtGenre> get copyWith => _$WtGenreCopyWithImpl<WtGenre>(this as WtGenre, _$identity);
+$WtTrendingTitleItemCopyWith<WtTrendingTitleItem> get copyWith => _$WtTrendingTitleItemCopyWithImpl<WtTrendingTitleItem>(this as WtTrendingTitleItem, _$identity);
 
-  /// Serializes this WtGenre to a JSON map.
+  /// Serializes this WtTrendingTitleItem to a JSON map.
   Map<String, dynamic> toJson();
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WtGenre&&(identical(other.displayName, displayName) || other.displayName == displayName));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WtTrendingTitleItem&&(identical(other.titleNo, titleNo) || other.titleNo == titleNo)&&(identical(other.title, title) || other.title == title)&&(identical(other.posterThumbnail, posterThumbnail) || other.posterThumbnail == posterThumbnail)&&(identical(other.genreDisplayName, genreDisplayName) || other.genreDisplayName == genreDisplayName));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,displayName);
+int get hashCode => Object.hash(runtimeType,titleNo,title,posterThumbnail,genreDisplayName);
 
 @override
 String toString() {
-  return 'WtGenre(displayName: $displayName)';
+  return 'WtTrendingTitleItem(titleNo: $titleNo, title: $title, posterThumbnail: $posterThumbnail, genreDisplayName: $genreDisplayName)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class $WtGenreCopyWith<$Res>  {
-  factory $WtGenreCopyWith(WtGenre value, $Res Function(WtGenre) _then) = _$WtGenreCopyWithImpl;
+abstract mixin class $WtTrendingTitleItemCopyWith<$Res>  {
+  factory $WtTrendingTitleItemCopyWith(WtTrendingTitleItem value, $Res Function(WtTrendingTitleItem) _then) = _$WtTrendingTitleItemCopyWithImpl;
 @useResult
 $Res call({
- String displayName
+ int titleNo, String title, String posterThumbnail, String? genreDisplayName
 });
 
 
@@ -1139,305 +1139,30 @@ $Res call({
 
 }
 /// @nodoc
-class _$WtGenreCopyWithImpl<$Res>
-    implements $WtGenreCopyWith<$Res> {
-  _$WtGenreCopyWithImpl(this._self, this._then);
+class _$WtTrendingTitleItemCopyWithImpl<$Res>
+    implements $WtTrendingTitleItemCopyWith<$Res> {
+  _$WtTrendingTitleItemCopyWithImpl(this._self, this._then);
 
-  final WtGenre _self;
-  final $Res Function(WtGenre) _then;
+  final WtTrendingTitleItem _self;
+  final $Res Function(WtTrendingTitleItem) _then;
 
-/// Create a copy of WtGenre
+/// Create a copy of WtTrendingTitleItem
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? displayName = null,}) {
-  return _then(WtGenre(
-displayName: null == displayName ? _self.displayName : displayName // ignore: cast_nullable_to_non_nullable
-as String,
-  ));
-}
-
-}
-
-
-/// Adds pattern-matching-related methods to [WtGenre].
-extension WtGenrePatterns on WtGenre {
-/// A variant of `map` that fallback to returning `orElse`.
-///
-/// It is equivalent to doing:
-/// ```dart
-/// switch (sealedClass) {
-///   case final Subclass value:
-///     return ...;
-///   case _:
-///     return orElse();
-/// }
-/// ```
-
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _WtGenre value)?  $default,{required TResult orElse(),}){
-final _that = this;
-switch (_that) {
-case _WtGenre() when $default != null:
-return $default(_that);case _:
-  return orElse();
-
-}
-}
-/// A `switch`-like method, using callbacks.
-///
-/// Callbacks receives the raw object, upcasted.
-/// It is equivalent to doing:
-/// ```dart
-/// switch (sealedClass) {
-///   case final Subclass value:
-///     return ...;
-///   case final Subclass2 value:
-///     return ...;
-/// }
-/// ```
-
-@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _WtGenre value)  $default,){
-final _that = this;
-switch (_that) {
-case _WtGenre():
-return $default(_that);case _:
-  throw StateError('Unexpected subclass');
-
-}
-}
-/// A variant of `map` that fallback to returning `null`.
-///
-/// It is equivalent to doing:
-/// ```dart
-/// switch (sealedClass) {
-///   case final Subclass value:
-///     return ...;
-///   case _:
-///     return null;
-/// }
-/// ```
-
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _WtGenre value)?  $default,){
-final _that = this;
-switch (_that) {
-case _WtGenre() when $default != null:
-return $default(_that);case _:
-  return null;
-
-}
-}
-/// A variant of `when` that fallback to an `orElse` callback.
-///
-/// It is equivalent to doing:
-/// ```dart
-/// switch (sealedClass) {
-///   case Subclass(:final field):
-///     return ...;
-///   case _:
-///     return orElse();
-/// }
-/// ```
-
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String displayName)?  $default,{required TResult orElse(),}) {final _that = this;
-switch (_that) {
-case _WtGenre() when $default != null:
-return $default(_that.displayName);case _:
-  return orElse();
-
-}
-}
-/// A `switch`-like method, using callbacks.
-///
-/// As opposed to `map`, this offers destructuring.
-/// It is equivalent to doing:
-/// ```dart
-/// switch (sealedClass) {
-///   case Subclass(:final field):
-///     return ...;
-///   case Subclass2(:final field2):
-///     return ...;
-/// }
-/// ```
-
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String displayName)  $default,) {final _that = this;
-switch (_that) {
-case _WtGenre():
-return $default(_that.displayName);case _:
-  throw StateError('Unexpected subclass');
-
-}
-}
-/// A variant of `when` that fallback to returning `null`
-///
-/// It is equivalent to doing:
-/// ```dart
-/// switch (sealedClass) {
-///   case Subclass(:final field):
-///     return ...;
-///   case _:
-///     return null;
-/// }
-/// ```
-
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String displayName)?  $default,) {final _that = this;
-switch (_that) {
-case _WtGenre() when $default != null:
-return $default(_that.displayName);case _:
-  return null;
-
-}
-}
-
-}
-
-/// @nodoc
-@JsonSerializable()
-
-class _WtGenre implements WtGenre {
-  const _WtGenre({required this.displayName});
-  factory _WtGenre.fromJson(Map<String, dynamic> json) => _$WtGenreFromJson(json);
-
-@override final  String displayName;
-
-/// Create a copy of WtGenre
-/// with the given fields replaced by the non-null parameter values.
-@override @JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-_$WtGenreCopyWith<_WtGenre> get copyWith => __$WtGenreCopyWithImpl<_WtGenre>(this, _$identity);
-
-@override
-Map<String, dynamic> toJson() {
-  return _$WtGenreToJson(this, );
-}
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WtGenre&&(identical(other.displayName, displayName) || other.displayName == displayName));
-}
-
-@JsonKey(includeFromJson: false, includeToJson: false)
-@override
-int get hashCode => Object.hash(runtimeType,displayName);
-
-@override
-String toString() {
-  return 'WtGenre(displayName: $displayName)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class _$WtGenreCopyWith<$Res> implements $WtGenreCopyWith<$Res> {
-  factory _$WtGenreCopyWith(_WtGenre value, $Res Function(_WtGenre) _then) = __$WtGenreCopyWithImpl;
-@override @useResult
-$Res call({
- String displayName
-});
-
-
-
-
-}
-/// @nodoc
-class __$WtGenreCopyWithImpl<$Res>
-    implements _$WtGenreCopyWith<$Res> {
-  __$WtGenreCopyWithImpl(this._self, this._then);
-
-  final _WtGenre _self;
-  final $Res Function(_WtGenre) _then;
-
-/// Create a copy of WtGenre
-/// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? displayName = null,}) {
-  return _then(_WtGenre(
-displayName: null == displayName ? _self.displayName : displayName // ignore: cast_nullable_to_non_nullable
-as String,
-  ));
-}
-
-
-}
-
-
-/// @nodoc
-mixin _$WtChallengeTitleItem {
-
- int get titleNo; String get readingTitle; String get thumbnailImageUrl; WtGenre? get representGenre;
-/// Create a copy of WtChallengeTitleItem
-/// with the given fields replaced by the non-null parameter values.
-@JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-$WtChallengeTitleItemCopyWith<WtChallengeTitleItem> get copyWith => _$WtChallengeTitleItemCopyWithImpl<WtChallengeTitleItem>(this as WtChallengeTitleItem, _$identity);
-
-  /// Serializes this WtChallengeTitleItem to a JSON map.
-  Map<String, dynamic> toJson();
-
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WtChallengeTitleItem&&(identical(other.titleNo, titleNo) || other.titleNo == titleNo)&&(identical(other.readingTitle, readingTitle) || other.readingTitle == readingTitle)&&(identical(other.thumbnailImageUrl, thumbnailImageUrl) || other.thumbnailImageUrl == thumbnailImageUrl)&&(identical(other.representGenre, representGenre) || other.representGenre == representGenre));
-}
-
-@JsonKey(includeFromJson: false, includeToJson: false)
-@override
-int get hashCode => Object.hash(runtimeType,titleNo,readingTitle,thumbnailImageUrl,representGenre);
-
-@override
-String toString() {
-  return 'WtChallengeTitleItem(titleNo: $titleNo, readingTitle: $readingTitle, thumbnailImageUrl: $thumbnailImageUrl, representGenre: $representGenre)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class $WtChallengeTitleItemCopyWith<$Res>  {
-  factory $WtChallengeTitleItemCopyWith(WtChallengeTitleItem value, $Res Function(WtChallengeTitleItem) _then) = _$WtChallengeTitleItemCopyWithImpl;
-@useResult
-$Res call({
- int titleNo, String readingTitle, String thumbnailImageUrl, WtGenre? representGenre
-});
-
-
-$WtGenreCopyWith<$Res>? get representGenre;
-
-}
-/// @nodoc
-class _$WtChallengeTitleItemCopyWithImpl<$Res>
-    implements $WtChallengeTitleItemCopyWith<$Res> {
-  _$WtChallengeTitleItemCopyWithImpl(this._self, this._then);
-
-  final WtChallengeTitleItem _self;
-  final $Res Function(WtChallengeTitleItem) _then;
-
-/// Create a copy of WtChallengeTitleItem
-/// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? titleNo = null,Object? readingTitle = null,Object? thumbnailImageUrl = null,Object? representGenre = freezed,}) {
-  return _then(WtChallengeTitleItem(
+@pragma('vm:prefer-inline') @override $Res call({Object? titleNo = null,Object? title = null,Object? posterThumbnail = null,Object? genreDisplayName = freezed,}) {
+  return _then(WtTrendingTitleItem(
 titleNo: null == titleNo ? _self.titleNo : titleNo // ignore: cast_nullable_to_non_nullable
-as int,readingTitle: null == readingTitle ? _self.readingTitle : readingTitle // ignore: cast_nullable_to_non_nullable
-as String,thumbnailImageUrl: null == thumbnailImageUrl ? _self.thumbnailImageUrl : thumbnailImageUrl // ignore: cast_nullable_to_non_nullable
-as String,representGenre: freezed == representGenre ? _self.representGenre : representGenre // ignore: cast_nullable_to_non_nullable
-as WtGenre?,
+as int,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String,posterThumbnail: null == posterThumbnail ? _self.posterThumbnail : posterThumbnail // ignore: cast_nullable_to_non_nullable
+as String,genreDisplayName: freezed == genreDisplayName ? _self.genreDisplayName : genreDisplayName // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
-/// Create a copy of WtChallengeTitleItem
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$WtGenreCopyWith<$Res>? get representGenre {
-    if (_self.representGenre == null) {
-    return null;
-  }
 
-  return $WtGenreCopyWith<$Res>(_self.representGenre!, (value) {
-    return _then(_self.copyWith(representGenre: value));
-  });
-}
 }
 
 
-/// Adds pattern-matching-related methods to [WtChallengeTitleItem].
-extension WtChallengeTitleItemPatterns on WtChallengeTitleItem {
+/// Adds pattern-matching-related methods to [WtTrendingTitleItem].
+extension WtTrendingTitleItemPatterns on WtTrendingTitleItem {
 /// A variant of `map` that fallback to returning `orElse`.
 ///
 /// It is equivalent to doing:
@@ -1450,10 +1175,10 @@ extension WtChallengeTitleItemPatterns on WtChallengeTitleItem {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _WtChallengeTitleItem value)?  $default,{required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _WtTrendingTitleItem value)?  $default,{required TResult orElse(),}){
 final _that = this;
 switch (_that) {
-case _WtChallengeTitleItem() when $default != null:
+case _WtTrendingTitleItem() when $default != null:
 return $default(_that);case _:
   return orElse();
 
@@ -1472,10 +1197,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _WtChallengeTitleItem value)  $default,){
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _WtTrendingTitleItem value)  $default,){
 final _that = this;
 switch (_that) {
-case _WtChallengeTitleItem():
+case _WtTrendingTitleItem():
 return $default(_that);case _:
   throw StateError('Unexpected subclass');
 
@@ -1493,10 +1218,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _WtChallengeTitleItem value)?  $default,){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _WtTrendingTitleItem value)?  $default,){
 final _that = this;
 switch (_that) {
-case _WtChallengeTitleItem() when $default != null:
+case _WtTrendingTitleItem() when $default != null:
 return $default(_that);case _:
   return null;
 
@@ -1514,10 +1239,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int titleNo,  String readingTitle,  String thumbnailImageUrl,  WtGenre? representGenre)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int titleNo,  String title,  String posterThumbnail,  String? genreDisplayName)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
-case _WtChallengeTitleItem() when $default != null:
-return $default(_that.titleNo,_that.readingTitle,_that.thumbnailImageUrl,_that.representGenre);case _:
+case _WtTrendingTitleItem() when $default != null:
+return $default(_that.titleNo,_that.title,_that.posterThumbnail,_that.genreDisplayName);case _:
   return orElse();
 
 }
@@ -1535,10 +1260,10 @@ return $default(_that.titleNo,_that.readingTitle,_that.thumbnailImageUrl,_that.r
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int titleNo,  String readingTitle,  String thumbnailImageUrl,  WtGenre? representGenre)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int titleNo,  String title,  String posterThumbnail,  String? genreDisplayName)  $default,) {final _that = this;
 switch (_that) {
-case _WtChallengeTitleItem():
-return $default(_that.titleNo,_that.readingTitle,_that.thumbnailImageUrl,_that.representGenre);case _:
+case _WtTrendingTitleItem():
+return $default(_that.titleNo,_that.title,_that.posterThumbnail,_that.genreDisplayName);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -1555,10 +1280,10 @@ return $default(_that.titleNo,_that.readingTitle,_that.thumbnailImageUrl,_that.r
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int titleNo,  String readingTitle,  String thumbnailImageUrl,  WtGenre? representGenre)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int titleNo,  String title,  String posterThumbnail,  String? genreDisplayName)?  $default,) {final _that = this;
 switch (_that) {
-case _WtChallengeTitleItem() when $default != null:
-return $default(_that.titleNo,_that.readingTitle,_that.thumbnailImageUrl,_that.representGenre);case _:
+case _WtTrendingTitleItem() when $default != null:
+return $default(_that.titleNo,_that.title,_that.posterThumbnail,_that.genreDisplayName);case _:
   return null;
 
 }
@@ -1569,128 +1294,116 @@ return $default(_that.titleNo,_that.readingTitle,_that.thumbnailImageUrl,_that.r
 /// @nodoc
 @JsonSerializable()
 
-class _WtChallengeTitleItem implements WtChallengeTitleItem {
-  const _WtChallengeTitleItem({required this.titleNo, required this.readingTitle, required this.thumbnailImageUrl, this.representGenre});
-  factory _WtChallengeTitleItem.fromJson(Map<String, dynamic> json) => _$WtChallengeTitleItemFromJson(json);
+class _WtTrendingTitleItem implements WtTrendingTitleItem {
+  const _WtTrendingTitleItem({required this.titleNo, required this.title, required this.posterThumbnail, this.genreDisplayName});
+  factory _WtTrendingTitleItem.fromJson(Map<String, dynamic> json) => _$WtTrendingTitleItemFromJson(json);
 
 @override final  int titleNo;
-@override final  String readingTitle;
-@override final  String thumbnailImageUrl;
-@override final  WtGenre? representGenre;
+@override final  String title;
+@override final  String posterThumbnail;
+@override final  String? genreDisplayName;
 
-/// Create a copy of WtChallengeTitleItem
+/// Create a copy of WtTrendingTitleItem
 /// with the given fields replaced by the non-null parameter values.
 @override @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-_$WtChallengeTitleItemCopyWith<_WtChallengeTitleItem> get copyWith => __$WtChallengeTitleItemCopyWithImpl<_WtChallengeTitleItem>(this, _$identity);
+_$WtTrendingTitleItemCopyWith<_WtTrendingTitleItem> get copyWith => __$WtTrendingTitleItemCopyWithImpl<_WtTrendingTitleItem>(this, _$identity);
 
 @override
 Map<String, dynamic> toJson() {
-  return _$WtChallengeTitleItemToJson(this, );
+  return _$WtTrendingTitleItemToJson(this, );
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WtChallengeTitleItem&&(identical(other.titleNo, titleNo) || other.titleNo == titleNo)&&(identical(other.readingTitle, readingTitle) || other.readingTitle == readingTitle)&&(identical(other.thumbnailImageUrl, thumbnailImageUrl) || other.thumbnailImageUrl == thumbnailImageUrl)&&(identical(other.representGenre, representGenre) || other.representGenre == representGenre));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WtTrendingTitleItem&&(identical(other.titleNo, titleNo) || other.titleNo == titleNo)&&(identical(other.title, title) || other.title == title)&&(identical(other.posterThumbnail, posterThumbnail) || other.posterThumbnail == posterThumbnail)&&(identical(other.genreDisplayName, genreDisplayName) || other.genreDisplayName == genreDisplayName));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,titleNo,readingTitle,thumbnailImageUrl,representGenre);
+int get hashCode => Object.hash(runtimeType,titleNo,title,posterThumbnail,genreDisplayName);
 
 @override
 String toString() {
-  return 'WtChallengeTitleItem(titleNo: $titleNo, readingTitle: $readingTitle, thumbnailImageUrl: $thumbnailImageUrl, representGenre: $representGenre)';
+  return 'WtTrendingTitleItem(titleNo: $titleNo, title: $title, posterThumbnail: $posterThumbnail, genreDisplayName: $genreDisplayName)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class _$WtChallengeTitleItemCopyWith<$Res> implements $WtChallengeTitleItemCopyWith<$Res> {
-  factory _$WtChallengeTitleItemCopyWith(_WtChallengeTitleItem value, $Res Function(_WtChallengeTitleItem) _then) = __$WtChallengeTitleItemCopyWithImpl;
+abstract mixin class _$WtTrendingTitleItemCopyWith<$Res> implements $WtTrendingTitleItemCopyWith<$Res> {
+  factory _$WtTrendingTitleItemCopyWith(_WtTrendingTitleItem value, $Res Function(_WtTrendingTitleItem) _then) = __$WtTrendingTitleItemCopyWithImpl;
 @override @useResult
 $Res call({
- int titleNo, String readingTitle, String thumbnailImageUrl, WtGenre? representGenre
+ int titleNo, String title, String posterThumbnail, String? genreDisplayName
 });
 
 
-@override $WtGenreCopyWith<$Res>? get representGenre;
+
 
 }
 /// @nodoc
-class __$WtChallengeTitleItemCopyWithImpl<$Res>
-    implements _$WtChallengeTitleItemCopyWith<$Res> {
-  __$WtChallengeTitleItemCopyWithImpl(this._self, this._then);
+class __$WtTrendingTitleItemCopyWithImpl<$Res>
+    implements _$WtTrendingTitleItemCopyWith<$Res> {
+  __$WtTrendingTitleItemCopyWithImpl(this._self, this._then);
 
-  final _WtChallengeTitleItem _self;
-  final $Res Function(_WtChallengeTitleItem) _then;
+  final _WtTrendingTitleItem _self;
+  final $Res Function(_WtTrendingTitleItem) _then;
 
-/// Create a copy of WtChallengeTitleItem
+/// Create a copy of WtTrendingTitleItem
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? titleNo = null,Object? readingTitle = null,Object? thumbnailImageUrl = null,Object? representGenre = freezed,}) {
-  return _then(_WtChallengeTitleItem(
+@override @pragma('vm:prefer-inline') $Res call({Object? titleNo = null,Object? title = null,Object? posterThumbnail = null,Object? genreDisplayName = freezed,}) {
+  return _then(_WtTrendingTitleItem(
 titleNo: null == titleNo ? _self.titleNo : titleNo // ignore: cast_nullable_to_non_nullable
-as int,readingTitle: null == readingTitle ? _self.readingTitle : readingTitle // ignore: cast_nullable_to_non_nullable
-as String,thumbnailImageUrl: null == thumbnailImageUrl ? _self.thumbnailImageUrl : thumbnailImageUrl // ignore: cast_nullable_to_non_nullable
-as String,representGenre: freezed == representGenre ? _self.representGenre : representGenre // ignore: cast_nullable_to_non_nullable
-as WtGenre?,
+as int,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String,posterThumbnail: null == posterThumbnail ? _self.posterThumbnail : posterThumbnail // ignore: cast_nullable_to_non_nullable
+as String,genreDisplayName: freezed == genreDisplayName ? _self.genreDisplayName : genreDisplayName // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
-/// Create a copy of WtChallengeTitleItem
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$WtGenreCopyWith<$Res>? get representGenre {
-    if (_self.representGenre == null) {
-    return null;
-  }
 
-  return $WtGenreCopyWith<$Res>(_self.representGenre!, (value) {
-    return _then(_self.copyWith(representGenre: value));
-  });
-}
 }
 
 
 /// @nodoc
-mixin _$WtChallengeGenreTitleListResult {
+mixin _$WtTrendingChartResult {
 
- List<WtChallengeTitleItem> get challengeTitleList;
-/// Create a copy of WtChallengeGenreTitleListResult
+ List<WtTrendingTitleItem> get titleList;
+/// Create a copy of WtTrendingChartResult
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-$WtChallengeGenreTitleListResultCopyWith<WtChallengeGenreTitleListResult> get copyWith => _$WtChallengeGenreTitleListResultCopyWithImpl<WtChallengeGenreTitleListResult>(this as WtChallengeGenreTitleListResult, _$identity);
+$WtTrendingChartResultCopyWith<WtTrendingChartResult> get copyWith => _$WtTrendingChartResultCopyWithImpl<WtTrendingChartResult>(this as WtTrendingChartResult, _$identity);
 
-  /// Serializes this WtChallengeGenreTitleListResult to a JSON map.
+  /// Serializes this WtTrendingChartResult to a JSON map.
   Map<String, dynamic> toJson();
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WtChallengeGenreTitleListResult&&const DeepCollectionEquality().equals(other.challengeTitleList, challengeTitleList));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WtTrendingChartResult&&const DeepCollectionEquality().equals(other.titleList, titleList));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(challengeTitleList));
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(titleList));
 
 @override
 String toString() {
-  return 'WtChallengeGenreTitleListResult(challengeTitleList: $challengeTitleList)';
+  return 'WtTrendingChartResult(titleList: $titleList)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class $WtChallengeGenreTitleListResultCopyWith<$Res>  {
-  factory $WtChallengeGenreTitleListResultCopyWith(WtChallengeGenreTitleListResult value, $Res Function(WtChallengeGenreTitleListResult) _then) = _$WtChallengeGenreTitleListResultCopyWithImpl;
+abstract mixin class $WtTrendingChartResultCopyWith<$Res>  {
+  factory $WtTrendingChartResultCopyWith(WtTrendingChartResult value, $Res Function(WtTrendingChartResult) _then) = _$WtTrendingChartResultCopyWithImpl;
 @useResult
 $Res call({
- List<WtChallengeTitleItem> challengeTitleList
+ List<WtTrendingTitleItem> titleList
 });
 
 
@@ -1698,27 +1411,27 @@ $Res call({
 
 }
 /// @nodoc
-class _$WtChallengeGenreTitleListResultCopyWithImpl<$Res>
-    implements $WtChallengeGenreTitleListResultCopyWith<$Res> {
-  _$WtChallengeGenreTitleListResultCopyWithImpl(this._self, this._then);
+class _$WtTrendingChartResultCopyWithImpl<$Res>
+    implements $WtTrendingChartResultCopyWith<$Res> {
+  _$WtTrendingChartResultCopyWithImpl(this._self, this._then);
 
-  final WtChallengeGenreTitleListResult _self;
-  final $Res Function(WtChallengeGenreTitleListResult) _then;
+  final WtTrendingChartResult _self;
+  final $Res Function(WtTrendingChartResult) _then;
 
-/// Create a copy of WtChallengeGenreTitleListResult
+/// Create a copy of WtTrendingChartResult
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? challengeTitleList = null,}) {
-  return _then(WtChallengeGenreTitleListResult(
-challengeTitleList: null == challengeTitleList ? _self.challengeTitleList : challengeTitleList // ignore: cast_nullable_to_non_nullable
-as List<WtChallengeTitleItem>,
+@pragma('vm:prefer-inline') @override $Res call({Object? titleList = null,}) {
+  return _then(WtTrendingChartResult(
+titleList: null == titleList ? _self.titleList : titleList // ignore: cast_nullable_to_non_nullable
+as List<WtTrendingTitleItem>,
   ));
 }
 
 }
 
 
-/// Adds pattern-matching-related methods to [WtChallengeGenreTitleListResult].
-extension WtChallengeGenreTitleListResultPatterns on WtChallengeGenreTitleListResult {
+/// Adds pattern-matching-related methods to [WtTrendingChartResult].
+extension WtTrendingChartResultPatterns on WtTrendingChartResult {
 /// A variant of `map` that fallback to returning `orElse`.
 ///
 /// It is equivalent to doing:
@@ -1731,10 +1444,10 @@ extension WtChallengeGenreTitleListResultPatterns on WtChallengeGenreTitleListRe
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _WtChallengeGenreTitleListResult value)?  $default,{required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _WtTrendingChartResult value)?  $default,{required TResult orElse(),}){
 final _that = this;
 switch (_that) {
-case _WtChallengeGenreTitleListResult() when $default != null:
+case _WtTrendingChartResult() when $default != null:
 return $default(_that);case _:
   return orElse();
 
@@ -1753,10 +1466,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _WtChallengeGenreTitleListResult value)  $default,){
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _WtTrendingChartResult value)  $default,){
 final _that = this;
 switch (_that) {
-case _WtChallengeGenreTitleListResult():
+case _WtTrendingChartResult():
 return $default(_that);case _:
   throw StateError('Unexpected subclass');
 
@@ -1774,10 +1487,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _WtChallengeGenreTitleListResult value)?  $default,){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _WtTrendingChartResult value)?  $default,){
 final _that = this;
 switch (_that) {
-case _WtChallengeGenreTitleListResult() when $default != null:
+case _WtTrendingChartResult() when $default != null:
 return $default(_that);case _:
   return null;
 
@@ -1795,10 +1508,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<WtChallengeTitleItem> challengeTitleList)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<WtTrendingTitleItem> titleList)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
-case _WtChallengeGenreTitleListResult() when $default != null:
-return $default(_that.challengeTitleList);case _:
+case _WtTrendingChartResult() when $default != null:
+return $default(_that.titleList);case _:
   return orElse();
 
 }
@@ -1816,10 +1529,10 @@ return $default(_that.challengeTitleList);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<WtChallengeTitleItem> challengeTitleList)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<WtTrendingTitleItem> titleList)  $default,) {final _that = this;
 switch (_that) {
-case _WtChallengeGenreTitleListResult():
-return $default(_that.challengeTitleList);case _:
+case _WtTrendingChartResult():
+return $default(_that.titleList);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -1836,10 +1549,10 @@ return $default(_that.challengeTitleList);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<WtChallengeTitleItem> challengeTitleList)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<WtTrendingTitleItem> titleList)?  $default,) {final _that = this;
 switch (_that) {
-case _WtChallengeGenreTitleListResult() when $default != null:
-return $default(_that.challengeTitleList);case _:
+case _WtTrendingChartResult() when $default != null:
+return $default(_that.titleList);case _:
   return null;
 
 }
@@ -1850,52 +1563,52 @@ return $default(_that.challengeTitleList);case _:
 /// @nodoc
 @JsonSerializable()
 
-class _WtChallengeGenreTitleListResult implements WtChallengeGenreTitleListResult {
-  const _WtChallengeGenreTitleListResult({ List<WtChallengeTitleItem> challengeTitleList = const []}): _challengeTitleList = challengeTitleList;
-  factory _WtChallengeGenreTitleListResult.fromJson(Map<String, dynamic> json) => _$WtChallengeGenreTitleListResultFromJson(json);
+class _WtTrendingChartResult implements WtTrendingChartResult {
+  const _WtTrendingChartResult({ List<WtTrendingTitleItem> titleList = const []}): _titleList = titleList;
+  factory _WtTrendingChartResult.fromJson(Map<String, dynamic> json) => _$WtTrendingChartResultFromJson(json);
 
- final  List<WtChallengeTitleItem> _challengeTitleList;
-@override@JsonKey() List<WtChallengeTitleItem> get challengeTitleList {
-  if (_challengeTitleList is EqualUnmodifiableListView) return _challengeTitleList;
+ final  List<WtTrendingTitleItem> _titleList;
+@override@JsonKey() List<WtTrendingTitleItem> get titleList {
+  if (_titleList is EqualUnmodifiableListView) return _titleList;
   // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_challengeTitleList);
+  return EqualUnmodifiableListView(_titleList);
 }
 
 
-/// Create a copy of WtChallengeGenreTitleListResult
+/// Create a copy of WtTrendingChartResult
 /// with the given fields replaced by the non-null parameter values.
 @override @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-_$WtChallengeGenreTitleListResultCopyWith<_WtChallengeGenreTitleListResult> get copyWith => __$WtChallengeGenreTitleListResultCopyWithImpl<_WtChallengeGenreTitleListResult>(this, _$identity);
+_$WtTrendingChartResultCopyWith<_WtTrendingChartResult> get copyWith => __$WtTrendingChartResultCopyWithImpl<_WtTrendingChartResult>(this, _$identity);
 
 @override
 Map<String, dynamic> toJson() {
-  return _$WtChallengeGenreTitleListResultToJson(this, );
+  return _$WtTrendingChartResultToJson(this, );
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WtChallengeGenreTitleListResult&&const DeepCollectionEquality().equals(other._challengeTitleList, _challengeTitleList));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WtTrendingChartResult&&const DeepCollectionEquality().equals(other._titleList, _titleList));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_challengeTitleList));
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_titleList));
 
 @override
 String toString() {
-  return 'WtChallengeGenreTitleListResult(challengeTitleList: $challengeTitleList)';
+  return 'WtTrendingChartResult(titleList: $titleList)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class _$WtChallengeGenreTitleListResultCopyWith<$Res> implements $WtChallengeGenreTitleListResultCopyWith<$Res> {
-  factory _$WtChallengeGenreTitleListResultCopyWith(_WtChallengeGenreTitleListResult value, $Res Function(_WtChallengeGenreTitleListResult) _then) = __$WtChallengeGenreTitleListResultCopyWithImpl;
+abstract mixin class _$WtTrendingChartResultCopyWith<$Res> implements $WtTrendingChartResultCopyWith<$Res> {
+  factory _$WtTrendingChartResultCopyWith(_WtTrendingChartResult value, $Res Function(_WtTrendingChartResult) _then) = __$WtTrendingChartResultCopyWithImpl;
 @override @useResult
 $Res call({
- List<WtChallengeTitleItem> challengeTitleList
+ List<WtTrendingTitleItem> titleList
 });
 
 
@@ -1903,19 +1616,19 @@ $Res call({
 
 }
 /// @nodoc
-class __$WtChallengeGenreTitleListResultCopyWithImpl<$Res>
-    implements _$WtChallengeGenreTitleListResultCopyWith<$Res> {
-  __$WtChallengeGenreTitleListResultCopyWithImpl(this._self, this._then);
+class __$WtTrendingChartResultCopyWithImpl<$Res>
+    implements _$WtTrendingChartResultCopyWith<$Res> {
+  __$WtTrendingChartResultCopyWithImpl(this._self, this._then);
 
-  final _WtChallengeGenreTitleListResult _self;
-  final $Res Function(_WtChallengeGenreTitleListResult) _then;
+  final _WtTrendingChartResult _self;
+  final $Res Function(_WtTrendingChartResult) _then;
 
-/// Create a copy of WtChallengeGenreTitleListResult
+/// Create a copy of WtTrendingChartResult
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? challengeTitleList = null,}) {
-  return _then(_WtChallengeGenreTitleListResult(
-challengeTitleList: null == challengeTitleList ? _self._challengeTitleList : challengeTitleList // ignore: cast_nullable_to_non_nullable
-as List<WtChallengeTitleItem>,
+@override @pragma('vm:prefer-inline') $Res call({Object? titleList = null,}) {
+  return _then(_WtTrendingChartResult(
+titleList: null == titleList ? _self._titleList : titleList // ignore: cast_nullable_to_non_nullable
+as List<WtTrendingTitleItem>,
   ));
 }
 

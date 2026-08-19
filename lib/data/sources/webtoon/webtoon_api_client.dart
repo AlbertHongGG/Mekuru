@@ -36,15 +36,12 @@ class WebtoonApiClient {
     return WtSearchResult.fromJson(_extractResult(response));
   }
 
-  Future<WtChallengeGenreTitleListResult> challengeGenreTitleListV1({String genre = 'ALL', String sortOrder = 'MANA', int startIndex = 0, int pageSize = 20}) async {
-    final response = await _dio.get('/lineWebtoon/webtoon/challengeGenreTitleListV1', queryParameters: {
-      'genre': genre,
-      'sortOrder': sortOrder,
-      'startIndex': startIndex,
-      'pageSize': pageSize,
+  Future<WtTrendingChartResult> trendingChartTitles({int size = 30}) async {
+    final response = await _dio.get('/lineWebtoon/webtoon/trendingChartTitles.json', queryParameters: {
+      'size': size,
       'v': '1',
     });
-    return WtChallengeGenreTitleListResult.fromJson(_extractResult(response));
+    return WtTrendingChartResult.fromJson(_extractResult(response));
   }
 
   Future<WtTitleHomeResult> titleHomeMainV3(int titleNo) async {

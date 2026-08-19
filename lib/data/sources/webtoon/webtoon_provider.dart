@@ -153,22 +153,30 @@ class WebtoonProvider implements IComicProvider {
 
   @override
   Future<PaginatedResult<ComicExploreResult>> exploreComics(int page) async {
-    final pageSize = 20;
-    final startIndex = (page - 1) * pageSize; // 0-based for this endpoint
-    final dto = await _apiClient.challengeGenreTitleListV1(startIndex: startIndex, pageSize: pageSize);
+    // trendingChartTitles does not have pagination (only size). 
+    // We only return data on page 1.
+    if (page > 1) {
+      return PaginatedResult<ComicExploreResult>(
+        items: [],
+        page: page,
+        hasNext: false,
+      );
+    }
+
+    final dto = await _apiClient.trendingChartTitles(size: 30);
     
-    final comics = dto.challengeTitleList.map((e) => ComicExploreResult(
+    final comics = dto.titleList.map((e) => ComicExploreResult(
       comicId: e.titleNo.toString(),
       providerId: _id,
-      title: e.readingTitle,
-      coverUrl: _getFullImageUrl(e.thumbnailImageUrl),
-      tags: e.representGenre != null ? [e.representGenre!.displayName] : [],
+      title: e.title,
+      coverUrl: _getFullImageUrl(e.posterThumbnail),
+      tags: e.genreDisplayName != null ? [e.genreDisplayName!] : [],
     )).toList();
     
     return PaginatedResult<ComicExploreResult>(
       items: comics,
       page: page,
-      hasNext: comics.length == pageSize, // Simplified logic
+      hasNext: false,
     );
   }
 }

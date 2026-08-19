@@ -39,32 +39,24 @@ abstract class WtSearchResult with _$WtSearchResult {
   factory WtSearchResult.fromJson(Map<String, dynamic> json) => _$WtSearchResultFromJson(json);
 }
 
-// --- Explore ---
+// --- Trending ---
 @freezed
-abstract class WtGenre with _$WtGenre {
-  const factory WtGenre({
-    required String displayName,
-  }) = _WtGenre;
-  factory WtGenre.fromJson(Map<String, dynamic> json) => _$WtGenreFromJson(json);
-}
-
-@freezed
-abstract class WtChallengeTitleItem with _$WtChallengeTitleItem {
-  const factory WtChallengeTitleItem({
+abstract class WtTrendingTitleItem with _$WtTrendingTitleItem {
+  const factory WtTrendingTitleItem({
     required int titleNo,
-    required String readingTitle,
-    required String thumbnailImageUrl,
-    WtGenre? representGenre,
-  }) = _WtChallengeTitleItem;
-  factory WtChallengeTitleItem.fromJson(Map<String, dynamic> json) => _$WtChallengeTitleItemFromJson(json);
+    required String title,
+    required String posterThumbnail,
+    String? genreDisplayName,
+  }) = _WtTrendingTitleItem;
+  factory WtTrendingTitleItem.fromJson(Map<String, dynamic> json) => _$WtTrendingTitleItemFromJson(json);
 }
 
 @freezed
-abstract class WtChallengeGenreTitleListResult with _$WtChallengeGenreTitleListResult {
-  const factory WtChallengeGenreTitleListResult({
-    @Default([]) List<WtChallengeTitleItem> challengeTitleList,
-  }) = _WtChallengeGenreTitleListResult;
-  factory WtChallengeGenreTitleListResult.fromJson(Map<String, dynamic> json) => _$WtChallengeGenreTitleListResultFromJson(json);
+abstract class WtTrendingChartResult with _$WtTrendingChartResult {
+  const factory WtTrendingChartResult({
+    @Default([]) List<WtTrendingTitleItem> titleList,
+  }) = _WtTrendingChartResult;
+  factory WtTrendingChartResult.fromJson(Map<String, dynamic> json) => _$WtTrendingChartResultFromJson(json);
 }
 
 // --- Title Detail ---

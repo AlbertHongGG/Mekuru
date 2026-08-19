@@ -49,46 +49,36 @@ _WtSearchResult _$WtSearchResultFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$WtSearchResultToJson(_WtSearchResult instance) =>
     <String, dynamic>{'webtoonSearch': instance.webtoonSearch};
 
-_WtGenre _$WtGenreFromJson(Map<String, dynamic> json) =>
-    _WtGenre(displayName: json['displayName'] as String);
+_WtTrendingTitleItem _$WtTrendingTitleItemFromJson(Map<String, dynamic> json) =>
+    _WtTrendingTitleItem(
+      titleNo: (json['titleNo'] as num).toInt(),
+      title: json['title'] as String,
+      posterThumbnail: json['posterThumbnail'] as String,
+      genreDisplayName: json['genreDisplayName'] as String?,
+    );
 
-Map<String, dynamic> _$WtGenreToJson(_WtGenre instance) => <String, dynamic>{
-  'displayName': instance.displayName,
-};
-
-_WtChallengeTitleItem _$WtChallengeTitleItemFromJson(
-  Map<String, dynamic> json,
-) => _WtChallengeTitleItem(
-  titleNo: (json['titleNo'] as num).toInt(),
-  readingTitle: json['readingTitle'] as String,
-  thumbnailImageUrl: json['thumbnailImageUrl'] as String,
-  representGenre: json['representGenre'] == null
-      ? null
-      : WtGenre.fromJson(json['representGenre'] as Map<String, dynamic>),
-);
-
-Map<String, dynamic> _$WtChallengeTitleItemToJson(
-  _WtChallengeTitleItem instance,
+Map<String, dynamic> _$WtTrendingTitleItemToJson(
+  _WtTrendingTitleItem instance,
 ) => <String, dynamic>{
   'titleNo': instance.titleNo,
-  'readingTitle': instance.readingTitle,
-  'thumbnailImageUrl': instance.thumbnailImageUrl,
-  'representGenre': instance.representGenre,
+  'title': instance.title,
+  'posterThumbnail': instance.posterThumbnail,
+  'genreDisplayName': instance.genreDisplayName,
 };
 
-_WtChallengeGenreTitleListResult _$WtChallengeGenreTitleListResultFromJson(
+_WtTrendingChartResult _$WtTrendingChartResultFromJson(
   Map<String, dynamic> json,
-) => _WtChallengeGenreTitleListResult(
-  challengeTitleList:
-      (json['challengeTitleList'] as List<dynamic>?)
-          ?.map((e) => WtChallengeTitleItem.fromJson(e as Map<String, dynamic>))
+) => _WtTrendingChartResult(
+  titleList:
+      (json['titleList'] as List<dynamic>?)
+          ?.map((e) => WtTrendingTitleItem.fromJson(e as Map<String, dynamic>))
           .toList() ??
       const [],
 );
 
-Map<String, dynamic> _$WtChallengeGenreTitleListResultToJson(
-  _WtChallengeGenreTitleListResult instance,
-) => <String, dynamic>{'challengeTitleList': instance.challengeTitleList};
+Map<String, dynamic> _$WtTrendingChartResultToJson(
+  _WtTrendingChartResult instance,
+) => <String, dynamic>{'titleList': instance.titleList};
 
 _WtTitleDetail _$WtTitleDetailFromJson(Map<String, dynamic> json) =>
     _WtTitleDetail(

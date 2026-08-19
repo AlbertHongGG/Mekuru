@@ -31,6 +31,12 @@ class WebtoonProvider implements IComicProvider {
   @override
   String get providerName => _name;
 
+  @override
+  Map<String, String>? get imageHeaders => {
+    'Referer': 'https://www.webtoons.com/',
+    'User-Agent': 'nApps (Android 9; 22081212C; linewebtoon; 3.9.9)',
+  };
+
   String _getFullImageUrl(String? uri) {
     if (uri == null || uri.isEmpty) return '';
     if (uri.startsWith('http')) return uri;
@@ -87,8 +93,7 @@ class WebtoonProvider implements IComicProvider {
       chapters.add(Chapter(
         id: ep.episodeNo.toString(),
         title: ep.episodeTitle,
-        publishTime: pubTime,
-        // Webtoon thumbnails are small, so leaving blank or use specific logic
+        publishedAt: pubTime,
       ));
     }
     return chapters;
@@ -106,10 +111,6 @@ class WebtoonProvider implements IComicProvider {
       pages.add(ComicPage(
         imageUrl: _getFullImageUrl(dto.episodeInfo.imageInfo[i].url),
         index: i,
-        headers: {
-          'Referer': 'https://www.webtoons.com/',
-          'User-Agent': 'nApps (Android 9; 22081212C; linewebtoon; 3.9.9)',
-        },
       ));
     }
     return pages;

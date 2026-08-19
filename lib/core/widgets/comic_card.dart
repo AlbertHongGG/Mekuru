@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mekuru/domain/models/comic.dart';
+import 'package:mekuru/core/widgets/comic_image.dart';
 
 class ComicCard extends StatelessWidget {
   final Comic comic;
@@ -26,8 +27,12 @@ class ComicCard extends StatelessWidget {
                 color: Colors.grey.withOpacity(0.2),
               ),
               clipBehavior: Clip.antiAlias,
-              child: comic.coverUrl != null
-                  ? Image.network(comic.coverUrl!, fit: BoxFit.cover)
+              child: comic.coverUrl != null && comic.coverUrl!.isNotEmpty
+                  ? ComicImage(
+                      imageUrl: comic.coverUrl!,
+                      providerId: comic.providerId,
+                      fit: BoxFit.cover,
+                    )
                   : const Center(child: Icon(Icons.image_not_supported)),
             ),
           ),

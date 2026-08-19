@@ -11,6 +11,9 @@ abstract class IComicProvider {
   /// A human-readable name for this provider (e.g., 'ComicWifi Official').
   String get providerName;
 
+  /// Headers required to fetch images from this provider (e.g., Referer).
+  Map<String, String>? get imageHeaders => null;
+
   /// Fetch basic details and metadata for a specific comic.
   Future<Comic> getComicDetail(String comicId);
 

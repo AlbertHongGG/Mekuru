@@ -66,6 +66,9 @@ class ComicWifiProvider implements IComicProvider {
   String get providerName => _name;
 
   @override
+  Map<String, String>? get imageHeaders => null;
+
+  @override
   Future<Comic> getComicDetail(String comicId) async {
     final rawDetail = await _apiClient.getComicDetail(comicId);
     return Comic(
@@ -88,8 +91,7 @@ class ComicWifiProvider implements IComicProvider {
       chapters.add(Chapter(
         id: ch.chapterId.toString(),
         title: ch.chapterName ?? 'Chapter ${i + 1}',
-        coverUrl: ch.chapterCover ?? '',
-        publishTime: ch.createTime ?? '',
+        publishedAt: ch.createTime ?? '',
       ));
     }
     return chapters;
@@ -103,8 +105,6 @@ class ComicWifiProvider implements IComicProvider {
       final img = rawImages.imgs[i];
       pages.add(ComicPage(
         imageUrl: img.url,
-        width: img.width,
-        height: img.height,
         index: i,
       ));
     }

@@ -9,6 +9,7 @@ import 'package:mekuru/features/viewer/presentation/providers/comic_viewer_provi
 import 'package:extended_image/extended_image.dart';
 import 'package:mekuru/features/viewer/presentation/widgets/webtoon_image_placeholder.dart';
 import 'package:mekuru/core/widgets/app_bottom_sheet.dart';
+import 'package:mekuru/core/widgets/comic_image.dart';
 
 class ComicViewerPage extends ConsumerStatefulWidget {
   final String providerId;
@@ -226,11 +227,10 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
                                   key: _sliverKeys[i], // Center anchor key
                                   child: Container(
                                     key: _itemKeys[i], // Position radar key
-                                    child: ExtendedImage.network(
-                                      state.pages[i].imageUrl,
+                                    child: ComicImage(
+                                      imageUrl: state.pages[i].imageUrl,
+                                      providerId: widget.providerId,
                                       fit: BoxFit.fitWidth, 
-                                      cache: true,
-                                      clearMemoryCacheIfFailed: true,
                                       loadStateChanged: (ExtendedImageState imgState) {
                                         switch (imgState.extendedImageLoadState) {
                                           case LoadState.loading:

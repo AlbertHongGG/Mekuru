@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:mekuru/core/theme/app_colors.dart';
 import 'package:mekuru/features/comic/presentation/providers/comic_details_provider.dart';
 import 'package:mekuru/features/comic/presentation/widgets/chapter_list_bottom_sheet.dart';
+import 'package:mekuru/core/widgets/comic_image.dart';
 
 class ComicDetailsPage extends ConsumerWidget {
   final String providerId;
@@ -115,8 +116,9 @@ class ComicDetailsPage extends ConsumerWidget {
                   ? Stack(
                       fit: StackFit.expand,
                       children: [
-                        Image.network(
-                          comic.coverUrl!,
+                        ComicImage(
+                          imageUrl: comic.coverUrl!,
+                          providerId: comic.providerId,
                           fit: BoxFit.cover,
                         ),
                         // Top gradient to protect icons

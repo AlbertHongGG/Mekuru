@@ -3,37 +3,41 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:mekuru/domain/models/local_comic_record.dart';
 import 'package:mekuru/domain/models/comic.dart';
 import 'package:mekuru/domain/models/chapter.dart';
-import 'package:mekuru/features/settings/presentation/providers/settings_provider.dart';
 
 class UserInteractionRepository {
   final Box<LocalComicRecord> _box;
-  final Ref _ref;
 
-  UserInteractionRepository(this._box, this._ref);
-
-  String get _currentMode => _ref.read(settingsProvider).dataSourceMode;
+  UserInteractionRepository(this._box);
 
   String _genId(String dataSourceMode, String providerId, String comicId) {
     return '${dataSourceMode}_${providerId}_$comicId';
   }
 
-  Future<List<LocalComicRecord>> getFavorites() async {
-    final mode = _currentMode;
+  Future<List<LocalComicRecord>> getFavorites({
+    required String dataSourceMode,
+    String? providerId,
+  }) async {
     return _box.values
-        .where((r) => r.dataSourceMode == mode && r.isFavorite)
+        .where((r) => r.dataSourceMode == dataSourceMode && 
+                     r.isFavorite && 
+                     (providerId == null || r.providerId == providerId))
         .toList()
       ..sort((a, b) => (b.favoriteAt ?? b.updatedAt).compareTo(a.favoriteAt ?? a.updatedAt));
   }
   
-  Future<List<LocalComicRecord>> getHistory() async {
-    final mode = _currentMode;
+  Future<List<LocalComicRecord>> getHistory({
+    required String dataSourceMode,
+    String? providerId,
+  }) async {
     return _box.values
-        .where((r) => r.dataSourceMode == mode)
+        .where((r) => r.dataSourceMode == dataSourceMode &&
+                     (providerId == null || r.providerId == providerId))
         .toList()
       ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
   }
 
   Future<void> markRead({
+    required String dataSourceMode,
     required String providerId,
     required String comicId,
     required Comic comic,
@@ -41,8 +45,7 @@ class UserInteractionRepository {
     required String chapterTitle,
     int? pageIndex,
   }) async {
-    final mode = _currentMode;
-    final id = _genId(mode, providerId, comicId);
+    final id = _genId(dataSourceMode, providerId, comicId);
     
     final existing = _box.get(id);
     final now = DateTime.now();
@@ -58,7 +61,7 @@ class UserInteractionRepository {
           )
         : LocalComicRecord(
             id: id,
-            dataSourceMode: mode,
+            dataSourceMode: dataSourceMode,
             providerId: providerId,
             comicId: comic.comicId ?? '',
             title: comic.title ?? '',
@@ -73,13 +76,21 @@ class UserInteractionRepository {
     await _box.put(id, record);
   }
 
-  Future<LocalComicRecord?> getInteraction(String providerId, String comicId) async {
-    final id = _genId(_currentMode, providerId, comicId);
+  Future<LocalComicRecord?> getInteraction({
+    required String dataSourceMode,
+    required String providerId,
+    required String comicId,
+  }) async {
+    final id = _genId(dataSourceMode, providerId, comicId);
     return _box.get(id);
   }
 
-  Stream<LocalComicRecord?> watchInteraction(String providerId, String comicId) async* {
-    final id = _genId(_currentMode, providerId, comicId);
+  Stream<LocalComicRecord?> watchInteraction({
+    required String dataSourceMode,
+    required String providerId,
+    required String comicId,
+  }) async* {
+    final id = _genId(dataSourceMode, providerId, comicId);
     yield _box.get(id);
     await for (final event in _box.watch(key: id)) {
       yield event.value as LocalComicRecord?;
@@ -87,13 +98,13 @@ class UserInteractionRepository {
   }
 
   Future<void> toggleFavorite({
+    required String dataSourceMode,
     required String providerId,
     required String comicId,
     required Comic comic,
     required bool isFavorite,
   }) async {
-    final mode = _currentMode;
-    final id = _genId(mode, providerId, comicId);
+    final id = _genId(dataSourceMode, providerId, comicId);
     final existing = _box.get(id);
     final now = DateTime.now();
 
@@ -107,7 +118,7 @@ class UserInteractionRepository {
           )
         : LocalComicRecord(
             id: id,
-            dataSourceMode: mode,
+            dataSourceMode: dataSourceMode,
             providerId: providerId,
             comicId: comic.comicId ?? '',
             title: comic.title ?? '',
@@ -123,5 +134,5 @@ class UserInteractionRepository {
 
 final userInteractionRepositoryProvider = Provider<UserInteractionRepository>((ref) {
   final box = Hive.box<LocalComicRecord>('comic_records');
-  return UserInteractionRepository(box, ref);
+  return UserInteractionRepository(box);
 });

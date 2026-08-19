@@ -6,6 +6,7 @@ import 'package:mekuru/domain/models/chapter.dart';
 import 'package:mekuru/core/notifications/presentation/controllers/notification_controller.dart';
 import 'package:mekuru/domain/models/local_comic_record.dart';
 import 'package:mekuru/features/library/presentation/providers/library_provider.dart';
+import 'package:mekuru/features/settings/presentation/providers/settings_provider.dart';
 
 
 class ComicDetailsState {
@@ -62,8 +63,15 @@ class ComicDetailsNotifier extends AutoDisposeFamilyNotifier<ComicDetailsState, 
         sourceRepo.getChapters(arg.providerId, arg.comicId),
       ]);
 
+      final settings = ref.read(settingsProvider);
+      final mode = settings.dataSourceMode;
+
       // Start watching the interaction stream
-      final sub = interactionRepo.watchInteraction(arg.providerId, arg.comicId).listen((record) {
+      final sub = interactionRepo.watchInteraction(
+        dataSourceMode: mode, 
+        providerId: arg.providerId, 
+        comicId: arg.comicId
+      ).listen((record) {
         state = state.copyWith(interaction: record);
       });
       ref.onDispose(() => sub.cancel());
@@ -85,6 +93,8 @@ class ComicDetailsNotifier extends AutoDisposeFamilyNotifier<ComicDetailsState, 
 
   Future<void> toggleFavorite() async {
     final interactionRepo = ref.read(userInteractionRepositoryProvider);
+    final settings = ref.read(settingsProvider);
+    final mode = settings.dataSourceMode;
     final isFavorite = state.interaction?.isFavorite ?? false;
     final newFavoriteStatus = !isFavorite;
     final comic = state.comic;
@@ -92,13 +102,18 @@ class ComicDetailsNotifier extends AutoDisposeFamilyNotifier<ComicDetailsState, 
 
     try {
       await interactionRepo.toggleFavorite(
+        dataSourceMode: mode,
         providerId: arg.providerId, 
         comicId: arg.comicId,
         comic: comic, 
         isFavorite: newFavoriteStatus
       );
       // Re-fetch interaction
-      final interaction = await interactionRepo.getInteraction(arg.providerId, arg.comicId);
+      final interaction = await interactionRepo.getInteraction(
+        dataSourceMode: mode,
+        providerId: arg.providerId, 
+        comicId: arg.comicId
+      );
       state = state.copyWith(interaction: interaction);
       ref.invalidate(libraryProvider);
       

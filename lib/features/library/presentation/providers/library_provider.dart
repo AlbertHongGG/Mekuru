@@ -42,10 +42,15 @@ class LibraryNotifier extends Notifier<LibraryState> {
     try {
       final interactionRepo = ref.read(userInteractionRepositoryProvider);
 
+      final settings = ref.read(settingsProvider);
+      
       // Instantly load from local DB.
       // Thanks to the Local DB architecture, we don't need to fetch comic details from API.
-      // And the interactionRepo automatically filters by the current dataSourceMode.
-      final records = await interactionRepo.getFavorites();
+      // We pass explicit mode and providerId for filtering.
+      final records = await interactionRepo.getFavorites(
+        dataSourceMode: settings.dataSourceMode,
+        providerId: settings.dataSourceMode == 'source' ? settings.currentSourceId : null,
+      );
 
       state = state.copyWith(
         isLoading: false,

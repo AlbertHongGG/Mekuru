@@ -4,6 +4,7 @@ import 'package:mekuru/data/repositories/user_interaction_repository.dart';
 import 'package:mekuru/domain/models/page.dart';
 import 'package:mekuru/core/notifications/presentation/controllers/notification_controller.dart';
 import 'package:mekuru/features/comic/presentation/providers/comic_details_provider.dart';
+import 'package:mekuru/features/settings/presentation/providers/settings_provider.dart';
 
 class ComicViewerState {
   final bool isLoading;
@@ -55,10 +56,17 @@ class ComicViewerNotifier extends AutoDisposeFamilyNotifier<ComicViewerState, ({
       final comic = detailsState.comic;
       final chapter = detailsState.chapters.firstWhere((c) => c.id == arg.chapterId);
 
+      final settings = ref.read(settingsProvider);
+      final mode = settings.dataSourceMode;
+
       int initAnchorIndex = 0;
       double initAnchorOffset = 0.0;
       try {
-        final interaction = await interactionRepo.getInteraction(arg.providerId, arg.comicId);
+        final interaction = await interactionRepo.getInteraction(
+          dataSourceMode: mode,
+          providerId: arg.providerId, 
+          comicId: arg.comicId
+        );
         if (interaction != null && interaction.lastReadChapterId == arg.chapterId) {
           int packed = interaction.lastReadPageIndex ?? 0;
           initAnchorIndex = packed ~/ 1000000;
@@ -76,6 +84,7 @@ class ComicViewerNotifier extends AutoDisposeFamilyNotifier<ComicViewerState, ({
       if (comic != null) {
         int packed = (initAnchorIndex * 1000000) + initAnchorOffset.toInt();
         interactionRepo.markRead(
+          dataSourceMode: mode,
           providerId: arg.providerId,
           comicId: arg.comicId,
           comic: comic,
@@ -95,11 +104,14 @@ class ComicViewerNotifier extends AutoDisposeFamilyNotifier<ComicViewerState, ({
     try {
       final interactionRepo = ref.read(userInteractionRepositoryProvider);
       final detailsState = ref.read(comicDetailsProvider((providerId: arg.providerId, comicId: arg.comicId)));
+      final settings = ref.read(settingsProvider);
+      final mode = settings.dataSourceMode;
       final comic = detailsState.comic;
       final chapter = detailsState.chapters.firstWhere((c) => c.id == arg.chapterId);
       if (comic != null) {
         int packed = (anchorIndex * 1000000) + anchorOffset.toInt();
         interactionRepo.markRead(
+          dataSourceMode: mode,
           providerId: arg.providerId,
           comicId: arg.comicId,
           comic: comic,

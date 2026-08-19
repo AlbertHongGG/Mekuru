@@ -91,9 +91,11 @@ class ComicDetailsNotifier extends AutoDisposeFamilyNotifier<ComicDetailsState, 
     }
   }
 
-  Future<void> toggleChapterSort() async {
-    state = state.copyWith(isChapterSortDescending: !state.isChapterSortDescending);
-    await loadDetails();
+  void toggleChapterSort() {
+    state = state.copyWith(
+      isChapterSortDescending: !state.isChapterSortDescending,
+      chapters: state.chapters.reversed.toList(),
+    );
   }
 
   Future<void> toggleFavorite() async {

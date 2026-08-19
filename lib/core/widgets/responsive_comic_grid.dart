@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:mekuru/domain/models/comic.dart';
+import 'package:mekuru/domain/models/comic_base.dart';
 import 'package:mekuru/core/widgets/comic_card.dart';
 import 'package:mekuru/core/theme/app_colors.dart';
 
 class ResponsiveComicGrid extends StatelessWidget {
-  final List<Comic> comics;
+  final List<IComicItem> comics;
   final ScrollController? controller;
   final bool hasNext;
   final VoidCallback? onLoadMore;
-  final void Function(Comic) onTap;
+  final void Function(IComicItem) onTap;
 
   const ResponsiveComicGrid({
     super.key,

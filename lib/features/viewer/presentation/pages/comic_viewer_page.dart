@@ -336,6 +336,9 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
                                     lastReadChapterId: widget.chapterId,
                                     isSortDescending: detailsState.isChapterSortDescending,
                                     onToggleSort: () => ref.read(comicDetailsProvider((providerId: widget.providerId, comicId: widget.comicId)).notifier).toggleChapterSort(),
+                                    onLoadMore: () => ref.read(comicDetailsProvider((providerId: widget.providerId, comicId: widget.comicId)).notifier).loadMoreChapters(),
+                                    hasMore: detailsState.hasMoreChapters,
+                                    isLoadingMore: detailsState.isChaptersLoading,
                                     onChapterTap: (chapter) {
                                       Navigator.pop(context);
                                       _navigateToChapter(chapter.id);

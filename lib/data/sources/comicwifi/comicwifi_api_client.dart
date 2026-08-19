@@ -14,14 +14,14 @@ class ComicWifiApiClient {
     return CwComicDetail.fromJson(response.data['data']);
   }
 
-  Future<CwChapterList> getChapterList(String comicId) async {
+  Future<CwChapterList> getChapterList(String comicId, int page, {int pageSize = 100, String order = 'asc'}) async {
     final response = await _dio.post(
       '/api/comic/chapter_list',
       data: {
         'comicId': comicId,
-        'order': 'asc',
-        'page': 1,
-        'pageSize': 999999,
+        'order': order,
+        'page': page,
+        'pageSize': pageSize,
       },
     );
     return CwChapterList.fromJson(response.data['data']);

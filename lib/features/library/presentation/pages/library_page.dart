@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mekuru/core/theme/app_colors.dart';
 import 'package:mekuru/core/widgets/responsive_comic_grid.dart';
 import 'package:mekuru/domain/models/local_comic_record.dart';
-import 'package:mekuru/domain/models/comic.dart';
+import 'package:mekuru/core/widgets/comic_card.dart';
 import 'package:mekuru/features/library/presentation/providers/library_provider.dart';
 import 'package:mekuru/core/widgets/search_dialog.dart';
 import 'package:mekuru/core/widgets/app_bottom_sheet.dart';
@@ -147,12 +147,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
       onRefresh: () async => ref.read(libraryProvider.notifier).loadLibrary(),
       color: AppColors.primary,
       child: ResponsiveComicGrid(
-        comics: result.map((e) => Comic(
-          comicId: e.comicId,
-          providerId: e.providerId,
-          title: e.title,
-          coverUrl: e.coverUrl,
-        )).toList(),
+        comics: result,
         onTap: (comic) {
           context.push('/details/${comic.providerId ?? "comicwifi"}/${comic.comicId}');
         },

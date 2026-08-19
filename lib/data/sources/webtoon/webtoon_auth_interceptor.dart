@@ -36,10 +36,13 @@ class WebtoonAuthInterceptor extends Interceptor {
     // 4. Base64 Encode
     final b64Str = base64.encode(digest.bytes);
     
-    // 5. URL Encode (handled safely by Dio queryParameters, or we append directly)
-    // Actually, we can just add them to queryParameters and Dio handles the encoding
-    options.queryParameters['msgpad'] = msgpad;
-    options.queryParameters['md'] = b64Str;
+    // 5. Append manually to ensure exact URL string matching
+    final separator = url.contains('?') ? '&' : '?';
+    final finalUrl = "$url${separator}msgpad=$msgpad&md=${Uri.encodeQueryComponent(b64Str)}";
+
+    // Set the full URL to path and clear queryParameters so Dio doesn't rebuild it differently
+    options.path = finalUrl;
+    options.queryParameters.clear();
 
     // Common Webtoon headers
     options.headers['User-Agent'] = 'nApps (Android 9; 22081212C; linewebtoon; 3.9.9)';

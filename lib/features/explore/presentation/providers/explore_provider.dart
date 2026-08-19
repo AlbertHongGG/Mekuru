@@ -2,12 +2,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:mekuru/data/providers/repository_providers.dart';
 import 'package:mekuru/core/notifications/presentation/controllers/notification_controller.dart';
-import 'package:mekuru/domain/models/comic.dart';
+import 'package:mekuru/domain/models/comic_base.dart';
+import 'package:mekuru/domain/models/comic_models.dart';
 import 'package:mekuru/features/settings/presentation/providers/settings_provider.dart';
 
 class ExploreState {
   final bool isLoading;
-  final List<Comic> comics;
+  final List<IComicItem> comics;
   final String? error;
   final int page;
   final bool hasNext;
@@ -30,7 +31,7 @@ class ExploreState {
 
   ExploreState copyWith({
     bool? isLoading,
-    List<Comic>? comics,
+    List<IComicItem>? comics,
     String? error,
     int? page,
     bool? hasNext,
@@ -54,7 +55,6 @@ class ExploreState {
 }
 
 class ExploreNotifier extends Notifier<ExploreState> {
-  static const String _providerId = 'comicwifi';
   late Box _tagsBox;
 
   @override
@@ -81,17 +81,20 @@ class ExploreNotifier extends Notifier<ExploreState> {
     );
   }
 
-  void _extractTags(List<Comic> fetchedComics) {
+  void _extractTags(List<IComicItem> fetchedComics) {
     final currentKnown = Set<String>.from(state.knownTags);
     bool addedNew = false;
     
     for (final comic in fetchedComics) {
-      if (comic.tags != null) {
-        for (final tag in comic.tags!) {
-          if (!currentKnown.contains(tag)) {
-            currentKnown.add(tag);
-            addedNew = true;
-          }
+      List<String> tags = [];
+      if (comic is ComicExploreResult) tags = comic.tags;
+      else if (comic is ComicSearchResult) tags = comic.tags;
+      else if (comic is ComicDetail) tags = comic.tags;
+
+      for (final tag in tags) {
+        if (!currentKnown.contains(tag)) {
+          currentKnown.add(tag);
+          addedNew = true;
         }
       }
     }
@@ -139,13 +142,13 @@ class ExploreNotifier extends Notifier<ExploreState> {
     }
 
     try {
-      final result = await repo.explore(providerId: currentProviderId, page: nextPage);
+      final result = await repo.exploreComics(currentProviderId, nextPage);
       
-      _extractTags(result.comics);
+      _extractTags(result.items);
 
       state = state.copyWith(
         isLoading: false,
-        comics: loadMore ? [...state.comics, ...result.comics] : result.comics,
+        comics: loadMore ? [...state.comics, ...result.items] : result.items,
         page: result.page,
         hasNext: result.hasNext,
       );
@@ -166,13 +169,13 @@ class ExploreNotifier extends Notifier<ExploreState> {
     state = state.copyWith(isLoading: true, comics: [], error: null, searchQuery: query, page: 1, hasNext: false);
 
     try {
-      final result = await repo.search(query, providerId: currentProviderId);
+      final result = await repo.searchComics(currentProviderId, query, 1);
       
-      _extractTags(result.comics);
+      _extractTags(result.items);
 
       state = state.copyWith(
         isLoading: false,
-        comics: result.comics,
+        comics: result.items,
         page: result.page,
         hasNext: result.hasNext,
       );

@@ -2,10 +2,10 @@ import 'package:dio/dio.dart';
 import 'package:mekuru/data/sources/i_comic_provider.dart';
 import 'package:mekuru/data/sources/comicwifi/comicwifi_api_client.dart';
 import 'package:mekuru/data/sources/comicwifi/comicwifi_auth_interceptor.dart';
-import 'package:mekuru/domain/models/comic.dart';
+import 'package:mekuru/domain/models/comic_models.dart';
 import 'package:mekuru/domain/models/chapter.dart';
 import 'package:mekuru/domain/models/page.dart';
-import 'package:mekuru/domain/models/paginated_comics.dart';
+import 'package:mekuru/domain/models/paginated_result.dart';
 
 class ComicWifiProvider implements IComicProvider {
   static const String _id = 'comicwifi';
@@ -69,9 +69,9 @@ class ComicWifiProvider implements IComicProvider {
   Map<String, String>? get imageHeaders => null;
 
   @override
-  Future<Comic> getComicDetail(String comicId) async {
+  Future<ComicDetail> getComicDetail(String comicId) async {
     final rawDetail = await _apiClient.getComicDetail(comicId);
-    return Comic(
+    return ComicDetail(
       comicId: rawDetail.id,
       providerId: _id,
       title: rawDetail.name ?? 'Unknown Title',
@@ -83,8 +83,14 @@ class ComicWifiProvider implements IComicProvider {
   }
 
   @override
-  Future<List<Chapter>> getChapterList(String comicId) async {
-    final rawList = await _apiClient.getChapterList(comicId);
+  Future<PaginatedResult<Chapter>> getChapterList(String comicId, int page, {bool isDescending = true}) async {
+    final pageSize = 100;
+    final rawList = await _apiClient.getChapterList(
+      comicId, 
+      page, 
+      pageSize: pageSize, 
+      order: isDescending ? 'desc' : 'asc'
+    );
     final List<Chapter> chapters = [];
     for (int i = 0; i < rawList.chapters.length; i++) {
       final ch = rawList.chapters[i];
@@ -94,7 +100,11 @@ class ComicWifiProvider implements IComicProvider {
         publishedAt: ch.createTime ?? '',
       ));
     }
-    return chapters;
+    return PaginatedResult<Chapter>(
+      items: chapters,
+      page: page,
+      hasNext: rawList.chapters.length == pageSize,
+    );
   }
 
   @override
@@ -112,38 +122,36 @@ class ComicWifiProvider implements IComicProvider {
   }
 
   @override
-  Future<PaginatedComics> searchComics(String keyword, int page) async {
+  Future<PaginatedResult<ComicSearchResult>> searchComics(String keyword, int page) async {
     final items = await _apiClient.searchComics(keyword, page);
-    final comics = items.map((e) => Comic(
+    final comics = items.map((e) => ComicSearchResult(
       comicId: e.moduleItem.id,
       providerId: _id,
       title: e.moduleItem.name,
       coverUrl: e.moduleItem.cover,
       tags: e.moduleItem.tags,
-      description: e.moduleItem.desc,
     )).toList();
     
-    return PaginatedComics(
-      comics: comics,
+    return PaginatedResult<ComicSearchResult>(
+      items: comics,
       page: page,
       hasNext: comics.length == 30,
     );
   }
 
   @override
-  Future<PaginatedComics> exploreComics(int page) async {
+  Future<PaginatedResult<ComicExploreResult>> exploreComics(int page) async {
     final items = await _apiClient.exploreComics(page);
-    final comics = items.map((e) => Comic(
+    final comics = items.map((e) => ComicExploreResult(
       comicId: e.moduleItem.id,
       providerId: _id,
       title: e.moduleItem.name,
       coverUrl: e.moduleItem.cover,
       tags: e.moduleItem.tags,
-      description: e.moduleItem.desc,
     )).toList();
 
-    return PaginatedComics(
-      comics: comics,
+    return PaginatedResult<ComicExploreResult>(
+      items: comics,
       page: page,
       hasNext: comics.length == 30,
     );

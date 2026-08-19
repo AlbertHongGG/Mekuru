@@ -43,6 +43,9 @@ class ComicDetailsPage extends ConsumerWidget {
                   lastReadChapterId: bottomState.interaction?.lastReadChapterId,
                   isSortDescending: bottomState.isChapterSortDescending,
                   onToggleSort: () => bottomNotifier.toggleChapterSort(),
+                  onLoadMore: () => bottomNotifier.loadMoreChapters(),
+                  hasMore: bottomState.hasMoreChapters,
+                  isLoadingMore: bottomState.isChaptersLoading,
                   onChapterTap: (chapter) async {
                     Navigator.pop(context);
                     await context.push('/viewer/$providerId/$comicId/${chapter.id}');
@@ -256,22 +259,15 @@ class ComicDetailsPage extends ConsumerWidget {
                 child: ElevatedButton(
                   onPressed: () async {
                     if (state.chapters.isEmpty) return;
-                    // Default to oldest/first chapter: if sort descending, it's the last element. Else, it's the first.
-                    bool isNativeDescending = false;
-                    if (state.chapters.length > 1) {
-                      final chaptersWithNumbers = state.chapters.where((c) => RegExp(r'\d+').hasMatch(c.title)).toList();
-                      if (chaptersWithNumbers.length > 1) {
-                        final int1 = int.parse(RegExp(r'\d+').firstMatch(chaptersWithNumbers.first.title)!.group(0)!);
-                        final int2 = int.parse(RegExp(r'\d+').firstMatch(chaptersWithNumbers.last.title)!.group(0)!);
-                        if (int1 > int2) isNativeDescending = true;
-                      }
+                    String targetChapterId = state.chapters.first.id;
+                    if (state.isChapterSortDescending) {
+                      targetChapterId = state.chapters.last.id;
                     }
-                    String targetChapterId = isNativeDescending ? state.chapters.last.id : state.chapters.first.id;
                     
                     if (lastReadChapterId != null) {
-                      // Validate if chapter still exists
-                      final exists = state.chapters.any((c) => c.id == lastReadChapterId);
-                      if (exists) targetChapterId = lastReadChapterId;
+                      // We don't check if it exists in the loaded chapters, because it might be in a not-yet-loaded page.
+                      // The viewer will handle if it's completely invalid.
+                      targetChapterId = lastReadChapterId;
                     }
                     
                     await context.push('/viewer/$providerId/$comicId/$targetChapterId');

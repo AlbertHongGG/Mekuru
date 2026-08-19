@@ -2,10 +2,10 @@ import 'package:dio/dio.dart';
 import 'package:mekuru/data/sources/i_comic_provider.dart';
 import 'package:mekuru/data/sources/webtoon/webtoon_api_client.dart';
 import 'package:mekuru/data/sources/webtoon/webtoon_auth_interceptor.dart';
-import 'package:mekuru/domain/models/comic.dart';
+import 'package:mekuru/domain/models/comic_models.dart';
 import 'package:mekuru/domain/models/chapter.dart';
 import 'package:mekuru/domain/models/page.dart';
-import 'package:mekuru/domain/models/paginated_comics.dart';
+import 'package:mekuru/domain/models/paginated_result.dart';
 
 class WebtoonProvider implements IComicProvider {
   static const String _id = 'webtoon';
@@ -44,7 +44,7 @@ class WebtoonProvider implements IComicProvider {
   }
 
   @override
-  Future<Comic> getComicDetail(String comicId) async {
+  Future<ComicDetail> getComicDetail(String comicId) async {
     final titleNo = int.parse(comicId);
     final dto = await _apiClient.titleHomeMainV3(titleNo);
     
@@ -64,7 +64,7 @@ class WebtoonProvider implements IComicProvider {
       }
     }
     
-    return Comic(
+    return ComicDetail(
       comicId: comicId,
       providerId: _id,
       title: dto.title.title,
@@ -77,11 +77,18 @@ class WebtoonProvider implements IComicProvider {
   }
 
   @override
-  Future<List<Chapter>> getChapterList(String comicId) async {
+  Future<PaginatedResult<Chapter>> getChapterList(String comicId, int page, {bool isDescending = true}) async {
     final titleNo = int.parse(comicId);
-    // Get all episodes. In real app, we might need pagination if there are many. 
-    // The python code uses offset 0, page_size 30 for simplicity, we do the same or fetch more.
-    final dto = await _apiClient.titleHomeEpisodeListV3(titleNo, offset: 0, pageSize: 9999);
+    final pageSize = 30;
+    final offset = (page - 1) * pageSize;
+    final ordering = isDescending ? 'NEWEST' : 'OLDEST'; // Verify if 'NEWEST' is the correct param for webtoon
+    
+    final dto = await _apiClient.titleHomeEpisodeListV3(
+      titleNo, 
+      offset: offset, 
+      pageSize: pageSize, 
+      ordering: ordering,
+    );
     
     final List<Chapter> chapters = [];
     for (final ep in dto.episodeList) {
@@ -96,7 +103,11 @@ class WebtoonProvider implements IComicProvider {
         publishedAt: pubTime,
       ));
     }
-    return chapters;
+    return PaginatedResult<Chapter>(
+      items: chapters,
+      page: page,
+      hasNext: chapters.length == pageSize,
+    );
   }
 
   @override
@@ -117,32 +128,32 @@ class WebtoonProvider implements IComicProvider {
   }
 
   @override
-  Future<PaginatedComics> searchComics(String keyword, int page) async {
+  Future<PaginatedResult<ComicSearchResult>> searchComics(String keyword, int page) async {
     final pageSize = 30;
     final startIndex = (page - 1) * pageSize + 1;
     final dto = await _apiClient.searchAllV2(keyword, startIndex: startIndex, pageSize: pageSize);
     
-    final comics = dto.webtoonSearch.titleList.map((e) => Comic(
+    final comics = dto.webtoonSearch.titleList.map((e) => ComicSearchResult(
       comicId: e.titleNo.toString(),
       providerId: _id,
-      title: 'Comic ${e.titleNo}', // The search API might not return titles in standard form, but we can try to fetch them later or use whatever is provided
+      title: null, // As requested, search api might not provide title or we drop it. Actually WtSearch returns no title.
       coverUrl: _getFullImageUrl(e.thumbnailUrl),
     )).toList();
     
-    return PaginatedComics(
-      comics: comics,
+    return PaginatedResult<ComicSearchResult>(
+      items: comics,
       page: page,
       hasNext: dto.webtoonSearch.hasMore,
     );
   }
 
   @override
-  Future<PaginatedComics> exploreComics(int page) async {
+  Future<PaginatedResult<ComicExploreResult>> exploreComics(int page) async {
     final pageSize = 20;
     final startIndex = (page - 1) * pageSize; // 0-based for this endpoint
     final dto = await _apiClient.challengeGenreTitleListV1(startIndex: startIndex, pageSize: pageSize);
     
-    final comics = dto.challengeTitleList.map((e) => Comic(
+    final comics = dto.challengeTitleList.map((e) => ComicExploreResult(
       comicId: e.titleNo.toString(),
       providerId: _id,
       title: e.readingTitle,
@@ -150,8 +161,8 @@ class WebtoonProvider implements IComicProvider {
       tags: e.representGenre != null ? [e.representGenre!.displayName] : [],
     )).toList();
     
-    return PaginatedComics(
-      comics: comics,
+    return PaginatedResult<ComicExploreResult>(
+      items: comics,
       page: page,
       hasNext: comics.length == pageSize, // Simplified logic
     );

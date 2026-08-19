@@ -3,13 +3,16 @@ import 'package:go_router/go_router.dart';
 import 'package:mekuru/core/theme/app_colors.dart';
 import 'package:mekuru/domain/models/chapter.dart';
 
-class ChapterListBottomSheet extends StatelessWidget {
+class ChapterListBottomSheet extends StatefulWidget {
   final String providerId;
   final String comicId;
   final List<Chapter> chapters;
   final String? lastReadChapterId;
   final bool isSortDescending;
   final VoidCallback onToggleSort;
+  final VoidCallback onLoadMore;
+  final bool hasMore;
+  final bool isLoadingMore;
   final void Function(Chapter)? onChapterTap;
 
   const ChapterListBottomSheet({
@@ -20,33 +23,43 @@ class ChapterListBottomSheet extends StatelessWidget {
     required this.lastReadChapterId,
     required this.isSortDescending,
     required this.onToggleSort,
+    required this.onLoadMore,
+    required this.hasMore,
+    required this.isLoadingMore,
     this.onChapterTap,
   });
+
+  @override
+  State<ChapterListBottomSheet> createState() => _ChapterListBottomSheetState();
+}
+
+class _ChapterListBottomSheetState extends State<ChapterListBottomSheet> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
+      if (widget.hasMore && !widget.isLoadingMore) {
+        widget.onLoadMore();
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final secondaryTextColor = isDark ? Colors.white54 : Colors.black54;
-
-    // Detect intrinsic sort direction robustly
-    bool isNativeDescending = false;
-    if (chapters.length > 1) {
-      final chaptersWithNumbers = chapters.where((c) => RegExp(r'\d+').hasMatch(c.title)).toList();
-      if (chaptersWithNumbers.length > 1) {
-        final int1 = int.parse(RegExp(r'\d+').firstMatch(chaptersWithNumbers.first.title)!.group(0)!);
-        final int2 = int.parse(RegExp(r'\d+').firstMatch(chaptersWithNumbers.last.title)!.group(0)!);
-        if (int1 > int2) {
-          isNativeDescending = true;
-        }
-      }
-    }
-
-    // Apply Sorting Locally
-    final displayChapters = List<Chapter>.from(chapters);
-    // If the user wants Descending but native is Ascending, we reverse.
-    // If the user wants Ascending but native is Descending, we reverse.
-    final shouldReverse = isSortDescending != isNativeDescending;
-    final sortedChapters = shouldReverse ? displayChapters.reversed.toList() : displayChapters;
 
     return Column(
       children: [
@@ -77,7 +90,7 @@ class ChapterListBottomSheet extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 2.5),
                     child: Text(
-                      '共 ${chapters.length} 話',
+                      '共 ${widget.chapters.length} 話',
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
@@ -104,7 +117,7 @@ class ChapterListBottomSheet extends StatelessWidget {
                     color: Colors.transparent,
                     child: InkWell(
                       borderRadius: BorderRadius.circular(20),
-                      onTap: onToggleSort,
+                      onTap: widget.onToggleSort,
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                         decoration: BoxDecoration(
@@ -115,13 +128,13 @@ class ChapterListBottomSheet extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(
-                              isSortDescending ? Icons.arrow_downward_rounded : Icons.arrow_upward_rounded,
+                              widget.isSortDescending ? Icons.arrow_downward_rounded : Icons.arrow_upward_rounded,
                               size: 16,
                               color: isDark ? Colors.white70 : Colors.black87,
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              isSortDescending ? '最新' : '最舊',
+                              widget.isSortDescending ? '最新' : '最舊',
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
@@ -141,7 +154,7 @@ class ChapterListBottomSheet extends StatelessWidget {
         const SizedBox(height: 16),
         // List
         Expanded(
-          child: sortedChapters.isEmpty
+          child: widget.chapters.isEmpty
               ? Center(
                   child: Text(
                     '尚無章節資料',
@@ -149,11 +162,21 @@ class ChapterListBottomSheet extends StatelessWidget {
                   ),
                 )
               : ListView.builder(
+                  controller: _scrollController,
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  itemCount: sortedChapters.length,
+                  itemCount: widget.chapters.length + (widget.hasMore ? 1 : 0),
                   itemBuilder: (context, index) {
-                    final chapter = sortedChapters[index];
-                    final isLastRead = chapter.id == lastReadChapterId;
+                    if (index == widget.chapters.length) {
+                      return const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 24.0),
+                        child: Center(
+                          child: CircularProgressIndicator(color: AppColors.primary),
+                        ),
+                      );
+                    }
+
+                    final chapter = widget.chapters[index];
+                    final isLastRead = chapter.id == widget.lastReadChapterId;
 
                     return Container(
                       margin: const EdgeInsets.only(bottom: 8),
@@ -162,10 +185,10 @@ class ChapterListBottomSheet extends StatelessWidget {
                         child: InkWell(
                           borderRadius: BorderRadius.circular(12),
                           onTap: () {
-                            if (onChapterTap != null) {
-                              onChapterTap!(chapter);
+                            if (widget.onChapterTap != null) {
+                              widget.onChapterTap!(chapter);
                             } else {
-                              context.push('/viewer/$providerId/$comicId/${chapter.id}');
+                              context.push('/viewer/${widget.providerId}/${widget.comicId}/${chapter.id}');
                             }
                           },
                           child: Container(

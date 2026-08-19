@@ -12,7 +12,7 @@ _UserFavorite _$UserFavoriteFromJson(Map<String, dynamic> json) =>
       comicId: json['comic_id'] as String?,
       comic: json['comic'] == null
           ? null
-          : Comic.fromJson(json['comic'] as Map<String, dynamic>),
+          : ComicDetail.fromJson(json['comic'] as Map<String, dynamic>),
       addedAt: json['added_at'] as String?,
       lastReadAt: json['last_read_at'] as String?,
       isArchived: json['is_archived'] as bool?,

@@ -55,12 +55,12 @@ class WebtoonApiClient {
     return WtTitleHomeResult.fromJson(_extractResult(response));
   }
 
-  Future<WtEpisodeListResult> titleHomeEpisodeListV3(int titleNo, {int offset = 0, int pageSize = 30}) async {
+  Future<WtEpisodeListResult> titleHomeEpisodeListV3(int titleNo, {int offset = 0, int pageSize = 30, String ordering = 'OLDEST'}) async {
     final response = await _dio.get('/lineWebtoon/webtoon/titleHomeEpisodeListV3', queryParameters: {
       'titleNo': titleNo,
       'offset': offset,
       'pageSize': pageSize,
-      'ordering': 'OLDEST',
+      'ordering': ordering,
       'v': '1',
     });
     return WtEpisodeListResult.fromJson(_extractResult(response));

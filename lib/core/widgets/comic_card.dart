@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:mekuru/domain/models/comic.dart';
+import 'package:mekuru/domain/models/comic_base.dart';
+import 'package:mekuru/domain/models/comic_models.dart';
 import 'package:mekuru/core/widgets/comic_image.dart';
 
 class ComicCard extends StatelessWidget {
-  final Comic comic;
+  final IComicItem comic;
   final VoidCallback? onTap;
 
   const ComicCard({
@@ -14,6 +15,18 @@ class ComicCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Determine tags/author by casting if possible
+    String? author;
+    List<String> tags = [];
+    if (comic is ComicDetail) {
+      author = (comic as ComicDetail).author;
+      tags = (comic as ComicDetail).tags;
+    } else if (comic is ComicExploreResult) {
+      tags = (comic as ComicExploreResult).tags;
+    } else if (comic is ComicSearchResult) {
+      tags = (comic as ComicSearchResult).tags;
+    }
+
     return GestureDetector(
       onTap: onTap,
       child: Column(
@@ -46,25 +59,25 @@ class ComicCard extends StatelessWidget {
           const SizedBox(height: 4),
           Row(
             children: [
-              if (comic.author != null && comic.author!.isNotEmpty) ...[
+              if (author != null && author.isNotEmpty) ...[
                 const Icon(Icons.person_outline, size: 12, color: Colors.grey),
                 const SizedBox(width: 2),
                 Flexible(
                   flex: 1,
                   child: Text(
-                    comic.author!,
+                    author,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(color: Colors.grey, fontSize: 12),
                   ),
                 ),
               ],
-              if (comic.author != null && comic.author!.isNotEmpty && comic.tags != null && comic.tags!.isNotEmpty)
+              if (author != null && author.isNotEmpty && tags.isNotEmpty)
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 4),
                   child: Text('•', style: TextStyle(color: Colors.grey, fontSize: 10)),
                 ),
-              if (comic.tags != null && comic.tags!.isNotEmpty)
+              if (tags.isNotEmpty)
                 Flexible(
                   flex: 1,
                   child: Container(
@@ -76,7 +89,7 @@ class ComicCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
-                      comic.tags!.first,
+                      tags.first,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(color: Colors.grey, fontSize: 10),
@@ -86,6 +99,7 @@ class ComicCard extends StatelessWidget {
             ],
           ),
         ],
-      ),    );
+      ),
+    );
   }
 }

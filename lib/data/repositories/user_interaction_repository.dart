@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:mekuru/domain/models/local_comic_record.dart';
-import 'package:mekuru/domain/models/comic.dart';
+import 'package:mekuru/domain/models/comic_base.dart';
 import 'package:mekuru/domain/models/chapter.dart';
 
 class UserInteractionRepository {
@@ -40,7 +40,7 @@ class UserInteractionRepository {
     required String dataSourceMode,
     required String providerId,
     required String comicId,
-    required Comic comic,
+    required IComicItem comic,
     required String chapterId,
     required String chapterTitle,
     int? pageIndex,
@@ -63,7 +63,7 @@ class UserInteractionRepository {
             id: id,
             dataSourceMode: dataSourceMode,
             providerId: providerId,
-            comicId: comic.comicId ?? '',
+            comicId: comic.comicId,
             title: comic.title ?? '',
             coverUrl: comic.coverUrl ?? '',
             lastReadChapterId: chapterId,
@@ -101,7 +101,7 @@ class UserInteractionRepository {
     required String dataSourceMode,
     required String providerId,
     required String comicId,
-    required Comic comic,
+    required IComicItem comic,
     required bool isFavorite,
   }) async {
     final id = _genId(dataSourceMode, providerId, comicId);
@@ -120,7 +120,7 @@ class UserInteractionRepository {
             id: id,
             dataSourceMode: dataSourceMode,
             providerId: providerId,
-            comicId: comic.comicId ?? '',
+            comicId: comic.comicId,
             title: comic.title ?? '',
             coverUrl: comic.coverUrl ?? '',
             isFavorite: isFavorite,

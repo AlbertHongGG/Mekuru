@@ -1,11 +1,13 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hive/hive.dart';
 
+import 'package:mekuru/domain/models/comic_base.dart';
+
 part 'local_comic_record.freezed.dart';
 part 'local_comic_record.g.dart';
 
 @freezed
-abstract class LocalComicRecord with _$LocalComicRecord {
+abstract class LocalComicRecord with _$LocalComicRecord implements IComicItem {
   const factory LocalComicRecord({
     required String id,
     required String dataSourceMode,

@@ -1,46 +1,59 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mekuru/data/providers/repository_providers.dart';
 import 'package:mekuru/data/repositories/user_interaction_repository.dart';
-import 'package:mekuru/domain/models/comic.dart';
+import 'package:mekuru/domain/models/comic_models.dart';
 import 'package:mekuru/domain/models/chapter.dart';
 import 'package:mekuru/core/notifications/presentation/controllers/notification_controller.dart';
 import 'package:mekuru/domain/models/local_comic_record.dart';
+import 'package:mekuru/domain/models/paginated_result.dart';
 import 'package:mekuru/features/library/presentation/providers/library_provider.dart';
 import 'package:mekuru/features/settings/presentation/providers/settings_provider.dart';
 
 
 class ComicDetailsState {
   final bool isLoading;
-  final Comic? comic;
+  final bool isChaptersLoading; // For subsequent chapter page loads
+  final ComicDetail? comic;
   final List<Chapter> chapters;
   final LocalComicRecord? interaction;
   final String? error;
   final bool isChapterSortDescending;
+  final int currentChapterPage;
+  final bool hasMoreChapters;
 
   ComicDetailsState({
     this.isLoading = true,
+    this.isChaptersLoading = false,
     this.comic,
     this.chapters = const [],
     this.interaction,
     this.error,
     this.isChapterSortDescending = true,
+    this.currentChapterPage = 1,
+    this.hasMoreChapters = true,
   });
 
   ComicDetailsState copyWith({
     bool? isLoading,
-    Comic? comic,
+    bool? isChaptersLoading,
+    ComicDetail? comic,
     List<Chapter>? chapters,
     LocalComicRecord? interaction,
     String? error,
     bool? isChapterSortDescending,
+    int? currentChapterPage,
+    bool? hasMoreChapters,
   }) {
     return ComicDetailsState(
       isLoading: isLoading ?? this.isLoading,
+      isChaptersLoading: isChaptersLoading ?? this.isChaptersLoading,
       comic: comic ?? this.comic,
       chapters: chapters ?? this.chapters,
       interaction: interaction ?? this.interaction,
       error: error,
       isChapterSortDescending: isChapterSortDescending ?? this.isChapterSortDescending,
+      currentChapterPage: currentChapterPage ?? this.currentChapterPage,
+      hasMoreChapters: hasMoreChapters ?? this.hasMoreChapters,
     );
   }
 }
@@ -60,7 +73,7 @@ class ComicDetailsNotifier extends AutoDisposeFamilyNotifier<ComicDetailsState, 
 
       final responses = await Future.wait([
         sourceRepo.getComic(arg.providerId, arg.comicId),
-        sourceRepo.getChapters(arg.providerId, arg.comicId),
+        sourceRepo.getChapters(arg.providerId, arg.comicId, 1, isDescending: state.isChapterSortDescending),
       ]);
 
       final settings = ref.read(settingsProvider);
@@ -76,10 +89,15 @@ class ComicDetailsNotifier extends AutoDisposeFamilyNotifier<ComicDetailsState, 
       });
       ref.onDispose(() => sub.cancel());
 
+      final comic = responses[0] as ComicDetail;
+      final chaptersResult = responses[1] as PaginatedResult<Chapter>;
+
       state = state.copyWith(
         isLoading: false,
-        comic: responses[0] as Comic,
-        chapters: responses[1] as List<Chapter>,
+        comic: comic,
+        chapters: chaptersResult.items,
+        currentChapterPage: 1,
+        hasMoreChapters: chaptersResult.hasNext,
       );
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
@@ -87,8 +105,37 @@ class ComicDetailsNotifier extends AutoDisposeFamilyNotifier<ComicDetailsState, 
     }
   }
 
-    void toggleChapterSort() {
+  Future<void> loadMoreChapters() async {
+    if (!state.hasMoreChapters || state.isChaptersLoading || state.isLoading) return;
+
+    state = state.copyWith(isChaptersLoading: true, error: null);
+    try {
+      final sourceRepo = ref.read(comicRepositoryProvider);
+      final nextPage = state.currentChapterPage + 1;
+      
+      final result = await sourceRepo.getChapters(
+        arg.providerId, 
+        arg.comicId, 
+        nextPage, 
+        isDescending: state.isChapterSortDescending
+      );
+
+      state = state.copyWith(
+        isChaptersLoading: false,
+        chapters: [...state.chapters, ...result.items],
+        currentChapterPage: nextPage,
+        hasMoreChapters: result.hasNext,
+      );
+    } catch (e) {
+      state = state.copyWith(isChaptersLoading: false, error: e.toString());
+      ref.read(notificationProvider.notifier).showError('章節加載失敗，請檢查網路');
+    }
+  }
+
+  Future<void> toggleChapterSort() async {
     state = state.copyWith(isChapterSortDescending: !state.isChapterSortDescending);
+    // Reload the details to get the first page of sorted chapters
+    await loadDetails();
   }
 
   Future<void> toggleFavorite() async {

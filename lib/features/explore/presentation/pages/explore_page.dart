@@ -4,9 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mekuru/core/theme/app_colors.dart';
 import 'package:mekuru/core/widgets/responsive_comic_grid.dart';
 import 'package:mekuru/features/explore/presentation/providers/explore_provider.dart';
-import 'package:mekuru/domain/models/comic.dart';
+import 'package:mekuru/core/widgets/comic_card.dart';
 import 'package:mekuru/core/widgets/search_dialog.dart';
 import 'package:mekuru/core/widgets/app_multi_select_bottom_sheet.dart';
+import 'package:mekuru/domain/models/comic_base.dart';
+import 'package:mekuru/domain/models/comic_models.dart';
 
 class ExplorePage extends ConsumerStatefulWidget {
   const ExplorePage({super.key});
@@ -45,17 +47,22 @@ class _ExplorePageState extends ConsumerState<ExplorePage> {
     final notifier = ref.read(exploreProvider.notifier);
 
     // Apply client-side tag filtering
-    List<Comic> displayComics = state.comics;
+    List<IComicItem> displayComics = state.comics;
     if (state.activeTags.isNotEmpty) {
       displayComics = displayComics.where((comic) {
-        if (comic.tags == null) return state.isExcludeMode; // If no tags, include if excluding, exclude if including
+        List<String> tags = [];
+        if (comic is ComicExploreResult) tags = comic.tags;
+        else if (comic is ComicSearchResult) tags = comic.tags;
+        else if (comic is ComicDetail) tags = comic.tags;
+
+        if (tags.isEmpty) return state.isExcludeMode; // If no tags, include if excluding, exclude if including
         
         if (state.isExcludeMode) {
           // EXCLUDE logic: comic must NOT have ANY of the active tags
-          return !state.activeTags.any((tag) => comic.tags!.contains(tag));
+          return !state.activeTags.any((tag) => tags.contains(tag));
         } else {
           // INCLUDE logic: comic must have ALL active tags
-          return state.activeTags.any((tag) => comic.tags!.contains(tag));
+          return state.activeTags.any((tag) => tags.contains(tag));
         }
       }).toList();
     }
@@ -151,7 +158,7 @@ class _ExplorePageState extends ConsumerState<ExplorePage> {
     );
   }
 
-  Widget _buildBody(ExploreState state, List<Comic> displayComics, ExploreNotifier notifier) {
+  Widget _buildBody(ExploreState state, List<IComicItem> displayComics, ExploreNotifier notifier) {
     if (state.error != null) {
       return Center(
         child: Column(

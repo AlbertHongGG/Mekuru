@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:mekuru/domain/models/comic.dart';
+import 'package:mekuru/domain/models/comic_models.dart';
 
 part 'user_interaction.freezed.dart';
 part 'user_interaction.g.dart';
@@ -9,7 +9,7 @@ abstract class UserFavorite with _$UserFavorite {
   const factory UserFavorite({
     @JsonKey(name: 'provider_id') String? providerId,
     @JsonKey(name: 'comic_id') String? comicId,
-    Comic? comic,
+    ComicDetail? comic,
     @JsonKey(name: 'added_at') String? addedAt,
     @JsonKey(name: 'last_read_at') String? lastReadAt,
     @JsonKey(name: 'is_archived') bool? isArchived,

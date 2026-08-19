@@ -1,11 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mekuru/domain/models/comic.dart';
+
 import 'package:mekuru/domain/models/chapter.dart';
+import 'package:mekuru/domain/models/comic_models.dart';
 import 'package:mekuru/domain/models/page.dart';
-import 'package:mekuru/domain/models/paginated_comics.dart';
-import 'package:mekuru/data/repositories/i_comic_repository.dart';
+import 'package:mekuru/domain/models/paginated_result.dart';
 import 'package:mekuru/data/sources/provider_registry.dart';
-import 'package:mekuru/features/settings/presentation/providers/settings_provider.dart';
+
+import 'package:mekuru/data/repositories/i_comic_repository.dart';
 
 class ComicSourceRepository implements IComicRepository {
   final ProviderRegistry _registry;
@@ -13,25 +14,26 @@ class ComicSourceRepository implements IComicRepository {
   ComicSourceRepository(this._registry);
 
   @override
-  Future<PaginatedComics> explore({String? providerId, int page = 1}) async {
-    final pid = providerId ?? 'comicwifi';
-    return _registry.getProvider(pid).exploreComics(page);
+  Future<PaginatedResult<ComicExploreResult>> exploreComics(String providerId, int page) async {
+    final provider = _registry.getProvider(providerId);
+    return provider.exploreComics(page);
   }
 
   @override
-  Future<PaginatedComics> search(String keyword, {String? providerId, int page = 1}) async {
-    final pid = providerId ?? 'comicwifi';
-    return _registry.getProvider(pid).searchComics(keyword, page);
+  Future<PaginatedResult<ComicSearchResult>> searchComics(String providerId, String keyword, int page) async {
+    final provider = _registry.getProvider(providerId);
+    return provider.searchComics(keyword, page);
   }
 
   @override
-  Future<Comic> getComic(String providerId, String comicId) async {
-    return _registry.getProvider(providerId).getComicDetail(comicId);
+  Future<ComicDetail> getComic(String providerId, String comicId) async {
+    final provider = _registry.getProvider(providerId);
+    return provider.getComicDetail(comicId);
   }
 
   @override
-  Future<List<Chapter>> getChapters(String providerId, String comicId) async {
-    return _registry.getProvider(providerId).getChapterList(comicId);
+  Future<PaginatedResult<Chapter>> getChapters(String providerId, String comicId, int page, {bool isDescending = true}) async {
+    return _registry.getProvider(providerId).getChapterList(comicId, page, isDescending: isDescending);
   }
 
   @override

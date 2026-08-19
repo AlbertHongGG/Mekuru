@@ -10,6 +10,7 @@ abstract class Comic with _$Comic {
     @JsonKey(name: 'provider_id') String? providerId,
     String? title,
     @JsonKey(name: 'cover_url') String? coverUrl,
+    String? author,
     String? description,
     List<String>? tags,
     @JsonKey(name: 'update_status') String? status,

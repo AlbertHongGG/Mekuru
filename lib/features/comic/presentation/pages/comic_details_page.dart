@@ -187,6 +187,16 @@ class ComicDetailsPage extends ConsumerWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+                  if (comic.author != null && comic.author!.isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      comic.author!,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black54,
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 16),
                   if (comic.tags != null && comic.tags!.isNotEmpty) ...[
                     Wrap(

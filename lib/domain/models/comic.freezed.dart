@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Comic {
 
-@JsonKey(name: 'id') String? get comicId;@JsonKey(name: 'provider_id') String? get providerId; String? get title;@JsonKey(name: 'cover_url') String? get coverUrl; String? get description; List<String>? get tags;@JsonKey(name: 'update_status') String? get status;
+@JsonKey(name: 'id') String? get comicId;@JsonKey(name: 'provider_id') String? get providerId; String? get title;@JsonKey(name: 'cover_url') String? get coverUrl; String? get author; String? get description; List<String>? get tags;@JsonKey(name: 'update_status') String? get status;
 /// Create a copy of Comic
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -29,16 +29,16 @@ $ComicCopyWith<Comic> get copyWith => _$ComicCopyWithImpl<Comic>(this as Comic, 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Comic&&(identical(other.comicId, comicId) || other.comicId == comicId)&&(identical(other.providerId, providerId) || other.providerId == providerId)&&(identical(other.title, title) || other.title == title)&&(identical(other.coverUrl, coverUrl) || other.coverUrl == coverUrl)&&(identical(other.description, description) || other.description == description)&&const DeepCollectionEquality().equals(other.tags, tags)&&(identical(other.status, status) || other.status == status));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Comic&&(identical(other.comicId, comicId) || other.comicId == comicId)&&(identical(other.providerId, providerId) || other.providerId == providerId)&&(identical(other.title, title) || other.title == title)&&(identical(other.coverUrl, coverUrl) || other.coverUrl == coverUrl)&&(identical(other.author, author) || other.author == author)&&(identical(other.description, description) || other.description == description)&&const DeepCollectionEquality().equals(other.tags, tags)&&(identical(other.status, status) || other.status == status));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,comicId,providerId,title,coverUrl,description,const DeepCollectionEquality().hash(tags),status);
+int get hashCode => Object.hash(runtimeType,comicId,providerId,title,coverUrl,author,description,const DeepCollectionEquality().hash(tags),status);
 
 @override
 String toString() {
-  return 'Comic(comicId: $comicId, providerId: $providerId, title: $title, coverUrl: $coverUrl, description: $description, tags: $tags, status: $status)';
+  return 'Comic(comicId: $comicId, providerId: $providerId, title: $title, coverUrl: $coverUrl, author: $author, description: $description, tags: $tags, status: $status)';
 }
 
 
@@ -49,7 +49,7 @@ abstract mixin class $ComicCopyWith<$Res>  {
   factory $ComicCopyWith(Comic value, $Res Function(Comic) _then) = _$ComicCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(name: 'id') String? comicId,@JsonKey(name: 'provider_id') String? providerId, String? title,@JsonKey(name: 'cover_url') String? coverUrl, String? description, List<String>? tags,@JsonKey(name: 'update_status') String? status
+@JsonKey(name: 'id') String? comicId,@JsonKey(name: 'provider_id') String? providerId, String? title,@JsonKey(name: 'cover_url') String? coverUrl, String? author, String? description, List<String>? tags,@JsonKey(name: 'update_status') String? status
 });
 
 
@@ -66,12 +66,13 @@ class _$ComicCopyWithImpl<$Res>
 
 /// Create a copy of Comic
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? comicId = freezed,Object? providerId = freezed,Object? title = freezed,Object? coverUrl = freezed,Object? description = freezed,Object? tags = freezed,Object? status = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? comicId = freezed,Object? providerId = freezed,Object? title = freezed,Object? coverUrl = freezed,Object? author = freezed,Object? description = freezed,Object? tags = freezed,Object? status = freezed,}) {
   return _then(Comic(
 comicId: freezed == comicId ? _self.comicId : comicId // ignore: cast_nullable_to_non_nullable
 as String?,providerId: freezed == providerId ? _self.providerId : providerId // ignore: cast_nullable_to_non_nullable
 as String?,title: freezed == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String?,coverUrl: freezed == coverUrl ? _self.coverUrl : coverUrl // ignore: cast_nullable_to_non_nullable
+as String?,author: freezed == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
 as String?,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String?,tags: freezed == tags ? _self.tags : tags // ignore: cast_nullable_to_non_nullable
 as List<String>?,status: freezed == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
@@ -160,10 +161,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'id')  String? comicId, @JsonKey(name: 'provider_id')  String? providerId,  String? title, @JsonKey(name: 'cover_url')  String? coverUrl,  String? description,  List<String>? tags, @JsonKey(name: 'update_status')  String? status)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'id')  String? comicId, @JsonKey(name: 'provider_id')  String? providerId,  String? title, @JsonKey(name: 'cover_url')  String? coverUrl,  String? author,  String? description,  List<String>? tags, @JsonKey(name: 'update_status')  String? status)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Comic() when $default != null:
-return $default(_that.comicId,_that.providerId,_that.title,_that.coverUrl,_that.description,_that.tags,_that.status);case _:
+return $default(_that.comicId,_that.providerId,_that.title,_that.coverUrl,_that.author,_that.description,_that.tags,_that.status);case _:
   return orElse();
 
 }
@@ -181,10 +182,10 @@ return $default(_that.comicId,_that.providerId,_that.title,_that.coverUrl,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'id')  String? comicId, @JsonKey(name: 'provider_id')  String? providerId,  String? title, @JsonKey(name: 'cover_url')  String? coverUrl,  String? description,  List<String>? tags, @JsonKey(name: 'update_status')  String? status)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'id')  String? comicId, @JsonKey(name: 'provider_id')  String? providerId,  String? title, @JsonKey(name: 'cover_url')  String? coverUrl,  String? author,  String? description,  List<String>? tags, @JsonKey(name: 'update_status')  String? status)  $default,) {final _that = this;
 switch (_that) {
 case _Comic():
-return $default(_that.comicId,_that.providerId,_that.title,_that.coverUrl,_that.description,_that.tags,_that.status);case _:
+return $default(_that.comicId,_that.providerId,_that.title,_that.coverUrl,_that.author,_that.description,_that.tags,_that.status);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -201,10 +202,10 @@ return $default(_that.comicId,_that.providerId,_that.title,_that.coverUrl,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'id')  String? comicId, @JsonKey(name: 'provider_id')  String? providerId,  String? title, @JsonKey(name: 'cover_url')  String? coverUrl,  String? description,  List<String>? tags, @JsonKey(name: 'update_status')  String? status)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'id')  String? comicId, @JsonKey(name: 'provider_id')  String? providerId,  String? title, @JsonKey(name: 'cover_url')  String? coverUrl,  String? author,  String? description,  List<String>? tags, @JsonKey(name: 'update_status')  String? status)?  $default,) {final _that = this;
 switch (_that) {
 case _Comic() when $default != null:
-return $default(_that.comicId,_that.providerId,_that.title,_that.coverUrl,_that.description,_that.tags,_that.status);case _:
+return $default(_that.comicId,_that.providerId,_that.title,_that.coverUrl,_that.author,_that.description,_that.tags,_that.status);case _:
   return null;
 
 }
@@ -216,13 +217,14 @@ return $default(_that.comicId,_that.providerId,_that.title,_that.coverUrl,_that.
 @JsonSerializable()
 
 class _Comic implements Comic {
-  const _Comic({@JsonKey(name: 'id') this.comicId, @JsonKey(name: 'provider_id') this.providerId, this.title, @JsonKey(name: 'cover_url') this.coverUrl, this.description,  List<String>? tags, @JsonKey(name: 'update_status') this.status}): _tags = tags;
+  const _Comic({@JsonKey(name: 'id') this.comicId, @JsonKey(name: 'provider_id') this.providerId, this.title, @JsonKey(name: 'cover_url') this.coverUrl, this.author, this.description,  List<String>? tags, @JsonKey(name: 'update_status') this.status}): _tags = tags;
   factory _Comic.fromJson(Map<String, dynamic> json) => _$ComicFromJson(json);
 
 @override@JsonKey(name: 'id') final  String? comicId;
 @override@JsonKey(name: 'provider_id') final  String? providerId;
 @override final  String? title;
 @override@JsonKey(name: 'cover_url') final  String? coverUrl;
+@override final  String? author;
 @override final  String? description;
  final  List<String>? _tags;
 @override List<String>? get tags {
@@ -248,16 +250,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Comic&&(identical(other.comicId, comicId) || other.comicId == comicId)&&(identical(other.providerId, providerId) || other.providerId == providerId)&&(identical(other.title, title) || other.title == title)&&(identical(other.coverUrl, coverUrl) || other.coverUrl == coverUrl)&&(identical(other.description, description) || other.description == description)&&const DeepCollectionEquality().equals(other._tags, _tags)&&(identical(other.status, status) || other.status == status));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Comic&&(identical(other.comicId, comicId) || other.comicId == comicId)&&(identical(other.providerId, providerId) || other.providerId == providerId)&&(identical(other.title, title) || other.title == title)&&(identical(other.coverUrl, coverUrl) || other.coverUrl == coverUrl)&&(identical(other.author, author) || other.author == author)&&(identical(other.description, description) || other.description == description)&&const DeepCollectionEquality().equals(other._tags, _tags)&&(identical(other.status, status) || other.status == status));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,comicId,providerId,title,coverUrl,description,const DeepCollectionEquality().hash(_tags),status);
+int get hashCode => Object.hash(runtimeType,comicId,providerId,title,coverUrl,author,description,const DeepCollectionEquality().hash(_tags),status);
 
 @override
 String toString() {
-  return 'Comic(comicId: $comicId, providerId: $providerId, title: $title, coverUrl: $coverUrl, description: $description, tags: $tags, status: $status)';
+  return 'Comic(comicId: $comicId, providerId: $providerId, title: $title, coverUrl: $coverUrl, author: $author, description: $description, tags: $tags, status: $status)';
 }
 
 
@@ -268,7 +270,7 @@ abstract mixin class _$ComicCopyWith<$Res> implements $ComicCopyWith<$Res> {
   factory _$ComicCopyWith(_Comic value, $Res Function(_Comic) _then) = __$ComicCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: 'id') String? comicId,@JsonKey(name: 'provider_id') String? providerId, String? title,@JsonKey(name: 'cover_url') String? coverUrl, String? description, List<String>? tags,@JsonKey(name: 'update_status') String? status
+@JsonKey(name: 'id') String? comicId,@JsonKey(name: 'provider_id') String? providerId, String? title,@JsonKey(name: 'cover_url') String? coverUrl, String? author, String? description, List<String>? tags,@JsonKey(name: 'update_status') String? status
 });
 
 
@@ -285,12 +287,13 @@ class __$ComicCopyWithImpl<$Res>
 
 /// Create a copy of Comic
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? comicId = freezed,Object? providerId = freezed,Object? title = freezed,Object? coverUrl = freezed,Object? description = freezed,Object? tags = freezed,Object? status = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? comicId = freezed,Object? providerId = freezed,Object? title = freezed,Object? coverUrl = freezed,Object? author = freezed,Object? description = freezed,Object? tags = freezed,Object? status = freezed,}) {
   return _then(_Comic(
 comicId: freezed == comicId ? _self.comicId : comicId // ignore: cast_nullable_to_non_nullable
 as String?,providerId: freezed == providerId ? _self.providerId : providerId // ignore: cast_nullable_to_non_nullable
 as String?,title: freezed == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String?,coverUrl: freezed == coverUrl ? _self.coverUrl : coverUrl // ignore: cast_nullable_to_non_nullable
+as String?,author: freezed == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
 as String?,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String?,tags: freezed == tags ? _self._tags : tags // ignore: cast_nullable_to_non_nullable
 as List<String>?,status: freezed == status ? _self.status : status // ignore: cast_nullable_to_non_nullable

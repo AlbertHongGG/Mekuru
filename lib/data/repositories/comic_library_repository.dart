@@ -48,24 +48,17 @@ class ComicLibraryRepository implements IComicRepository {
   }
 
   @override
-  Future<PaginatedResult<Chapter>> getChapters(String providerId, String comicId, int page, {bool isDescending = true}) async {
+  Future<List<Chapter>> getChapters(String providerId, String comicId, {bool isDescending = true}) async {
     // Note: The Python library server currently returns all chapters at once
     final response = await _dio.get('/api/v1/library/$providerId/$comicId/chapters');
     final data = response.data as List;
     var chapters = data.map((json) => Chapter.fromJson(json)).toList();
     
-    // Sort appropriately since it returns everything
     if (isDescending) {
-      // Assuming they are normally ascending, we can just reverse if needed, or sort by ID/date.
-      // For simplicity, we just return them. The caller can handle it, or we reverse here.
       chapters = chapters.reversed.toList();
     }
-
-    return PaginatedResult<Chapter>(
-      items: chapters,
-      page: 1,
-      hasNext: false,
-    );
+    
+    return chapters;
   }
 
   @override

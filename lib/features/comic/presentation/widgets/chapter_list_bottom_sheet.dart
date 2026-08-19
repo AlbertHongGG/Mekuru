@@ -10,9 +10,6 @@ class ChapterListBottomSheet extends StatefulWidget {
   final String? lastReadChapterId;
   final bool isSortDescending;
   final VoidCallback onToggleSort;
-  final VoidCallback onLoadMore;
-  final bool hasMore;
-  final bool isLoadingMore;
   final void Function(Chapter)? onChapterTap;
 
   const ChapterListBottomSheet({
@@ -23,9 +20,6 @@ class ChapterListBottomSheet extends StatefulWidget {
     required this.lastReadChapterId,
     required this.isSortDescending,
     required this.onToggleSort,
-    required this.onLoadMore,
-    required this.hasMore,
-    required this.isLoadingMore,
     this.onChapterTap,
   });
 
@@ -37,23 +31,9 @@ class _ChapterListBottomSheetState extends State<ChapterListBottomSheet> {
   final ScrollController _scrollController = ScrollController();
 
   @override
-  void initState() {
-    super.initState();
-    _scrollController.addListener(_onScroll);
-  }
-
-  @override
   void dispose() {
     _scrollController.dispose();
     super.dispose();
-  }
-
-  void _onScroll() {
-    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
-      if (widget.hasMore && !widget.isLoadingMore) {
-        widget.onLoadMore();
-      }
-    }
   }
 
   @override
@@ -164,17 +144,8 @@ class _ChapterListBottomSheetState extends State<ChapterListBottomSheet> {
               : ListView.builder(
                   controller: _scrollController,
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  itemCount: widget.chapters.length + (widget.hasMore ? 1 : 0),
+                  itemCount: widget.chapters.length,
                   itemBuilder: (context, index) {
-                    if (index == widget.chapters.length) {
-                      return const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 24.0),
-                        child: Center(
-                          child: CircularProgressIndicator(color: AppColors.primary),
-                        ),
-                      );
-                    }
-
                     final chapter = widget.chapters[index];
                     final isLastRead = chapter.id == widget.lastReadChapterId;
 

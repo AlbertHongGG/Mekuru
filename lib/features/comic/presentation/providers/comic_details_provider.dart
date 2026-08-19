@@ -12,48 +12,36 @@ import 'package:mekuru/features/settings/presentation/providers/settings_provide
 
 class ComicDetailsState {
   final bool isLoading;
-  final bool isChaptersLoading; // For subsequent chapter page loads
   final ComicDetail? comic;
   final List<Chapter> chapters;
   final LocalComicRecord? interaction;
   final String? error;
   final bool isChapterSortDescending;
-  final int currentChapterPage;
-  final bool hasMoreChapters;
 
   ComicDetailsState({
     this.isLoading = true,
-    this.isChaptersLoading = false,
     this.comic,
     this.chapters = const [],
     this.interaction,
     this.error,
     this.isChapterSortDescending = true,
-    this.currentChapterPage = 1,
-    this.hasMoreChapters = true,
   });
 
   ComicDetailsState copyWith({
     bool? isLoading,
-    bool? isChaptersLoading,
     ComicDetail? comic,
     List<Chapter>? chapters,
     LocalComicRecord? interaction,
     String? error,
     bool? isChapterSortDescending,
-    int? currentChapterPage,
-    bool? hasMoreChapters,
   }) {
     return ComicDetailsState(
       isLoading: isLoading ?? this.isLoading,
-      isChaptersLoading: isChaptersLoading ?? this.isChaptersLoading,
       comic: comic ?? this.comic,
       chapters: chapters ?? this.chapters,
       interaction: interaction ?? this.interaction,
-      error: error,
+      error: error ?? this.error,
       isChapterSortDescending: isChapterSortDescending ?? this.isChapterSortDescending,
-      currentChapterPage: currentChapterPage ?? this.currentChapterPage,
-      hasMoreChapters: hasMoreChapters ?? this.hasMoreChapters,
     );
   }
 }
@@ -73,7 +61,7 @@ class ComicDetailsNotifier extends AutoDisposeFamilyNotifier<ComicDetailsState, 
 
       final responses = await Future.wait([
         sourceRepo.getComic(arg.providerId, arg.comicId),
-        sourceRepo.getChapters(arg.providerId, arg.comicId, 1, isDescending: state.isChapterSortDescending),
+        sourceRepo.getChapters(arg.providerId, arg.comicId, isDescending: state.isChapterSortDescending),
       ]);
 
       final settings = ref.read(settingsProvider);
@@ -90,51 +78,21 @@ class ComicDetailsNotifier extends AutoDisposeFamilyNotifier<ComicDetailsState, 
       ref.onDispose(() => sub.cancel());
 
       final comic = responses[0] as ComicDetail;
-      final chaptersResult = responses[1] as PaginatedResult<Chapter>;
+      final chapters = responses[1] as List<Chapter>;
 
       state = state.copyWith(
         isLoading: false,
         comic: comic,
-        chapters: chaptersResult.items,
-        currentChapterPage: 1,
-        hasMoreChapters: chaptersResult.hasNext,
+        chapters: chapters,
       );
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
-      ref.read(notificationProvider.notifier).showError('漫畫加載失敗，請檢查網路');
-    }
-  }
-
-  Future<void> loadMoreChapters() async {
-    if (!state.hasMoreChapters || state.isChaptersLoading || state.isLoading) return;
-
-    state = state.copyWith(isChaptersLoading: true, error: null);
-    try {
-      final sourceRepo = ref.read(comicRepositoryProvider);
-      final nextPage = state.currentChapterPage + 1;
-      
-      final result = await sourceRepo.getChapters(
-        arg.providerId, 
-        arg.comicId, 
-        nextPage, 
-        isDescending: state.isChapterSortDescending
-      );
-
-      state = state.copyWith(
-        isChaptersLoading: false,
-        chapters: [...state.chapters, ...result.items],
-        currentChapterPage: nextPage,
-        hasMoreChapters: result.hasNext,
-      );
-    } catch (e) {
-      state = state.copyWith(isChaptersLoading: false, error: e.toString());
-      ref.read(notificationProvider.notifier).showError('章節加載失敗，請檢查網路');
+      ref.read(notificationProvider.notifier).showError('載入漫畫詳情失敗，請檢查網路');
     }
   }
 
   Future<void> toggleChapterSort() async {
     state = state.copyWith(isChapterSortDescending: !state.isChapterSortDescending);
-    // Reload the details to get the first page of sorted chapters
     await loadDetails();
   }
 

@@ -77,37 +77,41 @@ class WebtoonProvider implements IComicProvider {
   }
 
   @override
-  Future<PaginatedResult<Chapter>> getChapterList(String comicId, int page, {bool isDescending = true}) async {
+  Future<List<Chapter>> getChapterList(String comicId, {bool isDescending = true}) async {
     final titleNo = int.parse(comicId);
     final pageSize = 30;
-    final offset = (page - 1) * pageSize;
-    final ordering = isDescending ? 'NEWEST' : 'OLDEST'; // Verify if 'NEWEST' is the correct param for webtoon
+    final ordering = isDescending ? 'LATEST' : 'OLDEST';
     
-    final dto = await _apiClient.titleHomeEpisodeListV3(
-      titleNo, 
-      offset: offset, 
-      pageSize: pageSize, 
-      ordering: ordering,
-    );
-    
-    final List<Chapter> chapters = [];
-    for (final ep in dto.episodeList) {
-      String pubTime = '';
-      if (ep.exposureYmdt != null) {
-        pubTime = DateTime.fromMillisecondsSinceEpoch(ep.exposureYmdt!).toString();
-      }
+    final List<Chapter> allChapters = [];
+    int offset = 0;
+    bool hasMore = true;
+
+    while (hasMore) {
+      final dto = await _apiClient.titleHomeEpisodeListV3(
+        titleNo, 
+        offset: offset, 
+        pageSize: pageSize, 
+        ordering: ordering,
+      );
       
-      chapters.add(Chapter(
-        id: ep.episodeNo.toString(),
-        title: ep.episodeTitle,
-        publishedAt: pubTime,
-      ));
+      for (final ep in dto.episodeList) {
+        String? pubTime;
+        if (ep.exposureYmdt != null) {
+          pubTime = DateTime.fromMillisecondsSinceEpoch(ep.exposureYmdt!).toString().split(' ')[0];
+        }
+        
+        allChapters.add(Chapter(
+          id: ep.episodeNo.toString(),
+          title: ep.episodeTitle,
+          publishedAt: pubTime,
+        ));
+      }
+
+      hasMore = dto.episodeList.length == pageSize;
+      offset += pageSize;
     }
-    return PaginatedResult<Chapter>(
-      items: chapters,
-      page: page,
-      hasNext: chapters.length == pageSize,
-    );
+    
+    return allChapters;
   }
 
   @override

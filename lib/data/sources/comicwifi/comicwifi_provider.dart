@@ -83,11 +83,11 @@ class ComicWifiProvider implements IComicProvider {
   }
 
   @override
-  Future<PaginatedResult<Chapter>> getChapterList(String comicId, int page, {bool isDescending = true}) async {
-    final pageSize = 100;
+  Future<List<Chapter>> getChapterList(String comicId, {bool isDescending = true}) async {
+    final pageSize = 999999;
     final rawList = await _apiClient.getChapterList(
       comicId, 
-      page, 
+      1, 
       pageSize: pageSize, 
       order: isDescending ? 'desc' : 'asc'
     );
@@ -100,11 +100,7 @@ class ComicWifiProvider implements IComicProvider {
         publishedAt: ch.createTime ?? '',
       ));
     }
-    return PaginatedResult<Chapter>(
-      items: chapters,
-      page: page,
-      hasNext: rawList.chapters.length == pageSize,
-    );
+    return chapters;
   }
 
   @override

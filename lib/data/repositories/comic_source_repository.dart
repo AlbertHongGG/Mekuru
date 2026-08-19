@@ -32,8 +32,8 @@ class ComicSourceRepository implements IComicRepository {
   }
 
   @override
-  Future<PaginatedResult<Chapter>> getChapters(String providerId, String comicId, int page, {bool isDescending = true}) async {
-    return _registry.getProvider(providerId).getChapterList(comicId, page, isDescending: isDescending);
+  Future<List<Chapter>> getChapters(String providerId, String comicId, {bool isDescending = true}) async {
+    return _registry.getProvider(providerId).getChapterList(comicId, isDescending: isDescending);
   }
 
   @override

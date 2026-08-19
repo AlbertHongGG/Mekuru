@@ -17,8 +17,8 @@ abstract class IComicProvider {
   /// Fetch basic details and metadata for a specific comic.
   Future<ComicDetail> getComicDetail(String comicId);
 
-  /// Fetch a paginated list of chapters for a comic.
-  Future<PaginatedResult<Chapter>> getChapterList(String comicId, int page, {bool isDescending = true});
+  /// Fetch a list of all chapters for a comic.
+  Future<List<Chapter>> getChapterList(String comicId, {bool isDescending = true});
 
   /// Fetch the actual image pages for a specific chapter.
   Future<List<ComicPage>> getChapterImages(String comicId, String chapterId);

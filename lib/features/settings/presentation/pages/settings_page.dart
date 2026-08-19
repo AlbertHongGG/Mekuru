@@ -38,13 +38,22 @@ class SettingsPage extends ConsumerWidget {
                 subtitle: settingsState.dataSourceMode == 'db' ? 'DB Server' : 'Provider Source',
                 onTap: () => _showModeBottomSheet(context, ref, settingsState.dataSourceMode),
               ),
-              SettingsTile(
-                icon: Icons.link,
-                iconColor: AppColors.primary,
-                title: '伺服器網址',
-                subtitle: settingsState.serverUrl,
-                onTap: () => _showUrlBottomSheet(context, ref, settingsState.serverUrl),
-              ),
+              if (settingsState.dataSourceMode == 'source')
+                SettingsTile(
+                  icon: Icons.api_rounded,
+                  iconColor: AppColors.primary,
+                  title: '選擇漫畫來源',
+                  subtitle: settingsState.currentSourceId == 'webtoon' ? 'Webtoon' : 'ComicWifi Official',
+                  onTap: () => _showSourceProviderBottomSheet(context, ref, settingsState.currentSourceId),
+                ),
+              if (settingsState.dataSourceMode == 'db')
+                SettingsTile(
+                  icon: Icons.link,
+                  iconColor: AppColors.primary,
+                  title: '伺服器網址',
+                  subtitle: settingsState.serverUrl,
+                  onTap: () => _showUrlBottomSheet(context, ref, settingsState.serverUrl),
+                ),
               SettingsTile(
                 icon: Icons.dark_mode_rounded,
                 iconColor: AppColors.primary,
@@ -92,7 +101,7 @@ class SettingsPage extends ConsumerWidget {
       items: [
         AppBottomSheetItemData(
           title: 'Provider Source',
-          subtitle: '直接請求遠端 Comic API',
+          subtitle: '直接透過 App 連線到各大漫畫源',
           leadingIcon: Icons.cloud_outlined,
           value: 'source',
         ),
@@ -106,6 +115,31 @@ class SettingsPage extends ConsumerWidget {
       selectedValue: currentMode,
       onItemSelected: (val) {
         ref.read(settingsProvider.notifier).updateDataSourceMode(val);
+      },
+    );
+  }
+
+  void _showSourceProviderBottomSheet(BuildContext context, WidgetRef ref, String currentSourceId) {
+    AppBottomSheet.show(
+      context: context,
+      title: '選擇漫畫來源',
+      items: [
+        AppBottomSheetItemData(
+          title: 'ComicWifi Official',
+          subtitle: '主要漫畫來源，包含豐富的中文漫畫資源',
+          leadingIcon: Icons.wifi,
+          value: 'comicwifi',
+        ),
+        AppBottomSheetItemData(
+          title: 'Webtoon',
+          subtitle: 'Line Webtoon 官方資源，提供直條式漫畫',
+          leadingIcon: Icons.web,
+          value: 'webtoon',
+        ),
+      ],
+      selectedValue: currentSourceId,
+      onItemSelected: (val) {
+        ref.read(settingsProvider.notifier).updateCurrentSourceId(val);
       },
     );
   }

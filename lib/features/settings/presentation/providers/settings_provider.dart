@@ -6,22 +6,26 @@ class SettingsState {
   final ThemeMode themeMode;
   final String serverUrl;
   final String dataSourceMode;
+  final String currentSourceId;
 
   const SettingsState({
     required this.themeMode,
     required this.serverUrl,
     required this.dataSourceMode,
+    required this.currentSourceId,
   });
 
   SettingsState copyWith({
     ThemeMode? themeMode,
     String? serverUrl,
     String? dataSourceMode,
+    String? currentSourceId,
   }) {
     return SettingsState(
       themeMode: themeMode ?? this.themeMode,
       serverUrl: serverUrl ?? this.serverUrl,
       dataSourceMode: dataSourceMode ?? this.dataSourceMode,
+      currentSourceId: currentSourceId ?? this.currentSourceId,
     );
   }
 }
@@ -40,8 +44,14 @@ class SettingsNotifier extends Notifier<SettingsState> {
     // Default server URL
     final url = _settingsBox.get('serverUrl', defaultValue: 'http://10.0.2.2:8000') as String;
     final mode = _settingsBox.get('dataSourceMode', defaultValue: 'source') as String;
+    final sourceId = _settingsBox.get('currentSourceId', defaultValue: 'comicwifi') as String;
 
-    return SettingsState(themeMode: theme, serverUrl: url, dataSourceMode: mode);
+    return SettingsState(
+      themeMode: theme, 
+      serverUrl: url, 
+      dataSourceMode: mode,
+      currentSourceId: sourceId,
+    );
   }
 
   void updateThemeMode(ThemeMode mode) {
@@ -57,6 +67,11 @@ class SettingsNotifier extends Notifier<SettingsState> {
   void updateDataSourceMode(String mode) {
     _settingsBox.put('dataSourceMode', mode);
     state = state.copyWith(dataSourceMode: mode);
+  }
+
+  void updateCurrentSourceId(String sourceId) {
+    _settingsBox.put('currentSourceId', sourceId);
+    state = state.copyWith(currentSourceId: sourceId);
   }
 }
 

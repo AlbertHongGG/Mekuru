@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ComicPage {
 
-@JsonKey(name: 'order') int get index;@JsonKey(name: 'url') String get imageUrl;
+@JsonKey(name: 'order') int get index;@JsonKey(name: 'url') String get imageUrl; Map<String, String>? get headers;
 /// Create a copy of ComicPage
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -29,16 +29,16 @@ $ComicPageCopyWith<ComicPage> get copyWith => _$ComicPageCopyWithImpl<ComicPage>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ComicPage&&(identical(other.index, index) || other.index == index)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ComicPage&&(identical(other.index, index) || other.index == index)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&const DeepCollectionEquality().equals(other.headers, headers));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,index,imageUrl);
+int get hashCode => Object.hash(runtimeType,index,imageUrl,const DeepCollectionEquality().hash(headers));
 
 @override
 String toString() {
-  return 'ComicPage(index: $index, imageUrl: $imageUrl)';
+  return 'ComicPage(index: $index, imageUrl: $imageUrl, headers: $headers)';
 }
 
 
@@ -49,7 +49,7 @@ abstract mixin class $ComicPageCopyWith<$Res>  {
   factory $ComicPageCopyWith(ComicPage value, $Res Function(ComicPage) _then) = _$ComicPageCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(name: 'order') int index,@JsonKey(name: 'url') String imageUrl
+@JsonKey(name: 'order') int index,@JsonKey(name: 'url') String imageUrl, Map<String, String>? headers
 });
 
 
@@ -66,11 +66,12 @@ class _$ComicPageCopyWithImpl<$Res>
 
 /// Create a copy of ComicPage
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? index = null,Object? imageUrl = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? index = null,Object? imageUrl = null,Object? headers = freezed,}) {
   return _then(ComicPage(
 index: null == index ? _self.index : index // ignore: cast_nullable_to_non_nullable
 as int,imageUrl: null == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
-as String,
+as String,headers: freezed == headers ? _self.headers : headers // ignore: cast_nullable_to_non_nullable
+as Map<String, String>?,
   ));
 }
 
@@ -155,10 +156,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'order')  int index, @JsonKey(name: 'url')  String imageUrl)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'order')  int index, @JsonKey(name: 'url')  String imageUrl,  Map<String, String>? headers)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ComicPage() when $default != null:
-return $default(_that.index,_that.imageUrl);case _:
+return $default(_that.index,_that.imageUrl,_that.headers);case _:
   return orElse();
 
 }
@@ -176,10 +177,10 @@ return $default(_that.index,_that.imageUrl);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'order')  int index, @JsonKey(name: 'url')  String imageUrl)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'order')  int index, @JsonKey(name: 'url')  String imageUrl,  Map<String, String>? headers)  $default,) {final _that = this;
 switch (_that) {
 case _ComicPage():
-return $default(_that.index,_that.imageUrl);case _:
+return $default(_that.index,_that.imageUrl,_that.headers);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -196,10 +197,10 @@ return $default(_that.index,_that.imageUrl);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'order')  int index, @JsonKey(name: 'url')  String imageUrl)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'order')  int index, @JsonKey(name: 'url')  String imageUrl,  Map<String, String>? headers)?  $default,) {final _that = this;
 switch (_that) {
 case _ComicPage() when $default != null:
-return $default(_that.index,_that.imageUrl);case _:
+return $default(_that.index,_that.imageUrl,_that.headers);case _:
   return null;
 
 }
@@ -211,11 +212,20 @@ return $default(_that.index,_that.imageUrl);case _:
 @JsonSerializable()
 
 class _ComicPage implements ComicPage {
-  const _ComicPage({@JsonKey(name: 'order') required this.index, @JsonKey(name: 'url') required this.imageUrl});
+  const _ComicPage({@JsonKey(name: 'order') required this.index, @JsonKey(name: 'url') required this.imageUrl,  Map<String, String>? headers}): _headers = headers;
   factory _ComicPage.fromJson(Map<String, dynamic> json) => _$ComicPageFromJson(json);
 
 @override@JsonKey(name: 'order') final  int index;
 @override@JsonKey(name: 'url') final  String imageUrl;
+ final  Map<String, String>? _headers;
+@override Map<String, String>? get headers {
+  final value = _headers;
+  if (value == null) return null;
+  if (_headers is EqualUnmodifiableMapView) return _headers;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableMapView(value);
+}
+
 
 /// Create a copy of ComicPage
 /// with the given fields replaced by the non-null parameter values.
@@ -230,16 +240,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ComicPage&&(identical(other.index, index) || other.index == index)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ComicPage&&(identical(other.index, index) || other.index == index)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&const DeepCollectionEquality().equals(other._headers, _headers));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,index,imageUrl);
+int get hashCode => Object.hash(runtimeType,index,imageUrl,const DeepCollectionEquality().hash(_headers));
 
 @override
 String toString() {
-  return 'ComicPage(index: $index, imageUrl: $imageUrl)';
+  return 'ComicPage(index: $index, imageUrl: $imageUrl, headers: $headers)';
 }
 
 
@@ -250,7 +260,7 @@ abstract mixin class _$ComicPageCopyWith<$Res> implements $ComicPageCopyWith<$Re
   factory _$ComicPageCopyWith(_ComicPage value, $Res Function(_ComicPage) _then) = __$ComicPageCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: 'order') int index,@JsonKey(name: 'url') String imageUrl
+@JsonKey(name: 'order') int index,@JsonKey(name: 'url') String imageUrl, Map<String, String>? headers
 });
 
 
@@ -267,11 +277,12 @@ class __$ComicPageCopyWithImpl<$Res>
 
 /// Create a copy of ComicPage
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? index = null,Object? imageUrl = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? index = null,Object? imageUrl = null,Object? headers = freezed,}) {
   return _then(_ComicPage(
 index: null == index ? _self.index : index // ignore: cast_nullable_to_non_nullable
 as int,imageUrl: null == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
-as String,
+as String,headers: freezed == headers ? _self._headers : headers // ignore: cast_nullable_to_non_nullable
+as Map<String, String>?,
   ));
 }
 

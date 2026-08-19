@@ -3,6 +3,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:mekuru/data/providers/repository_providers.dart';
 import 'package:mekuru/core/notifications/presentation/controllers/notification_controller.dart';
 import 'package:mekuru/domain/models/comic.dart';
+import 'package:mekuru/features/settings/presentation/providers/settings_provider.dart';
 
 class ExploreState {
   final bool isLoading;
@@ -64,6 +65,14 @@ class ExploreNotifier extends Notifier<ExploreState> {
     final List<String> loadedActiveTags = _tagsBox.get('activeTags', defaultValue: <String>[])?.cast<String>();
     final bool loadedExcludeMode = _tagsBox.get('isExcludeMode', defaultValue: false);
 
+    ref.listen(settingsProvider.select((s) => s.currentSourceId), (prev, next) {
+      if (prev != null && prev != next) {
+        clearTags();
+        state = state.copyWith(page: 1, hasNext: false, comics: [], searchQuery: '');
+        loadExplore();
+      }
+    });
+
     Future.microtask(() => loadExplore());
     return ExploreState(
       knownTags: loadedKnownTags.toSet(),
@@ -120,6 +129,7 @@ class ExploreNotifier extends Notifier<ExploreState> {
     if (state.isLoading || (!state.hasNext && loadMore)) return;
 
     final repo = ref.read(comicRepositoryProvider);
+    final currentProviderId = ref.read(settingsProvider).currentSourceId;
     final nextPage = loadMore ? state.page + 1 : 1;
 
     if (!loadMore) {
@@ -129,7 +139,7 @@ class ExploreNotifier extends Notifier<ExploreState> {
     }
 
     try {
-      final result = await repo.explore(providerId: _providerId, page: nextPage);
+      final result = await repo.explore(providerId: currentProviderId, page: nextPage);
       
       _extractTags(result.comics);
 
@@ -151,11 +161,12 @@ class ExploreNotifier extends Notifier<ExploreState> {
     }
 
     final repo = ref.read(comicRepositoryProvider);
+    final currentProviderId = ref.read(settingsProvider).currentSourceId;
     
     state = state.copyWith(isLoading: true, comics: [], error: null, searchQuery: query, page: 1, hasNext: false);
 
     try {
-      final result = await repo.search(query, providerId: _providerId);
+      final result = await repo.search(query, providerId: currentProviderId);
       
       _extractTags(result.comics);
 

@@ -9,7 +9,14 @@ part of 'page.dart';
 _ComicPage _$ComicPageFromJson(Map<String, dynamic> json) => _ComicPage(
   index: (json['order'] as num).toInt(),
   imageUrl: json['url'] as String,
+  headers: (json['headers'] as Map<String, dynamic>?)?.map(
+    (k, e) => MapEntry(k, e as String),
+  ),
 );
 
 Map<String, dynamic> _$ComicPageToJson(_ComicPage instance) =>
-    <String, dynamic>{'order': instance.index, 'url': instance.imageUrl};
+    <String, dynamic>{
+      'order': instance.index,
+      'url': instance.imageUrl,
+      'headers': instance.headers,
+    };

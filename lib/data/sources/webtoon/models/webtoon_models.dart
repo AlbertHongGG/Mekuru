@@ -5,7 +5,7 @@ part 'webtoon_models.g.dart';
 
 // --- Shared ---
 @freezed
-class WtAuthor with _$WtAuthor {
+abstract class WtAuthor with _$WtAuthor {
   const factory WtAuthor({
     required String authorName,
   }) = _WtAuthor;
@@ -14,7 +14,7 @@ class WtAuthor with _$WtAuthor {
 
 // --- Search ---
 @freezed
-class WtTitle with _$WtTitle {
+abstract class WtTitle with _$WtTitle {
   const factory WtTitle({
     required int titleNo,
     required String thumbnailUrl,
@@ -23,7 +23,7 @@ class WtTitle with _$WtTitle {
 }
 
 @freezed
-class WtSearchSection with _$WtSearchSection {
+abstract class WtSearchSection with _$WtSearchSection {
   const factory WtSearchSection({
     @Default([]) List<WtTitle> titleList,
     @Default(false) bool hasMore,
@@ -32,7 +32,7 @@ class WtSearchSection with _$WtSearchSection {
 }
 
 @freezed
-class WtSearchResult with _$WtSearchResult {
+abstract class WtSearchResult with _$WtSearchResult {
   const factory WtSearchResult({
     required WtSearchSection webtoonSearch,
   }) = _WtSearchResult;
@@ -41,7 +41,7 @@ class WtSearchResult with _$WtSearchResult {
 
 // --- Explore ---
 @freezed
-class WtGenre with _$WtGenre {
+abstract class WtGenre with _$WtGenre {
   const factory WtGenre({
     required String displayName,
   }) = _WtGenre;
@@ -49,7 +49,7 @@ class WtGenre with _$WtGenre {
 }
 
 @freezed
-class WtChallengeTitleItem with _$WtChallengeTitleItem {
+abstract class WtChallengeTitleItem with _$WtChallengeTitleItem {
   const factory WtChallengeTitleItem({
     required int titleNo,
     required String readingTitle,
@@ -60,7 +60,7 @@ class WtChallengeTitleItem with _$WtChallengeTitleItem {
 }
 
 @freezed
-class WtChallengeGenreTitleListResult with _$WtChallengeGenreTitleListResult {
+abstract class WtChallengeGenreTitleListResult with _$WtChallengeGenreTitleListResult {
   const factory WtChallengeGenreTitleListResult({
     @Default([]) List<WtChallengeTitleItem> challengeTitleList,
   }) = _WtChallengeGenreTitleListResult;
@@ -69,7 +69,7 @@ class WtChallengeGenreTitleListResult with _$WtChallengeGenreTitleListResult {
 
 // --- Title Detail ---
 @freezed
-class WtTitleDetail with _$WtTitleDetail {
+abstract class WtTitleDetail with _$WtTitleDetail {
   const factory WtTitleDetail({
     required int titleNo,
     required String title,
@@ -81,7 +81,7 @@ class WtTitleDetail with _$WtTitleDetail {
 }
 
 @freezed
-class WtEpisodeMeta with _$WtEpisodeMeta {
+abstract class WtEpisodeMeta with _$WtEpisodeMeta {
   const factory WtEpisodeMeta({
     required int totalEpisodeCount,
   }) = _WtEpisodeMeta;
@@ -89,7 +89,7 @@ class WtEpisodeMeta with _$WtEpisodeMeta {
 }
 
 @freezed
-class WtTagItem with _$WtTagItem {
+abstract class WtTagItem with _$WtTagItem {
   const factory WtTagItem({
     required String text,
     required String type,
@@ -98,7 +98,7 @@ class WtTagItem with _$WtTagItem {
 }
 
 @freezed
-class WtTagInfo with _$WtTagInfo {
+abstract class WtTagInfo with _$WtTagInfo {
   const factory WtTagInfo({
     @Default([]) List<WtTagItem> tagList,
   }) = _WtTagInfo;
@@ -106,7 +106,7 @@ class WtTagInfo with _$WtTagInfo {
 }
 
 @freezed
-class WtTitleHomeResult with _$WtTitleHomeResult {
+abstract class WtTitleHomeResult with _$WtTitleHomeResult {
   const factory WtTitleHomeResult({
     required WtTitleDetail title,
     WtTagInfo? tag,
@@ -117,7 +117,7 @@ class WtTitleHomeResult with _$WtTitleHomeResult {
 
 // --- Episode List ---
 @freezed
-class WtEpisodeItem with _$WtEpisodeItem {
+abstract class WtEpisodeItem with _$WtEpisodeItem {
   const factory WtEpisodeItem({
     required int episodeNo,
     required String episodeTitle,
@@ -128,7 +128,7 @@ class WtEpisodeItem with _$WtEpisodeItem {
 }
 
 @freezed
-class WtEpisodeListResult with _$WtEpisodeListResult {
+abstract class WtEpisodeListResult with _$WtEpisodeListResult {
   const factory WtEpisodeListResult({
     @Default([]) List<WtEpisodeItem> episodeList,
     @Default(false) bool hasMore,
@@ -138,7 +138,7 @@ class WtEpisodeListResult with _$WtEpisodeListResult {
 
 // --- Episode Info (Images) ---
 @freezed
-class WtImageInfo with _$WtImageInfo {
+abstract class WtImageInfo with _$WtImageInfo {
   const factory WtImageInfo({
     required String url,
   }) = _WtImageInfo;
@@ -146,7 +146,7 @@ class WtImageInfo with _$WtImageInfo {
 }
 
 @freezed
-class WtEpisodeInfo with _$WtEpisodeInfo {
+abstract class WtEpisodeInfo with _$WtEpisodeInfo {
   const factory WtEpisodeInfo({
     @Default([]) List<WtImageInfo> imageInfo,
   }) = _WtEpisodeInfo;
@@ -154,7 +154,7 @@ class WtEpisodeInfo with _$WtEpisodeInfo {
 }
 
 @freezed
-class WtEpisodeInfoResult with _$WtEpisodeInfoResult {
+abstract class WtEpisodeInfoResult with _$WtEpisodeInfoResult {
   const factory WtEpisodeInfoResult({
     required WtEpisodeInfo episodeInfo,
   }) = _WtEpisodeInfoResult;

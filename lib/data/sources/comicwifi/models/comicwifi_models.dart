@@ -4,7 +4,7 @@ part 'comicwifi_models.freezed.dart';
 part 'comicwifi_models.g.dart';
 
 @freezed
-class CwComicDetail with _$CwComicDetail {
+abstract class CwComicDetail with _$CwComicDetail {
   const factory CwComicDetail({
     required String id,
     String? name,
@@ -18,7 +18,7 @@ class CwComicDetail with _$CwComicDetail {
 }
 
 @freezed
-class CwChapterInfo with _$CwChapterInfo {
+abstract class CwChapterInfo with _$CwChapterInfo {
   const factory CwChapterInfo({
     @JsonKey(name: 'chapter_id') required dynamic chapterId,
     @JsonKey(name: 'chapter_name') String? chapterName,
@@ -30,7 +30,7 @@ class CwChapterInfo with _$CwChapterInfo {
 }
 
 @freezed
-class CwChapterList with _$CwChapterList {
+abstract class CwChapterList with _$CwChapterList {
   const factory CwChapterList({
     @Default([]) List<CwChapterInfo> chapters,
   }) = _CwChapterList;
@@ -39,7 +39,7 @@ class CwChapterList with _$CwChapterList {
 }
 
 @freezed
-class CwChapterImage with _$CwChapterImage {
+abstract class CwChapterImage with _$CwChapterImage {
   const factory CwChapterImage({
     required String url,
     @Default(0) int height,
@@ -50,7 +50,7 @@ class CwChapterImage with _$CwChapterImage {
 }
 
 @freezed
-class CwChapterReadData with _$CwChapterReadData {
+abstract class CwChapterReadData with _$CwChapterReadData {
   const factory CwChapterReadData({
     @Default([]) List<CwChapterImage> imgs,
   }) = _CwChapterReadData;
@@ -59,7 +59,7 @@ class CwChapterReadData with _$CwChapterReadData {
 }
 
 @freezed
-class CwSearchModuleItem with _$CwSearchModuleItem {
+abstract class CwSearchModuleItem with _$CwSearchModuleItem {
   const factory CwSearchModuleItem({
     required String id,
     required String name,
@@ -72,7 +72,7 @@ class CwSearchModuleItem with _$CwSearchModuleItem {
 }
 
 @freezed
-class CwSearchResultItem with _$CwSearchResultItem {
+abstract class CwSearchResultItem with _$CwSearchResultItem {
   const factory CwSearchResultItem({
     @JsonKey(name: 'module_item') required CwSearchModuleItem moduleItem,
   }) = _CwSearchResultItem;

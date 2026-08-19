@@ -9,7 +9,7 @@ class ComicImage extends ConsumerWidget {
   final BoxFit fit;
   final double? width;
   final double? height;
-  final Widget Function(BuildContext, ExtendedImageState)? loadStateChanged;
+  final Widget? Function(ExtendedImageState)? loadStateChanged;
 
   const ComicImage({
     super.key,

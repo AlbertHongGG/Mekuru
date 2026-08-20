@@ -10,6 +10,9 @@ import 'package:extended_image/extended_image.dart';
 import 'package:mekuru/features/viewer/presentation/widgets/webtoon_image_placeholder.dart';
 import 'package:mekuru/core/widgets/app_bottom_sheet.dart';
 import 'package:mekuru/core/widgets/comic_image.dart';
+import 'package:mekuru/features/viewer/presentation/widgets/viewer_interaction_layer.dart';
+import 'package:mekuru/features/viewer/presentation/widgets/viewer_top_bar.dart';
+import 'package:mekuru/features/viewer/presentation/widgets/viewer_bottom_bar.dart';
 
 class ComicViewerPage extends ConsumerStatefulWidget {
   final String providerId;
@@ -127,12 +130,42 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
   }
   
   void _toggleUI() {
-    if (_scrollController != null && _scrollController!.hasClients && _scrollController!.position.isScrollingNotifier.value) {
-      return;
-    }
     setState(() {
       _showUI = !_showUI;
     });
+  }
+
+  void _showChapterList(dynamic detailsState) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return Container(
+          height: MediaQuery.of(context).size.height * 0.7,
+          padding: const EdgeInsets.only(top: 24),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: SafeArea(
+            child: ChapterListBottomSheet(
+              providerId: widget.providerId,
+              comicId: widget.comicId,
+              chapters: detailsState.chapters,
+              lastReadChapterId: widget.chapterId,
+              isSortDescending: detailsState.isChapterSortDescending,
+              onToggleSort: () => ref.read(comicDetailsProvider((providerId: widget.providerId, comicId: widget.comicId)).notifier).toggleChapterSort(),
+              onChapterTap: (chapter) {
+                Navigator.pop(context);
+                _navigateToChapter(chapter.id);
+              },
+            ),
+          ),
+        );
+      },
+    );
   }
 
   void _navigateToChapter(String chapterId) {
@@ -204,8 +237,8 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
       body: Stack(
         children: [
           // 1. Image Viewer Layer
-          GestureDetector(
-            onTap: _toggleUI,
+          ViewerInteractionLayer(
+            onCenterTap: _toggleUI,
             child: state.isLoading && state.pages.isEmpty
                 ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
                 : state.error != null
@@ -265,159 +298,20 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
           ),
 
           // 2. Top Bar
-          AnimatedPositioned(
-            duration: const Duration(milliseconds: 200),
-            curve: Curves.easeInOut,
-            top: _showUI ? 0 : -100,
-            left: 0,
-            right: 0,
-            child: Container(
-              color: Colors.black.withValues(alpha: 0.8),
-              child: SafeArea(
-                bottom: false,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-                  child: Row(
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.arrow_back, color: Colors.white),
-                        onPressed: () => context.pop(),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              comicTitle,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: 'Outfit',
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            Text(
-                              chapterTitle,
-                              style: const TextStyle(
-                                color: Colors.white70,
-                                fontSize: 14,
-                                fontFamily: 'Outfit',
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        ),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.menu, color: Colors.white),
-                        onPressed: () {
-                          final isDark = Theme.of(context).brightness == Brightness.dark;
-                          showModalBottomSheet(
-                            context: context,
-                            isScrollControlled: true,
-                            backgroundColor: Colors.transparent,
-                            builder: (context) {
-                              return Container(
-                                height: MediaQuery.of(context).size.height * 0.7,
-                                padding: const EdgeInsets.only(top: 24),
-                                decoration: BoxDecoration(
-                                  color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-                                  borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-                                ),
-                                child: SafeArea(
-                                  child: ChapterListBottomSheet(
-                                    providerId: widget.providerId,
-                                    comicId: widget.comicId,
-                                    chapters: detailsState.chapters,
-                                    lastReadChapterId: widget.chapterId,
-                                    isSortDescending: detailsState.isChapterSortDescending,
-                                    onToggleSort: () => ref.read(comicDetailsProvider((providerId: widget.providerId, comicId: widget.comicId)).notifier).toggleChapterSort(),
-                                    onChapterTap: (chapter) {
-                                      Navigator.pop(context);
-                                      _navigateToChapter(chapter.id);
-                                    },
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+          ViewerTopBar(
+            isVisible: _showUI,
+            comicTitle: comicTitle,
+            chapterTitle: chapterTitle,
+            onMenuPressed: () => _showChapterList(detailsState),
           ),
 
           // 3. Bottom Bar
-          AnimatedPositioned(
-            duration: const Duration(milliseconds: 200),
-            curve: Curves.easeInOut,
-            bottom: _showUI ? 0 : -100,
-            left: 0,
-            right: 0,
-            child: Container(
-              color: Colors.black.withValues(alpha: 0.8),
-              child: SafeArea(
-                top: false,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // Bottom Left: Progress Percentage
-                      Container(
-                        constraints: const BoxConstraints(minWidth: 50),
-                        child: state.pages.isNotEmpty
-                            ? ValueListenableBuilder<double>(
-                                valueListenable: _progressNotifier,
-                                builder: (context, progress, child) {
-                                  final percentStr = (progress * 100).toStringAsFixed(0);
-                                  return Text(
-                                    '$percentStr%',
-                                    style: const TextStyle(
-                                      color: Colors.white70,
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.bold,
-                                      fontFamily: 'Outfit',
-                                    ),
-                                  );
-                                },
-                              )
-                            : const SizedBox.shrink(),
-                      ),
-                      
-                      // Bottom Right: Chapter Navigation Icons
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
-                            onPressed: prevChapterId != null ? () => _navigateToChapter(prevChapterId!) : null,
-                            color: prevChapterId != null ? Colors.white : Colors.white30,
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(),
-                          ),
-                          const SizedBox(width: 32),
-                          IconButton(
-                            icon: const Icon(Icons.chevron_right, color: Colors.white, size: 28),
-                            onPressed: nextChapterId != null ? () => _navigateToChapter(nextChapterId!) : null,
-                            color: nextChapterId != null ? Colors.white : Colors.white30,
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+          ViewerBottomBar(
+            isVisible: _showUI,
+            progressNotifier: _progressNotifier,
+            hasPages: state.pages.isNotEmpty,
+            onPrevChapter: prevChapterId != null ? () => _navigateToChapter(prevChapterId!) : null,
+            onNextChapter: nextChapterId != null ? () => _navigateToChapter(nextChapterId!) : null,
           ),
         ],
       ),

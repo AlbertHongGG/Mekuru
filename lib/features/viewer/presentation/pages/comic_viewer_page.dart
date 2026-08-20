@@ -238,7 +238,8 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
         children: [
           // 1. Image Viewer Layer
           ViewerInteractionLayer(
-            onCenterTap: _toggleUI,
+            onTap: _toggleUI,
+            scrollController: _scrollController,
             child: state.isLoading && state.pages.isEmpty
                 ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
                 : state.error != null

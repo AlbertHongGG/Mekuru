@@ -1,46 +1,53 @@
 import 'package:flutter/material.dart';
 
-class ViewerInteractionLayer extends StatelessWidget {
+/// 專屬於漫畫閱讀器的互動狀態機攔截層
+/// 參考了業界頂級閱讀器 (如 Mihon) 的實作方式，從底層解耦點擊與滾動狀態。
+class ViewerInteractionLayer extends StatefulWidget {
   final Widget child;
-  final VoidCallback onCenterTap;
-  final VoidCallback? onLeftTap;
-  final VoidCallback? onRightTap;
+  final VoidCallback onTap;
+  final ScrollController? scrollController;
 
   const ViewerInteractionLayer({
     super.key,
     required this.child,
-    required this.onCenterTap,
-    this.onLeftTap,
-    this.onRightTap,
+    required this.onTap,
+    required this.scrollController,
   });
 
-  void _handleTapUp(BuildContext context, TapUpDetails details) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final tapX = details.globalPosition.dx;
+  @override
+  State<ViewerInteractionLayer> createState() => _ViewerInteractionLayerState();
+}
 
-    // 嚴格劃分點擊區域 (左 25% / 中 50% / 右 25%)
-    if (tapX < screenWidth * 0.25) {
-      if (onLeftTap != null) {
-        onLeftTap!();
-      }
-    } else if (tapX > screenWidth * 0.75) {
-      if (onRightTap != null) {
-        onRightTap!();
-      }
+class _ViewerInteractionLayerState extends State<ViewerInteractionLayer> {
+  /// 紀錄手指落下的瞬間，畫面是否正在滾動
+  bool _wasScrollingOnPointerDown = false;
+
+  void _onPointerDown(PointerDownEvent event) {
+    // 拍下狀態快照：絕對瞬間的滾動狀態
+    if (widget.scrollController != null && widget.scrollController!.hasClients) {
+      _wasScrollingOnPointerDown = widget.scrollController!.position.isScrollingNotifier.value;
     } else {
-      // 只有點擊中央 50% 的安全區，才會觸發 UI 開關
-      onCenterTap();
+      _wasScrollingOnPointerDown = false;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      // 使用 translucent 讓手勢可以穿透，但由 Gesture Arena 負責仲裁
+    return Listener(
+      // Listener 不會干預 Gesture Arena，只負責純粹的事件監聽
       behavior: HitTestBehavior.translucent,
-      // 使用 onTapUp，這樣如果 ScrollView 消耗了點擊事件(例如煞停)，這裡就不會觸發
-      onTapUp: (details) => _handleTapUp(context, details),
-      child: child,
+      onPointerDown: _onPointerDown,
+      child: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        // 使用 onTapUp 確保這是個合法的點擊 (未被判定為拖曳)
+        onTapUp: (details) {
+          // 如果這一下點擊發生在「畫面滾動中」，這就是一次煞停 (Brake)，絕對不能觸發 UI
+          if (!_wasScrollingOnPointerDown) {
+            widget.onTap();
+          }
+        },
+        child: widget.child,
+      ),
     );
   }
 }

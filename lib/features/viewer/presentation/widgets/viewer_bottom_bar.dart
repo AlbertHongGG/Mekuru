@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mekuru/core/widgets/app_action_button.dart';
 
 class ViewerBottomBar extends StatelessWidget {
   final bool isVisible;
@@ -59,20 +60,18 @@ class ViewerBottomBar extends StatelessWidget {
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    IconButton(
-                      icon: const Icon(Icons.chevron_left_rounded, color: Colors.white, size: 28),
+                    AppActionButton(
+                      icon: Icons.chevron_left_rounded,
                       onPressed: onPrevChapter,
-                      color: onPrevChapter != null ? Colors.white : Colors.white30,
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
+                      iconSize: 28,
+                      padding: 12,
                     ),
-                    const SizedBox(width: 32),
-                    IconButton(
-                      icon: const Icon(Icons.chevron_right_rounded, color: Colors.white, size: 28),
+                    const SizedBox(width: 8),
+                    AppActionButton(
+                      icon: Icons.chevron_right_rounded,
                       onPressed: onNextChapter,
-                      color: onNextChapter != null ? Colors.white : Colors.white30,
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
+                      iconSize: 28,
+                      padding: 12,
                     ),
                   ],
                 ),

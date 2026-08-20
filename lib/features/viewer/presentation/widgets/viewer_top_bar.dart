@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mekuru/core/widgets/app_action_button.dart';
 
 class ViewerTopBar extends StatelessWidget {
   final bool isVisible;
@@ -62,33 +63,30 @@ class ViewerTopBar extends StatelessWidget {
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    IconButton(
-                      icon: const Icon(Icons.arrow_upward_rounded, color: Colors.white),
+                    AppActionButton(
+                      icon: Icons.info_outline_rounded,
                       tooltip: '回到詳情',
-                      padding: const EdgeInsets.all(8),
-                      constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                      padding: 6,
                       onPressed: () {
                         if (context.canPop()) {
                           context.pop();
                         }
                       },
                     ),
-                    const SizedBox(width: 4),
-                    IconButton(
-                      icon: const Icon(Icons.home_rounded, color: Colors.white),
+                    const SizedBox(width: 2),
+                    AppActionButton(
+                      icon: Icons.home_rounded,
                       tooltip: '回到書庫',
-                      padding: const EdgeInsets.all(8),
-                      constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                      padding: 6,
                       onPressed: () {
                         context.go('/');
                       },
                     ),
-                    const SizedBox(width: 4),
-                    IconButton(
-                      icon: const Icon(Icons.menu_rounded, color: Colors.white),
+                    const SizedBox(width: 2),
+                    AppActionButton(
+                      icon: Icons.menu_rounded,
                       tooltip: '章節列表',
-                      padding: const EdgeInsets.all(8),
-                      constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                      padding: 6,
                       onPressed: onMenuPressed,
                     ),
                   ],

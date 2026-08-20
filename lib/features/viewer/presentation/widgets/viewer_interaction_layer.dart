@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 
-class ViewerInteractionLayer extends StatefulWidget {
+class ViewerInteractionLayer extends StatelessWidget {
   final Widget child;
   final VoidCallback onCenterTap;
   final VoidCallback? onLeftTap;
   final VoidCallback? onRightTap;
-  final double tapThreshold; 
-  final int timeThresholdMs; 
 
   const ViewerInteractionLayer({
     super.key,
@@ -14,72 +12,35 @@ class ViewerInteractionLayer extends StatefulWidget {
     required this.onCenterTap,
     this.onLeftTap,
     this.onRightTap,
-    this.tapThreshold = 10.0,
-    this.timeThresholdMs = 300,
   });
 
-  @override
-  State<ViewerInteractionLayer> createState() => _ViewerInteractionLayerState();
-}
-
-class _ViewerInteractionLayerState extends State<ViewerInteractionLayer> {
-  Offset? _pointerDownPosition;
-  int? _pointerDownTimestamp;
-
-  void _onPointerDown(PointerDownEvent event) {
-    _pointerDownPosition = event.position;
-    _pointerDownTimestamp = DateTime.now().millisecondsSinceEpoch;
-  }
-
-  void _onPointerUp(PointerUpEvent event) {
-    if (_pointerDownPosition == null || _pointerDownTimestamp == null) return;
-
-    final pointerUpPosition = event.position;
-    final pointerUpTimestamp = DateTime.now().millisecondsSinceEpoch;
-
-    final distance = (pointerUpPosition - _pointerDownPosition!).distance;
-    final timeElapsed = pointerUpTimestamp - _pointerDownTimestamp!;
-
-    _pointerDownPosition = null;
-    _pointerDownTimestamp = null;
-
-    if (distance > widget.tapThreshold || timeElapsed > widget.timeThresholdMs) {
-      return;
-    }
-
+  void _handleTapUp(BuildContext context, TapUpDetails details) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final tapX = pointerUpPosition.dx;
+    final tapX = details.globalPosition.dx;
 
+    // 嚴格劃分點擊區域 (左 25% / 中 50% / 右 25%)
     if (tapX < screenWidth * 0.25) {
-      if (widget.onLeftTap != null) {
-        widget.onLeftTap!();
-      } else {
-        widget.onCenterTap();
+      if (onLeftTap != null) {
+        onLeftTap!();
       }
     } else if (tapX > screenWidth * 0.75) {
-      if (widget.onRightTap != null) {
-        widget.onRightTap!();
-      } else {
-        widget.onCenterTap();
+      if (onRightTap != null) {
+        onRightTap!();
       }
     } else {
-      widget.onCenterTap();
+      // 只有點擊中央 50% 的安全區，才會觸發 UI 開關
+      onCenterTap();
     }
-  }
-
-  void _onPointerCancel(PointerCancelEvent event) {
-    _pointerDownPosition = null;
-    _pointerDownTimestamp = null;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Listener(
+    return GestureDetector(
+      // 使用 translucent 讓手勢可以穿透，但由 Gesture Arena 負責仲裁
       behavior: HitTestBehavior.translucent,
-      onPointerDown: _onPointerDown,
-      onPointerUp: _onPointerUp,
-      onPointerCancel: _onPointerCancel,
-      child: widget.child,
+      // 使用 onTapUp，這樣如果 ScrollView 消耗了點擊事件(例如煞停)，這裡就不會觸發
+      onTapUp: (details) => _handleTapUp(context, details),
+      child: child,
     );
   }
 }

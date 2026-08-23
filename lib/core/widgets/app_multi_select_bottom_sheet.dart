@@ -36,6 +36,7 @@ class AppMultiSelectBottomSheet extends StatelessWidget {
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
+      constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.8),
       builder: (context) {
         return Container(
           padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
@@ -132,48 +133,52 @@ class AppMultiSelectBottomSheet extends StatelessWidget {
             ),
           )
         else
-          Wrap(
-            spacing: 10,
-            runSpacing: 12,
-            children: items.map((tag) {
-              final isSelected = selectedItems.contains(tag);
-              return GestureDetector(
-                onTap: () => onToggleItem(tag),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: isSelected 
-                        ? activeColor 
-                        : (isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.04)),
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(
-                      color: isSelected 
-                          ? Colors.transparent 
-                          : (isDark ? Colors.white24 : Colors.black12),
-                      width: 1,
+          Flexible(
+            child: SingleChildScrollView(
+              child: Wrap(
+                spacing: 10,
+                runSpacing: 12,
+                children: items.map((tag) {
+                  final isSelected = selectedItems.contains(tag);
+                  return GestureDetector(
+                    onTap: () => onToggleItem(tag),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: isSelected 
+                            ? activeColor 
+                            : (isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.04)),
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(
+                          color: isSelected 
+                              ? Colors.transparent 
+                              : (isDark ? Colors.white24 : Colors.black12),
+                          width: 1,
+                        ),
+                        boxShadow: isSelected
+                            ? [
+                                BoxShadow(
+                                  color: activeColor.withValues(alpha: 0.3),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 4),
+                                )
+                              ]
+                            : [],
+                      ),
+                      child: Text(
+                        tag,
+                        style: TextStyle(
+                          color: isSelected ? Colors.white : (isDark ? Colors.white70 : Colors.black87),
+                          fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                          fontSize: 13,
+                        ),
+                      ),
                     ),
-                    boxShadow: isSelected
-                        ? [
-                            BoxShadow(
-                              color: activeColor.withValues(alpha: 0.3),
-                              blurRadius: 8,
-                              offset: const Offset(0, 4),
-                            )
-                          ]
-                        : [],
-                  ),
-                  child: Text(
-                    tag,
-                    style: TextStyle(
-                      color: isSelected ? Colors.white : (isDark ? Colors.white70 : Colors.black87),
-                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                      fontSize: 13,
-                    ),
-                  ),
-                ),
-              );
-            }).toList(),
+                  );
+                }).toList(),
+              ),
+            ),
           ),
       ],
     );

@@ -54,24 +54,20 @@ class ExploreState {
   }
 }
 
-class ExploreNotifier extends Notifier<ExploreState> {
+class ExploreNotifier extends AutoDisposeFamilyNotifier<ExploreState, String> {
   late Box _tagsBox;
 
+  String get _knownTagsKey => '\${arg}_knownTags';
+  String get _activeTagsKey => '\${arg}_activeTags';
+  String get _isExcludeModeKey => '\${arg}_isExcludeMode';
+
   @override
-  ExploreState build() {
+  ExploreState build(String arg) {
     _tagsBox = Hive.box('tags');
     
-    final List<String> loadedKnownTags = _tagsBox.get('knownTags', defaultValue: <String>[])?.cast<String>();
-    final List<String> loadedActiveTags = _tagsBox.get('activeTags', defaultValue: <String>[])?.cast<String>();
-    final bool loadedExcludeMode = _tagsBox.get('isExcludeMode', defaultValue: false);
-
-    ref.listen(settingsProvider.select((s) => s.currentSourceId), (prev, next) {
-      if (prev != null && prev != next) {
-        clearTags();
-        state = state.copyWith(page: 1, hasNext: false, comics: [], searchQuery: '');
-        loadExplore();
-      }
-    });
+    final List<String> loadedKnownTags = _tagsBox.get(_knownTagsKey, defaultValue: <String>[])?.cast<String>();
+    final List<String> loadedActiveTags = _tagsBox.get(_activeTagsKey, defaultValue: <String>[])?.cast<String>();
+    final bool loadedExcludeMode = _tagsBox.get(_isExcludeModeKey, defaultValue: false);
 
     Future.microtask(() => loadExplore());
     return ExploreState(
@@ -101,7 +97,7 @@ class ExploreNotifier extends Notifier<ExploreState> {
     
     if (addedNew) {
       state = state.copyWith(knownTags: currentKnown);
-      _tagsBox.put('knownTags', currentKnown.toList());
+      _tagsBox.put(_knownTagsKey, currentKnown.toList());
     }
   }
 
@@ -113,18 +109,18 @@ class ExploreNotifier extends Notifier<ExploreState> {
       currentActive.add(tag);
     }
     state = state.copyWith(activeTags: currentActive);
-    _tagsBox.put('activeTags', currentActive.toList());
+    _tagsBox.put(_activeTagsKey, currentActive.toList());
   }
 
   void toggleExcludeMode() {
     final newValue = !state.isExcludeMode;
     state = state.copyWith(isExcludeMode: newValue);
-    _tagsBox.put('isExcludeMode', newValue);
+    _tagsBox.put(_isExcludeModeKey, newValue);
   }
 
   void clearTags() {
     state = state.copyWith(activeTags: {});
-    _tagsBox.put('activeTags', <String>[]);
+    _tagsBox.put(_activeTagsKey, <String>[]);
     ref.read(notificationProvider.notifier).showInfo('已重置標籤過濾');
   }
 
@@ -132,7 +128,6 @@ class ExploreNotifier extends Notifier<ExploreState> {
     if (state.isLoading || (!state.hasNext && loadMore)) return;
 
     final repo = ref.read(comicRepositoryProvider);
-    final currentProviderId = ref.read(settingsProvider).currentSourceId;
     final nextPage = loadMore ? state.page + 1 : 1;
 
     if (!loadMore) {
@@ -141,7 +136,7 @@ class ExploreNotifier extends Notifier<ExploreState> {
       state = state.copyWith(isLoading: true, error: null);
     }
 
-    final result = await repo.exploreComics(currentProviderId, nextPage);
+    final result = await repo.exploreComics(arg, nextPage);
     
     result.fold(
       (paginated) {
@@ -166,11 +161,10 @@ class ExploreNotifier extends Notifier<ExploreState> {
     }
 
     final repo = ref.read(comicRepositoryProvider);
-    final currentProviderId = ref.read(settingsProvider).currentSourceId;
     
     state = state.copyWith(isLoading: true, comics: [], error: null, searchQuery: query, page: 1, hasNext: false);
 
-    final result = await repo.searchComics(currentProviderId, query, 1);
+    final result = await repo.searchComics(arg, query, 1);
     
     result.fold(
       (paginated) {
@@ -190,6 +184,6 @@ class ExploreNotifier extends Notifier<ExploreState> {
   }
 }
 
-final exploreProvider = NotifierProvider<ExploreNotifier, ExploreState>(() {
+final exploreProvider = NotifierProvider.autoDispose.family<ExploreNotifier, ExploreState, String>(() {
   return ExploreNotifier();
 });

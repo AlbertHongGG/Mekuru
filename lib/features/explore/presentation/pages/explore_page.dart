@@ -9,6 +9,7 @@ import 'package:mekuru/core/widgets/search_dialog.dart';
 import 'package:mekuru/core/widgets/app_multi_select_bottom_sheet.dart';
 import 'package:mekuru/domain/models/comic_base.dart';
 import 'package:mekuru/domain/models/comic_models.dart';
+import 'package:mekuru/features/settings/presentation/providers/settings_provider.dart';
 
 class ExplorePage extends ConsumerStatefulWidget {
   const ExplorePage({super.key});
@@ -37,14 +38,16 @@ class _ExplorePageState extends ConsumerState<ExplorePage> {
 
   void _onScroll() {
     if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
-      ref.read(exploreProvider.notifier).loadExplore(loadMore: true);
+      final currentSourceId = ref.read(settingsProvider).currentSourceId;
+      ref.read(exploreProvider(currentSourceId).notifier).loadExplore(loadMore: true);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(exploreProvider);
-    final notifier = ref.read(exploreProvider.notifier);
+    final currentSourceId = ref.watch(settingsProvider.select((s) => s.currentSourceId));
+    final state = ref.watch(exploreProvider(currentSourceId));
+    final notifier = ref.read(exploreProvider(currentSourceId).notifier);
 
     // Apply client-side tag filtering
     List<IComicItem> displayComics = state.comics;
@@ -69,7 +72,7 @@ class _ExplorePageState extends ConsumerState<ExplorePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(state.searchQuery.isNotEmpty ? '搜尋: ${state.searchQuery}' : '探索'),
+        title: Text(state.searchQuery.isNotEmpty ? '搜尋: \${state.searchQuery}' : '探索'),
         centerTitle: false,
         actions: [
           IconButton(
@@ -88,7 +91,7 @@ class _ExplorePageState extends ConsumerState<ExplorePage> {
                         shape: BoxShape.circle,
                       ),
                       child: Text(
-                        '${state.activeTags.length}',
+                        '\${state.activeTags.length}',
                         style: const TextStyle(fontSize: 8, color: Colors.white, fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -101,10 +104,11 @@ class _ExplorePageState extends ConsumerState<ExplorePage> {
                 context: context,
                 backgroundColor: Colors.transparent,
                 isScrollControlled: true,
+                constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.8),
                 builder: (context) => Consumer(
                   builder: (context, ref, _) {
-                    final bottomState = ref.watch(exploreProvider);
-                    final bottomNotifier = ref.read(exploreProvider.notifier);
+                    final bottomState = ref.watch(exploreProvider(currentSourceId));
+                    final bottomNotifier = ref.read(exploreProvider(currentSourceId).notifier);
                     return Container(
                       padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
                       decoration: BoxDecoration(

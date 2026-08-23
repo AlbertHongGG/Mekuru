@@ -100,7 +100,7 @@ class ComicWifiProvider extends BaseComicProvider {
         final ch = rawList.chapters[i];
         chapters.add(Chapter(
           id: ch.chapterId.toString(),
-          title: ch.chapterName ?? 'Chapter \${i + 1}',
+          title: ch.chapterName ?? 'Chapter ${i + 1}',
           publishedAt: ch.createTime ?? '',
         ));
       }

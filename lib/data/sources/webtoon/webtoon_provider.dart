@@ -42,7 +42,7 @@ class WebtoonProvider extends BaseComicProvider {
   String _getFullImageUrl(String? uri) {
     if (uri == null || uri.isEmpty) return '';
     if (uri.startsWith('http')) return uri;
-    return 'https://webtoon-phinf.pstatic.net\$uri';
+    return 'https://webtoon-phinf.pstatic.net$uri';
   }
 
   @override

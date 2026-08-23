@@ -13,7 +13,7 @@ abstract class BaseComicProvider implements IComicProvider {
       return Success(result);
     } on DioException catch (e) {
       if (e.response != null) {
-        return Error(ServerFailure('伺服器錯誤 (HTTP \${e.response?.statusCode})'));
+        return Error(ServerFailure('伺服器錯誤 (HTTP ${e.response?.statusCode})'));
       }
       return const Error(NetworkFailure());
     } on ServerException catch (e) {

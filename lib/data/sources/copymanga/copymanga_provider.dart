@@ -46,7 +46,7 @@ class CopymangaProvider extends BaseComicProvider {
     return handleApiCall(() async {
       final response = await _apiClient.getComicDetail(comicId);
       if (response.results?.comic == null) {
-        throw ServerException('Comic detail not found for \$comicId');
+        throw ServerException('Comic detail not found for $comicId');
       }
       
       final comic = response.results!.comic;

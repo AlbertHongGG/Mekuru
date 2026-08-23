@@ -57,9 +57,9 @@ class ExploreState {
 class ExploreNotifier extends AutoDisposeFamilyNotifier<ExploreState, String> {
   late Box _tagsBox;
 
-  String get _knownTagsKey => '\${arg}_knownTags';
-  String get _activeTagsKey => '\${arg}_activeTags';
-  String get _isExcludeModeKey => '\${arg}_isExcludeMode';
+  String get _knownTagsKey => '${arg}_knownTags';
+  String get _activeTagsKey => '${arg}_activeTags';
+  String get _isExcludeModeKey => '${arg}_isExcludeMode';
 
   @override
   ExploreState build(String arg) {
@@ -150,7 +150,7 @@ class ExploreNotifier extends AutoDisposeFamilyNotifier<ExploreState, String> {
       },
       (failure) {
         state = state.copyWith(isLoading: false, error: failure.message);
-        ref.read(notificationProvider.notifier).showError('探索加載失敗: \${failure.message}');
+        ref.read(notificationProvider.notifier).showError('探索加載失敗: ${failure.message}');
       },
     );
   }
@@ -178,7 +178,7 @@ class ExploreNotifier extends AutoDisposeFamilyNotifier<ExploreState, String> {
       },
       (failure) {
         state = state.copyWith(isLoading: false, error: failure.message);
-        ref.read(notificationProvider.notifier).showError('搜尋失敗: \${failure.message}');
+        ref.read(notificationProvider.notifier).showError('搜尋失敗: ${failure.message}');
       },
     );
   }

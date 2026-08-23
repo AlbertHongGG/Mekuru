@@ -72,7 +72,7 @@ class _ExplorePageState extends ConsumerState<ExplorePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(state.searchQuery.isNotEmpty ? '搜尋: \${state.searchQuery}' : '探索'),
+        title: Text(state.searchQuery.isNotEmpty ? '搜尋: ${state.searchQuery}' : '探索'),
         centerTitle: false,
         actions: [
           IconButton(
@@ -91,7 +91,7 @@ class _ExplorePageState extends ConsumerState<ExplorePage> {
                         shape: BoxShape.circle,
                       ),
                       child: Text(
-                        '\${state.activeTags.length}',
+                        '${state.activeTags.length}',
                         style: const TextStyle(fontSize: 8, color: Colors.white, fontWeight: FontWeight.bold),
                       ),
                     ),

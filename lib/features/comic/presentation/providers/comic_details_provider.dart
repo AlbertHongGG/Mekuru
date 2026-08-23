@@ -85,7 +85,7 @@ class ComicDetailsNotifier extends AutoDisposeFamilyNotifier<ComicDetailsState, 
       );
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
-      ref.read(notificationProvider.notifier).showError('載入漫畫詳情失敗: \$e');
+      ref.read(notificationProvider.notifier).showError('載入漫畫詳情失敗: $e');
     }
   }
 

@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:mekuru/core/error/result.dart';
 import 'package:mekuru/domain/models/chapter.dart';
 import 'package:mekuru/domain/models/comic_models.dart';
 import 'package:mekuru/domain/models/page.dart';
@@ -14,30 +15,30 @@ class ComicSourceRepository implements IComicRepository {
   ComicSourceRepository(this._registry);
 
   @override
-  Future<PaginatedResult<ComicExploreResult>> exploreComics(String providerId, int page) async {
+  Future<Result<PaginatedResult<ComicExploreResult>, Failure>> exploreComics(String providerId, int page) async {
     final provider = _registry.getProvider(providerId);
     return provider.exploreComics(page);
   }
 
   @override
-  Future<PaginatedResult<ComicSearchResult>> searchComics(String providerId, String keyword, int page) async {
+  Future<Result<PaginatedResult<ComicSearchResult>, Failure>> searchComics(String providerId, String keyword, int page) async {
     final provider = _registry.getProvider(providerId);
     return provider.searchComics(keyword, page);
   }
 
   @override
-  Future<ComicDetail> getComic(String providerId, String comicId) async {
+  Future<Result<ComicDetail, Failure>> getComic(String providerId, String comicId) async {
     final provider = _registry.getProvider(providerId);
     return provider.getComicDetail(comicId);
   }
 
   @override
-  Future<List<Chapter>> getChapters(String providerId, String comicId, {bool isDescending = true}) async {
+  Future<Result<List<Chapter>, Failure>> getChapters(String providerId, String comicId, {bool isDescending = true}) async {
     return _registry.getProvider(providerId).getChapterList(comicId, isDescending: isDescending);
   }
 
   @override
-  Future<List<ComicPage>> getChapterImages(String providerId, String comicId, String chapterId) async {
+  Future<Result<List<ComicPage>, Failure>> getChapterImages(String providerId, String comicId, String chapterId) async {
     return _registry.getProvider(providerId).getChapterImages(comicId, chapterId);
   }
 }

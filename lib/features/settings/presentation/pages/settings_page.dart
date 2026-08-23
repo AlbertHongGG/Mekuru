@@ -11,9 +11,18 @@ import 'package:mekuru/core/widgets/app_switch.dart';
 import 'package:mekuru/core/widgets/app_bottom_sheet.dart';
 import 'package:mekuru/core/notifications/presentation/screens/system_log_viewer_screen.dart';
 import 'package:mekuru/core/network/presentation/pages/api_log_list_page.dart';
+import 'package:mekuru/data/sources/provider_registry.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
+
+  String _getProviderName(String providerId) {
+    try {
+      return providerRegistry.getProvider(providerId).providerName;
+    } catch (e) {
+      return providerId;
+    }
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -43,7 +52,7 @@ class SettingsPage extends ConsumerWidget {
                   icon: Icons.api_rounded,
                   iconColor: AppColors.primary,
                   title: '選擇漫畫來源',
-                  subtitle: settingsState.currentSourceId == 'webtoon' ? 'Webtoon' : 'ComicWifi Official',
+                  subtitle: _getProviderName(settingsState.currentSourceId),
                   onTap: () => _showSourceProviderBottomSheet(context, ref, settingsState.currentSourceId),
                 ),
               if (settingsState.dataSourceMode == 'db')
@@ -120,23 +129,35 @@ class SettingsPage extends ConsumerWidget {
   }
 
   void _showSourceProviderBottomSheet(BuildContext context, WidgetRef ref, String currentSourceId) {
+    final providers = providerRegistry.getAllProviders();
+    
+    // Auto generate items from registry
+    final items = providers.map((provider) {
+      IconData icon;
+      switch (provider.providerId) {
+        case 'comicwifi':
+          icon = Icons.wifi;
+          break;
+        case 'webtoon':
+          icon = Icons.web;
+          break;
+        case 'copymanga':
+          icon = Icons.library_books;
+          break;
+        default:
+          icon = Icons.extension;
+      }
+      return AppBottomSheetItemData(
+        title: provider.providerName,
+        leadingIcon: icon,
+        value: provider.providerId,
+      );
+    }).toList();
+
     AppBottomSheet.show(
       context: context,
       title: '選擇漫畫來源',
-      items: [
-        AppBottomSheetItemData(
-          title: 'ComicWifi Official',
-          subtitle: '主要漫畫來源，包含豐富的中文漫畫資源',
-          leadingIcon: Icons.wifi,
-          value: 'comicwifi',
-        ),
-        AppBottomSheetItemData(
-          title: 'Webtoon',
-          subtitle: 'Line Webtoon 官方資源，提供直條式漫畫',
-          leadingIcon: Icons.web,
-          value: 'webtoon',
-        ),
-      ],
+      items: items,
       selectedValue: currentSourceId,
       onItemSelected: (val) {
         ref.read(settingsProvider.notifier).updateCurrentSourceId(val);

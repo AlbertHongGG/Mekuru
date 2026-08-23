@@ -59,10 +59,11 @@ class ComicDetailsNotifier extends AutoDisposeFamilyNotifier<ComicDetailsState, 
       final sourceRepo = ref.read(comicRepositoryProvider);
       final interactionRepo = ref.read(userInteractionRepositoryProvider);
 
-      final responses = await Future.wait([
-        sourceRepo.getComic(arg.providerId, arg.comicId),
-        sourceRepo.getChapters(arg.providerId, arg.comicId, isDescending: state.isChapterSortDescending),
-      ]);
+      final comicResult = await sourceRepo.getComic(arg.providerId, arg.comicId);
+      final chapterResult = await sourceRepo.getChapters(arg.providerId, arg.comicId, isDescending: state.isChapterSortDescending);
+
+      final comic = comicResult.getOrThrow();
+      final chapters = chapterResult.getOrThrow();
 
       final settings = ref.read(settingsProvider);
       final mode = settings.dataSourceMode;
@@ -77,9 +78,6 @@ class ComicDetailsNotifier extends AutoDisposeFamilyNotifier<ComicDetailsState, 
       });
       ref.onDispose(() => sub.cancel());
 
-      final comic = responses[0] as ComicDetail;
-      final chapters = responses[1] as List<Chapter>;
-
       state = state.copyWith(
         isLoading: false,
         comic: comic,
@@ -87,7 +85,7 @@ class ComicDetailsNotifier extends AutoDisposeFamilyNotifier<ComicDetailsState, 
       );
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
-      ref.read(notificationProvider.notifier).showError('載入漫畫詳情失敗，請檢查網路');
+      ref.read(notificationProvider.notifier).showError('載入漫畫詳情失敗: \$e');
     }
   }
 

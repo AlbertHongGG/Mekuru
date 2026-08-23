@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
-import 'package:mekuru/data/sources/i_comic_provider.dart';
+import 'package:mekuru/core/error/result.dart';
+import 'package:mekuru/core/error/failures.dart';
+import 'package:mekuru/data/sources/base_comic_provider.dart';
 import 'package:mekuru/data/sources/comicwifi/comicwifi_api_client.dart';
 import 'package:mekuru/data/sources/comicwifi/comicwifi_auth_interceptor.dart';
 import 'package:mekuru/domain/models/comic_models.dart';
@@ -7,7 +9,7 @@ import 'package:mekuru/domain/models/chapter.dart';
 import 'package:mekuru/domain/models/page.dart';
 import 'package:mekuru/domain/models/paginated_result.dart';
 
-class ComicWifiProvider implements IComicProvider {
+class ComicWifiProvider extends BaseComicProvider {
   static const String _id = 'comicwifi';
   static const String _name = 'ComicWifi Official';
   
@@ -54,7 +56,6 @@ class ComicWifiProvider implements IComicProvider {
       ),
     );
     dio.interceptors.add(ComicWifiAuthInterceptor());
-    // Error handling interceptor can be added here if needed to parse their custom logic errors
     
     _apiClient = ComicWifiApiClient(dio);
   }
@@ -69,87 +70,97 @@ class ComicWifiProvider implements IComicProvider {
   Map<String, String>? get imageHeaders => null;
 
   @override
-  Future<ComicDetail> getComicDetail(String comicId) async {
-    final rawDetail = await _apiClient.getComicDetail(comicId);
-    return ComicDetail(
-      comicId: rawDetail.id,
-      providerId: _id,
-      title: rawDetail.name ?? 'Unknown Title',
-      coverUrl: rawDetail.cover ?? '',
-      description: rawDetail.desc ?? '',
-      tags: rawDetail.tags ?? [],
-      status: rawDetail.trace ?? '',
-    );
+  Future<Result<ComicDetail, Failure>> getComicDetail(String comicId) async {
+    return handleApiCall(() async {
+      final rawDetail = await _apiClient.getComicDetail(comicId);
+      return ComicDetail(
+        comicId: rawDetail.id,
+        providerId: _id,
+        title: rawDetail.name ?? 'Unknown Title',
+        coverUrl: rawDetail.cover ?? '',
+        description: rawDetail.desc ?? '',
+        tags: rawDetail.tags ?? [],
+        status: rawDetail.trace ?? '',
+      );
+    });
   }
 
   @override
-  Future<List<Chapter>> getChapterList(String comicId, {bool isDescending = true}) async {
-    final pageSize = 999999;
-    final rawList = await _apiClient.getChapterList(
-      comicId, 
-      1, 
-      pageSize: pageSize, 
-      order: isDescending ? 'desc' : 'asc'
-    );
-    final List<Chapter> chapters = [];
-    for (int i = 0; i < rawList.chapters.length; i++) {
-      final ch = rawList.chapters[i];
-      chapters.add(Chapter(
-        id: ch.chapterId.toString(),
-        title: ch.chapterName ?? 'Chapter ${i + 1}',
-        publishedAt: ch.createTime ?? '',
-      ));
-    }
-    return chapters;
+  Future<Result<List<Chapter>, Failure>> getChapterList(String comicId, {bool isDescending = true}) async {
+    return handleApiCall(() async {
+      final pageSize = 999999;
+      final rawList = await _apiClient.getChapterList(
+        comicId, 
+        1, 
+        pageSize: pageSize, 
+        order: isDescending ? 'desc' : 'asc'
+      );
+      final List<Chapter> chapters = [];
+      for (int i = 0; i < rawList.chapters.length; i++) {
+        final ch = rawList.chapters[i];
+        chapters.add(Chapter(
+          id: ch.chapterId.toString(),
+          title: ch.chapterName ?? 'Chapter \${i + 1}',
+          publishedAt: ch.createTime ?? '',
+        ));
+      }
+      return chapters;
+    });
   }
 
   @override
-  Future<List<ComicPage>> getChapterImages(String comicId, String chapterId) async {
-    final rawImages = await _apiClient.getChapterImages(comicId, chapterId);
-    final List<ComicPage> pages = [];
-    for (int i = 0; i < rawImages.imgs.length; i++) {
-      final img = rawImages.imgs[i];
-      pages.add(ComicPage(
-        imageUrl: img.url,
-        index: i,
-      ));
-    }
-    return pages;
+  Future<Result<List<ComicPage>, Failure>> getChapterImages(String comicId, String chapterId) async {
+    return handleApiCall(() async {
+      final rawImages = await _apiClient.getChapterImages(comicId, chapterId);
+      final List<ComicPage> pages = [];
+      for (int i = 0; i < rawImages.imgs.length; i++) {
+        final img = rawImages.imgs[i];
+        pages.add(ComicPage(
+          imageUrl: img.url,
+          index: i,
+        ));
+      }
+      return pages;
+    });
   }
 
   @override
-  Future<PaginatedResult<ComicSearchResult>> searchComics(String keyword, int page) async {
-    final items = await _apiClient.searchComics(keyword, page);
-    final comics = items.map((e) => ComicSearchResult(
-      comicId: e.moduleItem.id,
-      providerId: _id,
-      title: e.moduleItem.name,
-      coverUrl: e.moduleItem.cover,
-      tags: e.moduleItem.tags,
-    )).toList();
-    
-    return PaginatedResult<ComicSearchResult>(
-      items: comics,
-      page: page,
-      hasNext: comics.length == 30,
-    );
+  Future<Result<PaginatedResult<ComicSearchResult>, Failure>> searchComics(String keyword, int page) async {
+    return handleApiCall(() async {
+      final items = await _apiClient.searchComics(keyword, page);
+      final comics = items.map((e) => ComicSearchResult(
+        comicId: e.moduleItem.id,
+        providerId: _id,
+        title: e.moduleItem.name,
+        coverUrl: e.moduleItem.cover,
+        tags: e.moduleItem.tags,
+      )).toList();
+      
+      return PaginatedResult<ComicSearchResult>(
+        items: comics,
+        page: page,
+        hasNext: comics.length == 30,
+      );
+    });
   }
 
   @override
-  Future<PaginatedResult<ComicExploreResult>> exploreComics(int page) async {
-    final items = await _apiClient.exploreComics(page);
-    final comics = items.map((e) => ComicExploreResult(
-      comicId: e.moduleItem.id,
-      providerId: _id,
-      title: e.moduleItem.name,
-      coverUrl: e.moduleItem.cover,
-      tags: e.moduleItem.tags,
-    )).toList();
+  Future<Result<PaginatedResult<ComicExploreResult>, Failure>> exploreComics(int page) async {
+    return handleApiCall(() async {
+      final items = await _apiClient.exploreComics(page);
+      final comics = items.map((e) => ComicExploreResult(
+        comicId: e.moduleItem.id,
+        providerId: _id,
+        title: e.moduleItem.name,
+        coverUrl: e.moduleItem.cover,
+        tags: e.moduleItem.tags,
+      )).toList();
 
-    return PaginatedResult<ComicExploreResult>(
-      items: comics,
-      page: page,
-      hasNext: comics.length == 30,
-    );
+      return PaginatedResult<ComicExploreResult>(
+        items: comics,
+        page: page,
+        hasNext: comics.length == 30,
+      );
+    });
   }
 }

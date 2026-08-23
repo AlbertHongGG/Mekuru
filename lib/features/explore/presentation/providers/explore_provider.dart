@@ -141,21 +141,23 @@ class ExploreNotifier extends Notifier<ExploreState> {
       state = state.copyWith(isLoading: true, error: null);
     }
 
-    try {
-      final result = await repo.exploreComics(currentProviderId, nextPage);
-      
-      _extractTags(result.items);
-
-      state = state.copyWith(
-        isLoading: false,
-        comics: loadMore ? [...state.comics, ...result.items] : result.items,
-        page: result.page,
-        hasNext: result.hasNext,
-      );
-    } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
-      ref.read(notificationProvider.notifier).showError('探索加載失敗: $e');
-    }
+    final result = await repo.exploreComics(currentProviderId, nextPage);
+    
+    result.fold(
+      (paginated) {
+        _extractTags(paginated.items);
+        state = state.copyWith(
+          isLoading: false,
+          comics: loadMore ? [...state.comics, ...paginated.items] : paginated.items,
+          page: paginated.page,
+          hasNext: paginated.hasNext,
+        );
+      },
+      (failure) {
+        state = state.copyWith(isLoading: false, error: failure.message);
+        ref.read(notificationProvider.notifier).showError('探索加載失敗: \${failure.message}');
+      },
+    );
   }
 
   Future<void> search(String query) async {
@@ -168,21 +170,23 @@ class ExploreNotifier extends Notifier<ExploreState> {
     
     state = state.copyWith(isLoading: true, comics: [], error: null, searchQuery: query, page: 1, hasNext: false);
 
-    try {
-      final result = await repo.searchComics(currentProviderId, query, 1);
-      
-      _extractTags(result.items);
-
-      state = state.copyWith(
-        isLoading: false,
-        comics: result.items,
-        page: result.page,
-        hasNext: result.hasNext,
-      );
-    } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
-      ref.read(notificationProvider.notifier).showError('探索加載失敗: $e');
-    }
+    final result = await repo.searchComics(currentProviderId, query, 1);
+    
+    result.fold(
+      (paginated) {
+        _extractTags(paginated.items);
+        state = state.copyWith(
+          isLoading: false,
+          comics: paginated.items,
+          page: paginated.page,
+          hasNext: paginated.hasNext,
+        );
+      },
+      (failure) {
+        state = state.copyWith(isLoading: false, error: failure.message);
+        ref.read(notificationProvider.notifier).showError('搜尋失敗: \${failure.message}');
+      },
+    );
   }
 }
 

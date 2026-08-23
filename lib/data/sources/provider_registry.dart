@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mekuru/data/sources/i_comic_provider.dart';
 import 'package:mekuru/data/sources/comicwifi/comicwifi_provider.dart';
 import 'package:mekuru/data/sources/webtoon/webtoon_provider.dart';
+import 'package:mekuru/data/sources/copymanga/copymanga_provider.dart';
 
 class ProviderRegistry {
   final Map<String, IComicProvider> _providers = {};
@@ -26,7 +27,8 @@ class ProviderRegistry {
 // Global instance to hold the registry
 final providerRegistry = ProviderRegistry()
   ..register(ComicWifiProvider())
-  ..register(WebtoonProvider());
+  ..register(WebtoonProvider())
+  ..register(CopymangaProvider());
 
 // Riverpod provider for the registry
 final providerRegistryProvider = Provider<ProviderRegistry>((ref) {

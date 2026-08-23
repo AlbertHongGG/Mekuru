@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mekuru/core/network/api_client.dart';
+import 'package:mekuru/core/error/result.dart';
+import 'package:mekuru/core/error/failures.dart';
 import 'package:mekuru/domain/models/comic_models.dart';
 import 'package:mekuru/domain/models/chapter.dart';
 import 'package:mekuru/domain/models/page.dart';
@@ -13,59 +15,78 @@ class ComicLibraryRepository implements IComicRepository {
   ComicLibraryRepository(this._dio);
 
   @override
-  Future<PaginatedResult<ComicExploreResult>> exploreComics(String providerId, int page) async {
-    final response = await _dio.get('/api/v1/library/explore');
-    final data = response.data as List;
-    final comics = data.map((json) => ComicExploreResult.fromJson(json)).toList();
-    
-    return PaginatedResult<ComicExploreResult>(
-      items: comics,
-      page: 1,
-      hasNext: false,
-    );
-  }
-
-  @override
-  Future<PaginatedResult<ComicSearchResult>> searchComics(String providerId, String keyword, int page) async {
-    final response = await _dio.get('/api/v1/library/search', queryParameters: {
-      'keyword': keyword,
-    });
-    
-    final data = response.data as List;
-    final comics = data.map((json) => ComicSearchResult.fromJson(json)).toList();
-    
-    return PaginatedResult<ComicSearchResult>(
-      items: comics,
-      page: 1,
-      hasNext: false,
-    );
-  }
-
-  @override
-  Future<ComicDetail> getComic(String providerId, String comicId) async {
-    final response = await _dio.get('/api/v1/library/$providerId/$comicId');
-    return ComicDetail.fromJson(response.data);
-  }
-
-  @override
-  Future<List<Chapter>> getChapters(String providerId, String comicId, {bool isDescending = true}) async {
-    // Note: The Python library server currently returns all chapters at once
-    final response = await _dio.get('/api/v1/library/$providerId/$comicId/chapters');
-    final data = response.data as List;
-    var chapters = data.map((json) => Chapter.fromJson(json)).toList();
-    
-    if (isDescending) {
-      chapters = chapters.reversed.toList();
+  Future<Result<PaginatedResult<ComicExploreResult>, Failure>> exploreComics(String providerId, int page) async {
+    try {
+      final response = await _dio.get('/api/v1/library/explore');
+      final data = response.data as List;
+      final comics = data.map((json) => ComicExploreResult.fromJson(json)).toList();
+      
+      return Success(PaginatedResult<ComicExploreResult>(
+        items: comics,
+        page: 1,
+        hasNext: false,
+      ));
+    } catch (e) {
+      return Error(ServerFailure(e.toString()));
     }
-    
-    return chapters;
   }
 
   @override
-  Future<List<ComicPage>> getChapterImages(String providerId, String comicId, String chapterId) async {
-    final response = await _dio.get('/api/v1/library/$providerId/$comicId/chapters/$chapterId/images');
-    final data = response.data as List;
-    return data.map((json) => ComicPage.fromJson(json)).toList();
+  Future<Result<PaginatedResult<ComicSearchResult>, Failure>> searchComics(String providerId, String keyword, int page) async {
+    try {
+      final response = await _dio.get('/api/v1/library/search', queryParameters: {
+        'keyword': keyword,
+      });
+      
+      final data = response.data as List;
+      final comics = data.map((json) => ComicSearchResult.fromJson(json)).toList();
+      
+      return Success(PaginatedResult<ComicSearchResult>(
+        items: comics,
+        page: 1,
+        hasNext: false,
+      ));
+    } catch (e) {
+      return Error(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Result<ComicDetail, Failure>> getComic(String providerId, String comicId) async {
+    try {
+      final response = await _dio.get('/api/v1/library/$providerId/$comicId');
+      return Success(ComicDetail.fromJson(response.data));
+    } catch (e) {
+      return Error(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Result<List<Chapter>, Failure>> getChapters(String providerId, String comicId, {bool isDescending = true}) async {
+    try {
+      final response = await _dio.get('/api/v1/library/$providerId/$comicId/chapters');
+      final data = response.data as List;
+      var chapters = data.map((json) => Chapter.fromJson(json)).toList();
+      
+      if (isDescending) {
+        chapters = chapters.reversed.toList();
+      }
+      
+      return Success(chapters);
+    } catch (e) {
+      return Error(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Result<List<ComicPage>, Failure>> getChapterImages(String providerId, String comicId, String chapterId) async {
+    try {
+      final response = await _dio.get('/api/v1/library/$providerId/$comicId/chapters/$chapterId/images');
+      final data = response.data as List;
+      return Success(data.map((json) => ComicPage.fromJson(json)).toList());
+    } catch (e) {
+      return Error(ServerFailure(e.toString()));
+    }
   }
 }
 

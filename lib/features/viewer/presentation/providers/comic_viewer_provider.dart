@@ -49,7 +49,8 @@ class ComicViewerNotifier extends AutoDisposeFamilyNotifier<ComicViewerState, ({
     state = state.copyWith(isLoading: true, error: null);
     try {
       final repo = ref.read(comicRepositoryProvider);
-      final pages = await repo.getChapterImages(arg.providerId, arg.comicId, arg.chapterId);
+      final result = await repo.getChapterImages(arg.providerId, arg.comicId, arg.chapterId);
+      final pages = result.getOrThrow();
 
       final interactionRepo = ref.read(userInteractionRepositoryProvider);
       final detailsState = ref.read(comicDetailsProvider((providerId: arg.providerId, comicId: arg.comicId)));

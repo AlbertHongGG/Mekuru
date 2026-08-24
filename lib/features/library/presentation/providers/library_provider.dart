@@ -121,31 +121,7 @@ class LibraryNotifier extends Notifier<LibraryState> {
       result = result.where((f) => (f.title).toLowerCase().contains(q)).toList();
     }
     
-    result.sort((a, b) {
-      if (state.sortMode == LibrarySortMode.added) {
-        final timeA = a.favoriteAt ?? a.updatedAt;
-        final timeB = b.favoriteAt ?? b.updatedAt;
-        return timeB.compareTo(timeA);
-      } else if (state.sortMode == LibrarySortMode.read) {
-        // Unread comics sink to the bottom (Epoch 0)
-        final timeA = a.readAt ?? DateTime.fromMillisecondsSinceEpoch(0);
-        final timeB = b.readAt ?? DateTime.fromMillisecondsSinceEpoch(0);
-        
-        // If both are unread, sort by added time
-        if (timeA.millisecondsSinceEpoch == 0 && timeB.millisecondsSinceEpoch == 0) {
-          final addedA = a.favoriteAt ?? a.updatedAt;
-          final addedB = b.favoriteAt ?? b.updatedAt;
-          return addedB.compareTo(addedA);
-        }
-        
-        return timeB.compareTo(timeA);
-      } else if (state.sortMode == LibrarySortMode.updated) {
-        final timeA = a.updatedAt;
-        final timeB = b.updatedAt;
-        return timeB.compareTo(timeA);
-      }
-      return 0;
-    });
+    result.sort((a, b) => state.sortMode.strategy.compare(a, b));
 
     final registry = ref.read(providerRegistryProvider);
     final displayItems = result.map((r) {

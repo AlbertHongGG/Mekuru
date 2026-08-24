@@ -45,11 +45,13 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
   bool _initialized = false;
   int _lastSavedPacked = -1;
 
+  late final dynamic _notifier;
+
   @override
   void initState() {
     super.initState();
+    _notifier = ref.read(comicViewerProvider((providerId: widget.providerId, comicId: widget.comicId, chapterId: widget.chapterId)).notifier);
   }
-
   @override
   void dispose() {
     _debounceTimer?.cancel();
@@ -94,8 +96,7 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
     int packed = (_currentAnchorIndex * 1000000) + _currentAnchorOffset.toInt();
     if (packed != _lastSavedPacked) {
       _lastSavedPacked = packed;
-      ref.read(comicViewerProvider((providerId: widget.providerId, comicId: widget.comicId, chapterId: widget.chapterId)).notifier)
-          .updateProgress(_currentAnchorIndex, _currentAnchorOffset);
+      _notifier.updateProgress(_currentAnchorIndex, _currentAnchorOffset);
     }
   }
 
@@ -134,34 +135,41 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
     });
   }
 
-  void _showChapterList(dynamic detailsState) {
+  void _showChapterList() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) {
-        return Container(
-          height: MediaQuery.of(context).size.height * 0.7,
-          padding: const EdgeInsets.only(top: 24),
-          decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-          ),
-          child: SafeArea(
-            child: ChapterListBottomSheet(
-              providerId: widget.providerId,
-              comicId: widget.comicId,
-              chapters: detailsState.chapters,
-              lastReadChapterId: widget.chapterId,
-              isSortDescending: detailsState.isChapterSortDescending,
-              onToggleSort: () => ref.read(comicDetailsProvider((providerId: widget.providerId, comicId: widget.comicId)).notifier).toggleChapterSort(),
-              onChapterTap: (chapter) {
-                Navigator.pop(context);
-                _navigateToChapter(chapter.id);
-              },
-            ),
-          ),
+        return Consumer(
+          builder: (context, ref, child) {
+            final detailsArg = (providerId: widget.providerId, comicId: widget.comicId);
+            final currentDetailsState = ref.watch(comicDetailsProvider(detailsArg));
+            
+            return Container(
+              height: MediaQuery.of(context).size.height * 0.7,
+              padding: const EdgeInsets.only(top: 24),
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              child: SafeArea(
+                child: ChapterListBottomSheet(
+                  providerId: widget.providerId,
+                  comicId: widget.comicId,
+                  chapters: currentDetailsState.chapters,
+                  lastReadChapterId: widget.chapterId,
+                  isSortDescending: currentDetailsState.isChapterSortDescending,
+                  onToggleSort: () => ref.read(comicDetailsProvider(detailsArg).notifier).toggleChapterSort(),
+                  onChapterTap: (chapter) {
+                    Navigator.pop(context);
+                    _navigateToChapter(chapter.id);
+                  },
+                ),
+              ),
+            );
+          },
         );
       },
     );
@@ -312,7 +320,7 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
             isVisible: _showUI,
             comicTitle: comicTitle,
             chapterTitle: chapterTitle,
-            onMenuPressed: () => _showChapterList(detailsState),
+            onMenuPressed: () => _showChapterList(),
           ),
 
           // 3. Bottom Bar

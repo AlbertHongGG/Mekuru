@@ -10,7 +10,6 @@ import 'package:extended_image/extended_image.dart';
 import 'package:mekuru/features/viewer/presentation/widgets/webtoon_image_placeholder.dart';
 import 'package:mekuru/core/widgets/app_bottom_sheet.dart';
 import 'package:mekuru/core/widgets/comic_image.dart';
-import 'package:mekuru/features/viewer/presentation/widgets/viewer_interaction_layer.dart';
 import 'package:mekuru/features/viewer/presentation/widgets/viewer_top_bar.dart';
 import 'package:mekuru/features/viewer/presentation/widgets/viewer_bottom_bar.dart';
 
@@ -237,30 +236,40 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
       body: Stack(
         children: [
           // 1. Image Viewer Layer
-          ViewerInteractionLayer(
-            onTap: _toggleUI,
-            scrollController: _scrollController,
-            child: state.isLoading && state.pages.isEmpty
-                ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
-                : state.error != null
-                    ? Center(child: Text('錯誤: ${state.error}', style: const TextStyle(color: Colors.white)))
-                    : NotificationListener<ScrollNotification>(
-                        onNotification: _onScrollNotification,
-                        child: CustomScrollView(
-                          key: _viewportKey,
-                          controller: _scrollController,
-                          cacheExtent: 5000.0, 
-                          physics: const ClampingScrollPhysics(),
-                          center: state.pages.isNotEmpty && _sliverKeys.isNotEmpty 
-                              ? _sliverKeys[state.initialAnchorIndex < state.pages.length ? state.initialAnchorIndex : 0]
-                              : null,
-                          slivers: [
-                            if (state.pages.isNotEmpty)
-                              for (int i = 0; i < state.pages.length; i++)
-                                SliverToBoxAdapter(
-                                  key: _sliverKeys[i], // Center anchor key
+          state.isLoading && state.pages.isEmpty
+              ? GestureDetector(
+                  onTap: _toggleUI,
+                  behavior: HitTestBehavior.opaque,
+                  child: const Center(child: CircularProgressIndicator(color: AppColors.primary)),
+                )
+              : state.error != null
+                  ? GestureDetector(
+                      onTap: _toggleUI,
+                      behavior: HitTestBehavior.opaque,
+                      child: Center(child: Text('錯誤: ${state.error}', style: const TextStyle(color: Colors.white))),
+                    )
+                  : NotificationListener<ScrollNotification>(
+                      onNotification: _onScrollNotification,
+                      child: CustomScrollView(
+                        key: _viewportKey,
+                        controller: _scrollController,
+                        cacheExtent: 5000.0, 
+                        physics: const ClampingScrollPhysics(),
+                        center: state.pages.isNotEmpty && _sliverKeys.isNotEmpty 
+                            ? _sliverKeys[state.initialAnchorIndex < state.pages.length ? state.initialAnchorIndex : 0]
+                            : null,
+                        slivers: [
+                          if (state.pages.isNotEmpty)
+                            for (int i = 0; i < state.pages.length; i++)
+                              SliverToBoxAdapter(
+                                key: _sliverKeys[i], // Center anchor key
+                                child: GestureDetector(
+                                  onTap: _toggleUI,
+                                  behavior: HitTestBehavior.opaque,
                                   child: Container(
                                     key: _itemKeys[i], // Position radar key
+                                    width: double.infinity,
+                                    color: Colors.transparent,
                                     child: ComicImage(
                                       imageUrl: state.pages[i].imageUrl,
                                       providerId: widget.providerId,
@@ -293,10 +302,10 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
                                     ),
                                   ),
                                 ),
-                          ],
-                        ),
+                              ),
+                        ],
                       ),
-          ),
+                    ),
 
           // 2. Top Bar
           ViewerTopBar(

@@ -8,6 +8,7 @@ class ComicCardData {
   final String? coverUrl;
   final String? author;
   final List<String> tags;
+  final String? progressLabel;
 
   const ComicCardData({
     required this.comicId,
@@ -16,9 +17,10 @@ class ComicCardData {
     this.coverUrl,
     this.author,
     this.tags = const [],
+    this.progressLabel,
   });
 
-  factory ComicCardData.fromComic(IComicItem comic, {List<String>? overrideTags}) {
+  factory ComicCardData.fromComic(IComicItem comic, {List<String>? overrideTags, String? progressLabel}) {
     String? author;
     List<String> tags = overrideTags ?? [];
     
@@ -40,6 +42,7 @@ class ComicCardData {
       coverUrl: comic.coverUrl,
       author: author,
       tags: tags,
+      progressLabel: progressLabel,
     );
   }
 }

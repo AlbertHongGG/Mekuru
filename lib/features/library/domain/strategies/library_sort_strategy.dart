@@ -1,4 +1,4 @@
-﻿import 'package:mekuru/core/models/comic_record.dart';
+import 'package:mekuru/core/models/comic_record.dart';
 
 abstract class LibrarySortStrategy {
   int compare(ComicRecord a, ComicRecord b);
@@ -16,8 +16,8 @@ class AddedSortStrategy implements LibrarySortStrategy {
 class UpdatedSortStrategy implements LibrarySortStrategy {
   @override
   int compare(ComicRecord a, ComicRecord b) {
-    final timeA = a.updatedAt;
-    final timeB = b.updatedAt;
+    final timeA = a.sourceUpdatedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+    final timeB = b.sourceUpdatedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
     return timeB.compareTo(timeA);
   }
 }

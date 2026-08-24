@@ -69,6 +69,9 @@ class ComicDetailsNotifier extends AutoDisposeFamilyNotifier<ComicDetailsState, 
       final settings = ref.read(settingsProvider);
       final mode = settings.dataSourceMode;
 
+      // Update metadata with chapter list information
+      await interactionRepo.updateMetadata(mode, arg.providerId, comic, chapters: chapters, isChaptersDescending: state.isChapterSortDescending);
+
       // Start watching the interaction stream
       final sub = interactionRepo.watchInteraction(
         dataSourceMode: mode, 

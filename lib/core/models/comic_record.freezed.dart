@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ComicRecord {
 
- String get id; DataSourceMode get dataSourceMode; String get providerId; String get comicId; String get title; String get coverUrl; bool get isFavorite; String? get lastReadChapterId; String? get lastReadChapterTitle; int? get lastReadPageIndex; DateTime get updatedAt; DateTime? get favoriteAt; DateTime? get readAt; List<String> get readChapterIds;
+ String get id; DataSourceMode get dataSourceMode; String get providerId; String get comicId; String get title; String get coverUrl; bool get isFavorite; String? get lastReadChapterId; String? get lastReadChapterTitle; int? get lastReadPageIndex; int? get lastReadChapterIndex; DateTime get updatedAt; DateTime? get sourceUpdatedAt; int? get totalChapters; String? get latestChapterTitle; DateTime? get favoriteAt; DateTime? get readAt; List<String> get readChapterIds;
 /// Create a copy of ComicRecord
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -26,16 +26,16 @@ $ComicRecordCopyWith<ComicRecord> get copyWith => _$ComicRecordCopyWithImpl<Comi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ComicRecord&&(identical(other.id, id) || other.id == id)&&(identical(other.dataSourceMode, dataSourceMode) || other.dataSourceMode == dataSourceMode)&&(identical(other.providerId, providerId) || other.providerId == providerId)&&(identical(other.comicId, comicId) || other.comicId == comicId)&&(identical(other.title, title) || other.title == title)&&(identical(other.coverUrl, coverUrl) || other.coverUrl == coverUrl)&&(identical(other.isFavorite, isFavorite) || other.isFavorite == isFavorite)&&(identical(other.lastReadChapterId, lastReadChapterId) || other.lastReadChapterId == lastReadChapterId)&&(identical(other.lastReadChapterTitle, lastReadChapterTitle) || other.lastReadChapterTitle == lastReadChapterTitle)&&(identical(other.lastReadPageIndex, lastReadPageIndex) || other.lastReadPageIndex == lastReadPageIndex)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.favoriteAt, favoriteAt) || other.favoriteAt == favoriteAt)&&(identical(other.readAt, readAt) || other.readAt == readAt)&&const DeepCollectionEquality().equals(other.readChapterIds, readChapterIds));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ComicRecord&&(identical(other.id, id) || other.id == id)&&(identical(other.dataSourceMode, dataSourceMode) || other.dataSourceMode == dataSourceMode)&&(identical(other.providerId, providerId) || other.providerId == providerId)&&(identical(other.comicId, comicId) || other.comicId == comicId)&&(identical(other.title, title) || other.title == title)&&(identical(other.coverUrl, coverUrl) || other.coverUrl == coverUrl)&&(identical(other.isFavorite, isFavorite) || other.isFavorite == isFavorite)&&(identical(other.lastReadChapterId, lastReadChapterId) || other.lastReadChapterId == lastReadChapterId)&&(identical(other.lastReadChapterTitle, lastReadChapterTitle) || other.lastReadChapterTitle == lastReadChapterTitle)&&(identical(other.lastReadPageIndex, lastReadPageIndex) || other.lastReadPageIndex == lastReadPageIndex)&&(identical(other.lastReadChapterIndex, lastReadChapterIndex) || other.lastReadChapterIndex == lastReadChapterIndex)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.sourceUpdatedAt, sourceUpdatedAt) || other.sourceUpdatedAt == sourceUpdatedAt)&&(identical(other.totalChapters, totalChapters) || other.totalChapters == totalChapters)&&(identical(other.latestChapterTitle, latestChapterTitle) || other.latestChapterTitle == latestChapterTitle)&&(identical(other.favoriteAt, favoriteAt) || other.favoriteAt == favoriteAt)&&(identical(other.readAt, readAt) || other.readAt == readAt)&&const DeepCollectionEquality().equals(other.readChapterIds, readChapterIds));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,dataSourceMode,providerId,comicId,title,coverUrl,isFavorite,lastReadChapterId,lastReadChapterTitle,lastReadPageIndex,updatedAt,favoriteAt,readAt,const DeepCollectionEquality().hash(readChapterIds));
+int get hashCode => Object.hash(runtimeType,id,dataSourceMode,providerId,comicId,title,coverUrl,isFavorite,lastReadChapterId,lastReadChapterTitle,lastReadPageIndex,lastReadChapterIndex,updatedAt,sourceUpdatedAt,totalChapters,latestChapterTitle,favoriteAt,readAt,const DeepCollectionEquality().hash(readChapterIds));
 
 @override
 String toString() {
-  return 'ComicRecord(id: $id, dataSourceMode: $dataSourceMode, providerId: $providerId, comicId: $comicId, title: $title, coverUrl: $coverUrl, isFavorite: $isFavorite, lastReadChapterId: $lastReadChapterId, lastReadChapterTitle: $lastReadChapterTitle, lastReadPageIndex: $lastReadPageIndex, updatedAt: $updatedAt, favoriteAt: $favoriteAt, readAt: $readAt, readChapterIds: $readChapterIds)';
+  return 'ComicRecord(id: $id, dataSourceMode: $dataSourceMode, providerId: $providerId, comicId: $comicId, title: $title, coverUrl: $coverUrl, isFavorite: $isFavorite, lastReadChapterId: $lastReadChapterId, lastReadChapterTitle: $lastReadChapterTitle, lastReadPageIndex: $lastReadPageIndex, lastReadChapterIndex: $lastReadChapterIndex, updatedAt: $updatedAt, sourceUpdatedAt: $sourceUpdatedAt, totalChapters: $totalChapters, latestChapterTitle: $latestChapterTitle, favoriteAt: $favoriteAt, readAt: $readAt, readChapterIds: $readChapterIds)';
 }
 
 
@@ -46,7 +46,7 @@ abstract mixin class $ComicRecordCopyWith<$Res>  {
   factory $ComicRecordCopyWith(ComicRecord value, $Res Function(ComicRecord) _then) = _$ComicRecordCopyWithImpl;
 @useResult
 $Res call({
- String id, DataSourceMode dataSourceMode, String providerId, String comicId, String title, String coverUrl, bool isFavorite, String? lastReadChapterId, String? lastReadChapterTitle, int? lastReadPageIndex, DateTime updatedAt, DateTime? favoriteAt, DateTime? readAt, List<String> readChapterIds
+ String id, DataSourceMode dataSourceMode, String providerId, String comicId, String title, String coverUrl, bool isFavorite, String? lastReadChapterId, String? lastReadChapterTitle, int? lastReadPageIndex, int? lastReadChapterIndex, DateTime updatedAt, DateTime? sourceUpdatedAt, int? totalChapters, String? latestChapterTitle, DateTime? favoriteAt, DateTime? readAt, List<String> readChapterIds
 });
 
 
@@ -63,7 +63,7 @@ class _$ComicRecordCopyWithImpl<$Res>
 
 /// Create a copy of ComicRecord
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? dataSourceMode = null,Object? providerId = null,Object? comicId = null,Object? title = null,Object? coverUrl = null,Object? isFavorite = null,Object? lastReadChapterId = freezed,Object? lastReadChapterTitle = freezed,Object? lastReadPageIndex = freezed,Object? updatedAt = null,Object? favoriteAt = freezed,Object? readAt = freezed,Object? readChapterIds = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? dataSourceMode = null,Object? providerId = null,Object? comicId = null,Object? title = null,Object? coverUrl = null,Object? isFavorite = null,Object? lastReadChapterId = freezed,Object? lastReadChapterTitle = freezed,Object? lastReadPageIndex = freezed,Object? lastReadChapterIndex = freezed,Object? updatedAt = null,Object? sourceUpdatedAt = freezed,Object? totalChapters = freezed,Object? latestChapterTitle = freezed,Object? favoriteAt = freezed,Object? readAt = freezed,Object? readChapterIds = null,}) {
   return _then(ComicRecord(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,dataSourceMode: null == dataSourceMode ? _self.dataSourceMode : dataSourceMode // ignore: cast_nullable_to_non_nullable
@@ -75,8 +75,12 @@ as String,isFavorite: null == isFavorite ? _self.isFavorite : isFavorite // igno
 as bool,lastReadChapterId: freezed == lastReadChapterId ? _self.lastReadChapterId : lastReadChapterId // ignore: cast_nullable_to_non_nullable
 as String?,lastReadChapterTitle: freezed == lastReadChapterTitle ? _self.lastReadChapterTitle : lastReadChapterTitle // ignore: cast_nullable_to_non_nullable
 as String?,lastReadPageIndex: freezed == lastReadPageIndex ? _self.lastReadPageIndex : lastReadPageIndex // ignore: cast_nullable_to_non_nullable
+as int?,lastReadChapterIndex: freezed == lastReadChapterIndex ? _self.lastReadChapterIndex : lastReadChapterIndex // ignore: cast_nullable_to_non_nullable
 as int?,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
-as DateTime,favoriteAt: freezed == favoriteAt ? _self.favoriteAt : favoriteAt // ignore: cast_nullable_to_non_nullable
+as DateTime,sourceUpdatedAt: freezed == sourceUpdatedAt ? _self.sourceUpdatedAt : sourceUpdatedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,totalChapters: freezed == totalChapters ? _self.totalChapters : totalChapters // ignore: cast_nullable_to_non_nullable
+as int?,latestChapterTitle: freezed == latestChapterTitle ? _self.latestChapterTitle : latestChapterTitle // ignore: cast_nullable_to_non_nullable
+as String?,favoriteAt: freezed == favoriteAt ? _self.favoriteAt : favoriteAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,readAt: freezed == readAt ? _self.readAt : readAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,readChapterIds: null == readChapterIds ? _self.readChapterIds : readChapterIds // ignore: cast_nullable_to_non_nullable
 as List<String>,
@@ -164,10 +168,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  DataSourceMode dataSourceMode,  String providerId,  String comicId,  String title,  String coverUrl,  bool isFavorite,  String? lastReadChapterId,  String? lastReadChapterTitle,  int? lastReadPageIndex,  DateTime updatedAt,  DateTime? favoriteAt,  DateTime? readAt,  List<String> readChapterIds)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  DataSourceMode dataSourceMode,  String providerId,  String comicId,  String title,  String coverUrl,  bool isFavorite,  String? lastReadChapterId,  String? lastReadChapterTitle,  int? lastReadPageIndex,  int? lastReadChapterIndex,  DateTime updatedAt,  DateTime? sourceUpdatedAt,  int? totalChapters,  String? latestChapterTitle,  DateTime? favoriteAt,  DateTime? readAt,  List<String> readChapterIds)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ComicRecord() when $default != null:
-return $default(_that.id,_that.dataSourceMode,_that.providerId,_that.comicId,_that.title,_that.coverUrl,_that.isFavorite,_that.lastReadChapterId,_that.lastReadChapterTitle,_that.lastReadPageIndex,_that.updatedAt,_that.favoriteAt,_that.readAt,_that.readChapterIds);case _:
+return $default(_that.id,_that.dataSourceMode,_that.providerId,_that.comicId,_that.title,_that.coverUrl,_that.isFavorite,_that.lastReadChapterId,_that.lastReadChapterTitle,_that.lastReadPageIndex,_that.lastReadChapterIndex,_that.updatedAt,_that.sourceUpdatedAt,_that.totalChapters,_that.latestChapterTitle,_that.favoriteAt,_that.readAt,_that.readChapterIds);case _:
   return orElse();
 
 }
@@ -185,10 +189,10 @@ return $default(_that.id,_that.dataSourceMode,_that.providerId,_that.comicId,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  DataSourceMode dataSourceMode,  String providerId,  String comicId,  String title,  String coverUrl,  bool isFavorite,  String? lastReadChapterId,  String? lastReadChapterTitle,  int? lastReadPageIndex,  DateTime updatedAt,  DateTime? favoriteAt,  DateTime? readAt,  List<String> readChapterIds)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  DataSourceMode dataSourceMode,  String providerId,  String comicId,  String title,  String coverUrl,  bool isFavorite,  String? lastReadChapterId,  String? lastReadChapterTitle,  int? lastReadPageIndex,  int? lastReadChapterIndex,  DateTime updatedAt,  DateTime? sourceUpdatedAt,  int? totalChapters,  String? latestChapterTitle,  DateTime? favoriteAt,  DateTime? readAt,  List<String> readChapterIds)  $default,) {final _that = this;
 switch (_that) {
 case _ComicRecord():
-return $default(_that.id,_that.dataSourceMode,_that.providerId,_that.comicId,_that.title,_that.coverUrl,_that.isFavorite,_that.lastReadChapterId,_that.lastReadChapterTitle,_that.lastReadPageIndex,_that.updatedAt,_that.favoriteAt,_that.readAt,_that.readChapterIds);case _:
+return $default(_that.id,_that.dataSourceMode,_that.providerId,_that.comicId,_that.title,_that.coverUrl,_that.isFavorite,_that.lastReadChapterId,_that.lastReadChapterTitle,_that.lastReadPageIndex,_that.lastReadChapterIndex,_that.updatedAt,_that.sourceUpdatedAt,_that.totalChapters,_that.latestChapterTitle,_that.favoriteAt,_that.readAt,_that.readChapterIds);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -205,10 +209,10 @@ return $default(_that.id,_that.dataSourceMode,_that.providerId,_that.comicId,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  DataSourceMode dataSourceMode,  String providerId,  String comicId,  String title,  String coverUrl,  bool isFavorite,  String? lastReadChapterId,  String? lastReadChapterTitle,  int? lastReadPageIndex,  DateTime updatedAt,  DateTime? favoriteAt,  DateTime? readAt,  List<String> readChapterIds)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  DataSourceMode dataSourceMode,  String providerId,  String comicId,  String title,  String coverUrl,  bool isFavorite,  String? lastReadChapterId,  String? lastReadChapterTitle,  int? lastReadPageIndex,  int? lastReadChapterIndex,  DateTime updatedAt,  DateTime? sourceUpdatedAt,  int? totalChapters,  String? latestChapterTitle,  DateTime? favoriteAt,  DateTime? readAt,  List<String> readChapterIds)?  $default,) {final _that = this;
 switch (_that) {
 case _ComicRecord() when $default != null:
-return $default(_that.id,_that.dataSourceMode,_that.providerId,_that.comicId,_that.title,_that.coverUrl,_that.isFavorite,_that.lastReadChapterId,_that.lastReadChapterTitle,_that.lastReadPageIndex,_that.updatedAt,_that.favoriteAt,_that.readAt,_that.readChapterIds);case _:
+return $default(_that.id,_that.dataSourceMode,_that.providerId,_that.comicId,_that.title,_that.coverUrl,_that.isFavorite,_that.lastReadChapterId,_that.lastReadChapterTitle,_that.lastReadPageIndex,_that.lastReadChapterIndex,_that.updatedAt,_that.sourceUpdatedAt,_that.totalChapters,_that.latestChapterTitle,_that.favoriteAt,_that.readAt,_that.readChapterIds);case _:
   return null;
 
 }
@@ -220,7 +224,7 @@ return $default(_that.id,_that.dataSourceMode,_that.providerId,_that.comicId,_th
 
 
 class _ComicRecord extends ComicRecord {
-  const _ComicRecord({required this.id, required this.dataSourceMode, required this.providerId, required this.comicId, required this.title, required this.coverUrl, this.isFavorite = false, this.lastReadChapterId, this.lastReadChapterTitle, this.lastReadPageIndex, required this.updatedAt, this.favoriteAt, this.readAt,  List<String> readChapterIds = const []}): _readChapterIds = readChapterIds,super._();
+  const _ComicRecord({required this.id, required this.dataSourceMode, required this.providerId, required this.comicId, required this.title, required this.coverUrl, this.isFavorite = false, this.lastReadChapterId, this.lastReadChapterTitle, this.lastReadPageIndex, this.lastReadChapterIndex, required this.updatedAt, this.sourceUpdatedAt, this.totalChapters, this.latestChapterTitle, this.favoriteAt, this.readAt,  List<String> readChapterIds = const []}): _readChapterIds = readChapterIds,super._();
   
 
 @override final  String id;
@@ -233,7 +237,11 @@ class _ComicRecord extends ComicRecord {
 @override final  String? lastReadChapterId;
 @override final  String? lastReadChapterTitle;
 @override final  int? lastReadPageIndex;
+@override final  int? lastReadChapterIndex;
 @override final  DateTime updatedAt;
+@override final  DateTime? sourceUpdatedAt;
+@override final  int? totalChapters;
+@override final  String? latestChapterTitle;
 @override final  DateTime? favoriteAt;
 @override final  DateTime? readAt;
  final  List<String> _readChapterIds;
@@ -254,16 +262,16 @@ _$ComicRecordCopyWith<_ComicRecord> get copyWith => __$ComicRecordCopyWithImpl<_
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ComicRecord&&(identical(other.id, id) || other.id == id)&&(identical(other.dataSourceMode, dataSourceMode) || other.dataSourceMode == dataSourceMode)&&(identical(other.providerId, providerId) || other.providerId == providerId)&&(identical(other.comicId, comicId) || other.comicId == comicId)&&(identical(other.title, title) || other.title == title)&&(identical(other.coverUrl, coverUrl) || other.coverUrl == coverUrl)&&(identical(other.isFavorite, isFavorite) || other.isFavorite == isFavorite)&&(identical(other.lastReadChapterId, lastReadChapterId) || other.lastReadChapterId == lastReadChapterId)&&(identical(other.lastReadChapterTitle, lastReadChapterTitle) || other.lastReadChapterTitle == lastReadChapterTitle)&&(identical(other.lastReadPageIndex, lastReadPageIndex) || other.lastReadPageIndex == lastReadPageIndex)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.favoriteAt, favoriteAt) || other.favoriteAt == favoriteAt)&&(identical(other.readAt, readAt) || other.readAt == readAt)&&const DeepCollectionEquality().equals(other._readChapterIds, _readChapterIds));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ComicRecord&&(identical(other.id, id) || other.id == id)&&(identical(other.dataSourceMode, dataSourceMode) || other.dataSourceMode == dataSourceMode)&&(identical(other.providerId, providerId) || other.providerId == providerId)&&(identical(other.comicId, comicId) || other.comicId == comicId)&&(identical(other.title, title) || other.title == title)&&(identical(other.coverUrl, coverUrl) || other.coverUrl == coverUrl)&&(identical(other.isFavorite, isFavorite) || other.isFavorite == isFavorite)&&(identical(other.lastReadChapterId, lastReadChapterId) || other.lastReadChapterId == lastReadChapterId)&&(identical(other.lastReadChapterTitle, lastReadChapterTitle) || other.lastReadChapterTitle == lastReadChapterTitle)&&(identical(other.lastReadPageIndex, lastReadPageIndex) || other.lastReadPageIndex == lastReadPageIndex)&&(identical(other.lastReadChapterIndex, lastReadChapterIndex) || other.lastReadChapterIndex == lastReadChapterIndex)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.sourceUpdatedAt, sourceUpdatedAt) || other.sourceUpdatedAt == sourceUpdatedAt)&&(identical(other.totalChapters, totalChapters) || other.totalChapters == totalChapters)&&(identical(other.latestChapterTitle, latestChapterTitle) || other.latestChapterTitle == latestChapterTitle)&&(identical(other.favoriteAt, favoriteAt) || other.favoriteAt == favoriteAt)&&(identical(other.readAt, readAt) || other.readAt == readAt)&&const DeepCollectionEquality().equals(other._readChapterIds, _readChapterIds));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,dataSourceMode,providerId,comicId,title,coverUrl,isFavorite,lastReadChapterId,lastReadChapterTitle,lastReadPageIndex,updatedAt,favoriteAt,readAt,const DeepCollectionEquality().hash(_readChapterIds));
+int get hashCode => Object.hash(runtimeType,id,dataSourceMode,providerId,comicId,title,coverUrl,isFavorite,lastReadChapterId,lastReadChapterTitle,lastReadPageIndex,lastReadChapterIndex,updatedAt,sourceUpdatedAt,totalChapters,latestChapterTitle,favoriteAt,readAt,const DeepCollectionEquality().hash(_readChapterIds));
 
 @override
 String toString() {
-  return 'ComicRecord(id: $id, dataSourceMode: $dataSourceMode, providerId: $providerId, comicId: $comicId, title: $title, coverUrl: $coverUrl, isFavorite: $isFavorite, lastReadChapterId: $lastReadChapterId, lastReadChapterTitle: $lastReadChapterTitle, lastReadPageIndex: $lastReadPageIndex, updatedAt: $updatedAt, favoriteAt: $favoriteAt, readAt: $readAt, readChapterIds: $readChapterIds)';
+  return 'ComicRecord(id: $id, dataSourceMode: $dataSourceMode, providerId: $providerId, comicId: $comicId, title: $title, coverUrl: $coverUrl, isFavorite: $isFavorite, lastReadChapterId: $lastReadChapterId, lastReadChapterTitle: $lastReadChapterTitle, lastReadPageIndex: $lastReadPageIndex, lastReadChapterIndex: $lastReadChapterIndex, updatedAt: $updatedAt, sourceUpdatedAt: $sourceUpdatedAt, totalChapters: $totalChapters, latestChapterTitle: $latestChapterTitle, favoriteAt: $favoriteAt, readAt: $readAt, readChapterIds: $readChapterIds)';
 }
 
 
@@ -274,7 +282,7 @@ abstract mixin class _$ComicRecordCopyWith<$Res> implements $ComicRecordCopyWith
   factory _$ComicRecordCopyWith(_ComicRecord value, $Res Function(_ComicRecord) _then) = __$ComicRecordCopyWithImpl;
 @override @useResult
 $Res call({
- String id, DataSourceMode dataSourceMode, String providerId, String comicId, String title, String coverUrl, bool isFavorite, String? lastReadChapterId, String? lastReadChapterTitle, int? lastReadPageIndex, DateTime updatedAt, DateTime? favoriteAt, DateTime? readAt, List<String> readChapterIds
+ String id, DataSourceMode dataSourceMode, String providerId, String comicId, String title, String coverUrl, bool isFavorite, String? lastReadChapterId, String? lastReadChapterTitle, int? lastReadPageIndex, int? lastReadChapterIndex, DateTime updatedAt, DateTime? sourceUpdatedAt, int? totalChapters, String? latestChapterTitle, DateTime? favoriteAt, DateTime? readAt, List<String> readChapterIds
 });
 
 
@@ -291,7 +299,7 @@ class __$ComicRecordCopyWithImpl<$Res>
 
 /// Create a copy of ComicRecord
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? dataSourceMode = null,Object? providerId = null,Object? comicId = null,Object? title = null,Object? coverUrl = null,Object? isFavorite = null,Object? lastReadChapterId = freezed,Object? lastReadChapterTitle = freezed,Object? lastReadPageIndex = freezed,Object? updatedAt = null,Object? favoriteAt = freezed,Object? readAt = freezed,Object? readChapterIds = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? dataSourceMode = null,Object? providerId = null,Object? comicId = null,Object? title = null,Object? coverUrl = null,Object? isFavorite = null,Object? lastReadChapterId = freezed,Object? lastReadChapterTitle = freezed,Object? lastReadPageIndex = freezed,Object? lastReadChapterIndex = freezed,Object? updatedAt = null,Object? sourceUpdatedAt = freezed,Object? totalChapters = freezed,Object? latestChapterTitle = freezed,Object? favoriteAt = freezed,Object? readAt = freezed,Object? readChapterIds = null,}) {
   return _then(_ComicRecord(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,dataSourceMode: null == dataSourceMode ? _self.dataSourceMode : dataSourceMode // ignore: cast_nullable_to_non_nullable
@@ -303,8 +311,12 @@ as String,isFavorite: null == isFavorite ? _self.isFavorite : isFavorite // igno
 as bool,lastReadChapterId: freezed == lastReadChapterId ? _self.lastReadChapterId : lastReadChapterId // ignore: cast_nullable_to_non_nullable
 as String?,lastReadChapterTitle: freezed == lastReadChapterTitle ? _self.lastReadChapterTitle : lastReadChapterTitle // ignore: cast_nullable_to_non_nullable
 as String?,lastReadPageIndex: freezed == lastReadPageIndex ? _self.lastReadPageIndex : lastReadPageIndex // ignore: cast_nullable_to_non_nullable
+as int?,lastReadChapterIndex: freezed == lastReadChapterIndex ? _self.lastReadChapterIndex : lastReadChapterIndex // ignore: cast_nullable_to_non_nullable
 as int?,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
-as DateTime,favoriteAt: freezed == favoriteAt ? _self.favoriteAt : favoriteAt // ignore: cast_nullable_to_non_nullable
+as DateTime,sourceUpdatedAt: freezed == sourceUpdatedAt ? _self.sourceUpdatedAt : sourceUpdatedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,totalChapters: freezed == totalChapters ? _self.totalChapters : totalChapters // ignore: cast_nullable_to_non_nullable
+as int?,latestChapterTitle: freezed == latestChapterTitle ? _self.latestChapterTitle : latestChapterTitle // ignore: cast_nullable_to_non_nullable
+as String?,favoriteAt: freezed == favoriteAt ? _self.favoriteAt : favoriteAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,readAt: freezed == readAt ? _self.readAt : readAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,readChapterIds: null == readChapterIds ? _self._readChapterIds : readChapterIds // ignore: cast_nullable_to_non_nullable
 as List<String>,

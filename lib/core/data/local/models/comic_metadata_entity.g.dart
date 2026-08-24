@@ -18,6 +18,11 @@ _ComicMetadataEntity _$ComicMetadataEntityFromJson(Map<String, dynamic> json) =>
       title: json['title'] as String,
       coverUrl: json['coverUrl'] as String,
       updatedAt: DateTime.parse(json['updatedAt'] as String),
+      sourceUpdatedAt: json['sourceUpdatedAt'] == null
+          ? null
+          : DateTime.parse(json['sourceUpdatedAt'] as String),
+      totalChapters: (json['totalChapters'] as num?)?.toInt(),
+      latestChapterTitle: json['latestChapterTitle'] as String?,
     );
 
 Map<String, dynamic> _$ComicMetadataEntityToJson(
@@ -30,6 +35,9 @@ Map<String, dynamic> _$ComicMetadataEntityToJson(
   'title': instance.title,
   'coverUrl': instance.coverUrl,
   'updatedAt': instance.updatedAt.toIso8601String(),
+  'sourceUpdatedAt': instance.sourceUpdatedAt?.toIso8601String(),
+  'totalChapters': instance.totalChapters,
+  'latestChapterTitle': instance.latestChapterTitle,
 };
 
 const _$DataSourceModeEnumMap = {

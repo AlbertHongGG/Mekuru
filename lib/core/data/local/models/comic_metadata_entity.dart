@@ -14,6 +14,9 @@ abstract class ComicMetadataEntity with _$ComicMetadataEntity {
     required String title,
     required String coverUrl,
     required DateTime updatedAt, // 快取更新時間
+    DateTime? sourceUpdatedAt, // 來源最新章節發布時間
+    int? totalChapters, // 總章節數
+    String? latestChapterTitle, // 最新章節名稱
   }) = _ComicMetadataEntity;
 
   factory ComicMetadataEntity.fromJson(Map<String, dynamic> json) => 

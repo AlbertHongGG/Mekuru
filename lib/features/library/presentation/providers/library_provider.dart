@@ -129,7 +129,17 @@ class LibraryNotifier extends Notifier<LibraryState> {
       try {
         providerName = registry.getProvider(r.providerId).providerName;
       } catch (_) {}
-      return ComicCardData.fromComic(r, overrideTags: [providerName]);
+      
+      String? progressLabel;
+      if (r.totalChapters != null && r.totalChapters! > 0) {
+        String readLabel = '0';
+        if (r.lastReadChapterIndex != null) {
+          readLabel = r.lastReadChapterIndex.toString();
+        }
+        progressLabel = '$readLabel/${r.totalChapters}';
+      }
+      
+      return ComicCardData.fromComic(r, overrideTags: [providerName], progressLabel: progressLabel);
     }).toList();
 
     state = state.copyWith(displayItems: displayItems);

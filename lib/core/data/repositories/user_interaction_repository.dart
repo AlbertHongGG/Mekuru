@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mekuru/core/data/local/i_local_storage.dart';
 import 'package:mekuru/core/models/comic_record.dart';
 import 'package:mekuru/core/models/comic_base.dart';
+import 'package:mekuru/core/models/chapter.dart';
 import 'package:mekuru/core/data/local/models/comic_metadata_entity.dart';
 import 'package:mekuru/core/data/local/models/favorite_entity.dart';
 import 'package:mekuru/core/data/local/models/history_entity.dart';
@@ -34,11 +35,15 @@ class UserInteractionRepository {
       title: metadata.title,
       coverUrl: metadata.coverUrl,
       updatedAt: metadata.updatedAt,
+      sourceUpdatedAt: metadata.sourceUpdatedAt,
+      totalChapters: metadata.totalChapters,
+      latestChapterTitle: metadata.latestChapterTitle,
       isFavorite: favorite != null,
       favoriteAt: favorite?.favoriteAt,
       lastReadChapterId: history?.lastReadChapterId,
       lastReadChapterTitle: history?.lastReadChapterTitle,
       lastReadPageIndex: history?.lastReadPageIndex,
+      lastReadChapterIndex: history?.lastReadChapterIndex,
       readAt: history?.updatedAt,
       readChapterIds: history?.readChapterIds ?? [],
     );
@@ -78,12 +83,45 @@ class UserInteractionRepository {
     return records.where((r) => r.providerId == providerId).toList();
   }
 
-  Future<void> _updateMetadata(String id, DataSourceMode dataSourceMode, String providerId, IComicItem comic) async {
+  Future<void> updateMetadata(DataSourceMode dataSourceMode, String providerId, IComicItem comic, {List<Chapter>? chapters, bool isChaptersDescending = false}) async {
+    final id = _genId(dataSourceMode, providerId, comic.comicId);
     final now = DateTime.now();
     final existing = _metadataBox.get(id);
     
-    // Only update metadata if cover or title actually changed, or if it doesn't exist
-    if (existing == null || existing.coverUrl != comic.coverUrl || existing.title != comic.title) {
+    DateTime? sourceUpdatedAt = existing?.sourceUpdatedAt;
+    int? totalChapters = existing?.totalChapters;
+    String? latestChapterTitle = existing?.latestChapterTitle;
+    bool chaptersUpdated = false;
+
+    if (chapters != null && chapters.isNotEmpty) {
+      // Find the newest publish time
+      DateTime? newestTime;
+      Chapter? latestChap = chapters.first;
+      for (final chap in chapters) {
+        if (chap.publishedAt != null) {
+          final time = DateTime.tryParse(chap.publishedAt!);
+          if (time != null) {
+            if (newestTime == null || time.isAfter(newestTime)) {
+              newestTime = time;
+              latestChap = chap;
+            }
+          }
+        }
+      }
+      
+      if (newestTime != null && (sourceUpdatedAt == null || newestTime.isAfter(sourceUpdatedAt))) {
+        sourceUpdatedAt = newestTime;
+        chaptersUpdated = true;
+      }
+      
+      if (totalChapters != chapters.length || latestChapterTitle != latestChap?.title) {
+        totalChapters = chapters.length;
+        latestChapterTitle = latestChap?.title;
+        chaptersUpdated = true;
+      }
+    }
+    
+    if (existing == null || existing.coverUrl != comic.coverUrl || existing.title != comic.title || chaptersUpdated) {
       await _metadataBox.put(id, ComicMetadataEntity(
         id: id,
         dataSourceMode: dataSourceMode,
@@ -92,7 +130,28 @@ class UserInteractionRepository {
         title: comic.title ?? existing?.title ?? '',
         coverUrl: comic.coverUrl ?? existing?.coverUrl ?? '',
         updatedAt: now,
+        sourceUpdatedAt: sourceUpdatedAt,
+        totalChapters: totalChapters,
+        latestChapterTitle: latestChapterTitle,
       ));
+    }
+
+    if (chapters != null && chapters.isNotEmpty) {
+      final existingHistory = _historyBox.get(id);
+      if (existingHistory != null && existingHistory.lastReadChapterId.isNotEmpty) {
+        final indexInList = chapters.indexWhere((c) => c.id == existingHistory.lastReadChapterId);
+        if (indexInList != -1) {
+          final int actualIndex = isChaptersDescending 
+              ? chapters.length - indexInList 
+              : indexInList + 1;
+          
+          if (existingHistory.lastReadChapterIndex != actualIndex) {
+            await _historyBox.put(id, existingHistory.copyWith(
+              lastReadChapterIndex: actualIndex,
+            ));
+          }
+        }
+      }
     }
   }
 
@@ -107,7 +166,7 @@ class UserInteractionRepository {
   }) async {
     final id = _genId(dataSourceMode, providerId, comicId);
     
-    await _updateMetadata(id, dataSourceMode, providerId, comic);
+    await updateMetadata(dataSourceMode, providerId, comic);
     
     final existingHistory = _historyBox.get(id);
     final readChapterIds = existingHistory?.readChapterIds.toList() ?? [];
@@ -166,7 +225,7 @@ class UserInteractionRepository {
   }) async {
     final id = _genId(dataSourceMode, providerId, comicId);
     
-    await _updateMetadata(id, dataSourceMode, providerId, comic);
+    await updateMetadata(dataSourceMode, providerId, comic);
     
     if (isFavorite) {
       await _favoritesBox.put(id, FavoriteEntity(

@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$HistoryEntity {
 
- String get comicId; String get lastReadChapterId; String get lastReadChapterTitle; int get lastReadPageIndex; DateTime get updatedAt; List<String> get readChapterIds;
+ String get comicId; String get lastReadChapterId; String get lastReadChapterTitle; int get lastReadPageIndex; DateTime get updatedAt; List<String> get readChapterIds; int? get lastReadChapterIndex;
 /// Create a copy of HistoryEntity
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -29,16 +29,16 @@ $HistoryEntityCopyWith<HistoryEntity> get copyWith => _$HistoryEntityCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is HistoryEntity&&(identical(other.comicId, comicId) || other.comicId == comicId)&&(identical(other.lastReadChapterId, lastReadChapterId) || other.lastReadChapterId == lastReadChapterId)&&(identical(other.lastReadChapterTitle, lastReadChapterTitle) || other.lastReadChapterTitle == lastReadChapterTitle)&&(identical(other.lastReadPageIndex, lastReadPageIndex) || other.lastReadPageIndex == lastReadPageIndex)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&const DeepCollectionEquality().equals(other.readChapterIds, readChapterIds));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is HistoryEntity&&(identical(other.comicId, comicId) || other.comicId == comicId)&&(identical(other.lastReadChapterId, lastReadChapterId) || other.lastReadChapterId == lastReadChapterId)&&(identical(other.lastReadChapterTitle, lastReadChapterTitle) || other.lastReadChapterTitle == lastReadChapterTitle)&&(identical(other.lastReadPageIndex, lastReadPageIndex) || other.lastReadPageIndex == lastReadPageIndex)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&const DeepCollectionEquality().equals(other.readChapterIds, readChapterIds)&&(identical(other.lastReadChapterIndex, lastReadChapterIndex) || other.lastReadChapterIndex == lastReadChapterIndex));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,comicId,lastReadChapterId,lastReadChapterTitle,lastReadPageIndex,updatedAt,const DeepCollectionEquality().hash(readChapterIds));
+int get hashCode => Object.hash(runtimeType,comicId,lastReadChapterId,lastReadChapterTitle,lastReadPageIndex,updatedAt,const DeepCollectionEquality().hash(readChapterIds),lastReadChapterIndex);
 
 @override
 String toString() {
-  return 'HistoryEntity(comicId: $comicId, lastReadChapterId: $lastReadChapterId, lastReadChapterTitle: $lastReadChapterTitle, lastReadPageIndex: $lastReadPageIndex, updatedAt: $updatedAt, readChapterIds: $readChapterIds)';
+  return 'HistoryEntity(comicId: $comicId, lastReadChapterId: $lastReadChapterId, lastReadChapterTitle: $lastReadChapterTitle, lastReadPageIndex: $lastReadPageIndex, updatedAt: $updatedAt, readChapterIds: $readChapterIds, lastReadChapterIndex: $lastReadChapterIndex)';
 }
 
 
@@ -49,7 +49,7 @@ abstract mixin class $HistoryEntityCopyWith<$Res>  {
   factory $HistoryEntityCopyWith(HistoryEntity value, $Res Function(HistoryEntity) _then) = _$HistoryEntityCopyWithImpl;
 @useResult
 $Res call({
- String comicId, String lastReadChapterId, String lastReadChapterTitle, int lastReadPageIndex, DateTime updatedAt, List<String> readChapterIds
+ String comicId, String lastReadChapterId, String lastReadChapterTitle, int lastReadPageIndex, DateTime updatedAt, List<String> readChapterIds, int? lastReadChapterIndex
 });
 
 
@@ -66,7 +66,7 @@ class _$HistoryEntityCopyWithImpl<$Res>
 
 /// Create a copy of HistoryEntity
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? comicId = null,Object? lastReadChapterId = null,Object? lastReadChapterTitle = null,Object? lastReadPageIndex = null,Object? updatedAt = null,Object? readChapterIds = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? comicId = null,Object? lastReadChapterId = null,Object? lastReadChapterTitle = null,Object? lastReadPageIndex = null,Object? updatedAt = null,Object? readChapterIds = null,Object? lastReadChapterIndex = freezed,}) {
   return _then(HistoryEntity(
 comicId: null == comicId ? _self.comicId : comicId // ignore: cast_nullable_to_non_nullable
 as String,lastReadChapterId: null == lastReadChapterId ? _self.lastReadChapterId : lastReadChapterId // ignore: cast_nullable_to_non_nullable
@@ -74,7 +74,8 @@ as String,lastReadChapterTitle: null == lastReadChapterTitle ? _self.lastReadCha
 as String,lastReadPageIndex: null == lastReadPageIndex ? _self.lastReadPageIndex : lastReadPageIndex // ignore: cast_nullable_to_non_nullable
 as int,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
 as DateTime,readChapterIds: null == readChapterIds ? _self.readChapterIds : readChapterIds // ignore: cast_nullable_to_non_nullable
-as List<String>,
+as List<String>,lastReadChapterIndex: freezed == lastReadChapterIndex ? _self.lastReadChapterIndex : lastReadChapterIndex // ignore: cast_nullable_to_non_nullable
+as int?,
   ));
 }
 
@@ -159,10 +160,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String comicId,  String lastReadChapterId,  String lastReadChapterTitle,  int lastReadPageIndex,  DateTime updatedAt,  List<String> readChapterIds)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String comicId,  String lastReadChapterId,  String lastReadChapterTitle,  int lastReadPageIndex,  DateTime updatedAt,  List<String> readChapterIds,  int? lastReadChapterIndex)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _HistoryEntity() when $default != null:
-return $default(_that.comicId,_that.lastReadChapterId,_that.lastReadChapterTitle,_that.lastReadPageIndex,_that.updatedAt,_that.readChapterIds);case _:
+return $default(_that.comicId,_that.lastReadChapterId,_that.lastReadChapterTitle,_that.lastReadPageIndex,_that.updatedAt,_that.readChapterIds,_that.lastReadChapterIndex);case _:
   return orElse();
 
 }
@@ -180,10 +181,10 @@ return $default(_that.comicId,_that.lastReadChapterId,_that.lastReadChapterTitle
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String comicId,  String lastReadChapterId,  String lastReadChapterTitle,  int lastReadPageIndex,  DateTime updatedAt,  List<String> readChapterIds)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String comicId,  String lastReadChapterId,  String lastReadChapterTitle,  int lastReadPageIndex,  DateTime updatedAt,  List<String> readChapterIds,  int? lastReadChapterIndex)  $default,) {final _that = this;
 switch (_that) {
 case _HistoryEntity():
-return $default(_that.comicId,_that.lastReadChapterId,_that.lastReadChapterTitle,_that.lastReadPageIndex,_that.updatedAt,_that.readChapterIds);case _:
+return $default(_that.comicId,_that.lastReadChapterId,_that.lastReadChapterTitle,_that.lastReadPageIndex,_that.updatedAt,_that.readChapterIds,_that.lastReadChapterIndex);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -200,10 +201,10 @@ return $default(_that.comicId,_that.lastReadChapterId,_that.lastReadChapterTitle
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String comicId,  String lastReadChapterId,  String lastReadChapterTitle,  int lastReadPageIndex,  DateTime updatedAt,  List<String> readChapterIds)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String comicId,  String lastReadChapterId,  String lastReadChapterTitle,  int lastReadPageIndex,  DateTime updatedAt,  List<String> readChapterIds,  int? lastReadChapterIndex)?  $default,) {final _that = this;
 switch (_that) {
 case _HistoryEntity() when $default != null:
-return $default(_that.comicId,_that.lastReadChapterId,_that.lastReadChapterTitle,_that.lastReadPageIndex,_that.updatedAt,_that.readChapterIds);case _:
+return $default(_that.comicId,_that.lastReadChapterId,_that.lastReadChapterTitle,_that.lastReadPageIndex,_that.updatedAt,_that.readChapterIds,_that.lastReadChapterIndex);case _:
   return null;
 
 }
@@ -215,7 +216,7 @@ return $default(_that.comicId,_that.lastReadChapterId,_that.lastReadChapterTitle
 @JsonSerializable()
 
 class _HistoryEntity implements HistoryEntity {
-  const _HistoryEntity({required this.comicId, required this.lastReadChapterId, required this.lastReadChapterTitle, required this.lastReadPageIndex, required this.updatedAt,  List<String> readChapterIds = const []}): _readChapterIds = readChapterIds;
+  const _HistoryEntity({required this.comicId, required this.lastReadChapterId, required this.lastReadChapterTitle, required this.lastReadPageIndex, required this.updatedAt,  List<String> readChapterIds = const [], this.lastReadChapterIndex}): _readChapterIds = readChapterIds;
   factory _HistoryEntity.fromJson(Map<String, dynamic> json) => _$HistoryEntityFromJson(json);
 
 @override final  String comicId;
@@ -230,6 +231,7 @@ class _HistoryEntity implements HistoryEntity {
   return EqualUnmodifiableListView(_readChapterIds);
 }
 
+@override final  int? lastReadChapterIndex;
 
 /// Create a copy of HistoryEntity
 /// with the given fields replaced by the non-null parameter values.
@@ -244,16 +246,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HistoryEntity&&(identical(other.comicId, comicId) || other.comicId == comicId)&&(identical(other.lastReadChapterId, lastReadChapterId) || other.lastReadChapterId == lastReadChapterId)&&(identical(other.lastReadChapterTitle, lastReadChapterTitle) || other.lastReadChapterTitle == lastReadChapterTitle)&&(identical(other.lastReadPageIndex, lastReadPageIndex) || other.lastReadPageIndex == lastReadPageIndex)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&const DeepCollectionEquality().equals(other._readChapterIds, _readChapterIds));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HistoryEntity&&(identical(other.comicId, comicId) || other.comicId == comicId)&&(identical(other.lastReadChapterId, lastReadChapterId) || other.lastReadChapterId == lastReadChapterId)&&(identical(other.lastReadChapterTitle, lastReadChapterTitle) || other.lastReadChapterTitle == lastReadChapterTitle)&&(identical(other.lastReadPageIndex, lastReadPageIndex) || other.lastReadPageIndex == lastReadPageIndex)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&const DeepCollectionEquality().equals(other._readChapterIds, _readChapterIds)&&(identical(other.lastReadChapterIndex, lastReadChapterIndex) || other.lastReadChapterIndex == lastReadChapterIndex));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,comicId,lastReadChapterId,lastReadChapterTitle,lastReadPageIndex,updatedAt,const DeepCollectionEquality().hash(_readChapterIds));
+int get hashCode => Object.hash(runtimeType,comicId,lastReadChapterId,lastReadChapterTitle,lastReadPageIndex,updatedAt,const DeepCollectionEquality().hash(_readChapterIds),lastReadChapterIndex);
 
 @override
 String toString() {
-  return 'HistoryEntity(comicId: $comicId, lastReadChapterId: $lastReadChapterId, lastReadChapterTitle: $lastReadChapterTitle, lastReadPageIndex: $lastReadPageIndex, updatedAt: $updatedAt, readChapterIds: $readChapterIds)';
+  return 'HistoryEntity(comicId: $comicId, lastReadChapterId: $lastReadChapterId, lastReadChapterTitle: $lastReadChapterTitle, lastReadPageIndex: $lastReadPageIndex, updatedAt: $updatedAt, readChapterIds: $readChapterIds, lastReadChapterIndex: $lastReadChapterIndex)';
 }
 
 
@@ -264,7 +266,7 @@ abstract mixin class _$HistoryEntityCopyWith<$Res> implements $HistoryEntityCopy
   factory _$HistoryEntityCopyWith(_HistoryEntity value, $Res Function(_HistoryEntity) _then) = __$HistoryEntityCopyWithImpl;
 @override @useResult
 $Res call({
- String comicId, String lastReadChapterId, String lastReadChapterTitle, int lastReadPageIndex, DateTime updatedAt, List<String> readChapterIds
+ String comicId, String lastReadChapterId, String lastReadChapterTitle, int lastReadPageIndex, DateTime updatedAt, List<String> readChapterIds, int? lastReadChapterIndex
 });
 
 
@@ -281,7 +283,7 @@ class __$HistoryEntityCopyWithImpl<$Res>
 
 /// Create a copy of HistoryEntity
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? comicId = null,Object? lastReadChapterId = null,Object? lastReadChapterTitle = null,Object? lastReadPageIndex = null,Object? updatedAt = null,Object? readChapterIds = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? comicId = null,Object? lastReadChapterId = null,Object? lastReadChapterTitle = null,Object? lastReadPageIndex = null,Object? updatedAt = null,Object? readChapterIds = null,Object? lastReadChapterIndex = freezed,}) {
   return _then(_HistoryEntity(
 comicId: null == comicId ? _self.comicId : comicId // ignore: cast_nullable_to_non_nullable
 as String,lastReadChapterId: null == lastReadChapterId ? _self.lastReadChapterId : lastReadChapterId // ignore: cast_nullable_to_non_nullable
@@ -289,7 +291,8 @@ as String,lastReadChapterTitle: null == lastReadChapterTitle ? _self.lastReadCha
 as String,lastReadPageIndex: null == lastReadPageIndex ? _self.lastReadPageIndex : lastReadPageIndex // ignore: cast_nullable_to_non_nullable
 as int,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
 as DateTime,readChapterIds: null == readChapterIds ? _self._readChapterIds : readChapterIds // ignore: cast_nullable_to_non_nullable
-as List<String>,
+as List<String>,lastReadChapterIndex: freezed == lastReadChapterIndex ? _self.lastReadChapterIndex : lastReadChapterIndex // ignore: cast_nullable_to_non_nullable
+as int?,
   ));
 }
 

@@ -18,6 +18,7 @@ _HistoryEntity _$HistoryEntityFromJson(Map<String, dynamic> json) =>
               ?.map((e) => e as String)
               .toList() ??
           const [],
+      lastReadChapterIndex: (json['lastReadChapterIndex'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$HistoryEntityToJson(_HistoryEntity instance) =>
@@ -28,4 +29,5 @@ Map<String, dynamic> _$HistoryEntityToJson(_HistoryEntity instance) =>
       'lastReadPageIndex': instance.lastReadPageIndex,
       'updatedAt': instance.updatedAt.toIso8601String(),
       'readChapterIds': instance.readChapterIds,
+      'lastReadChapterIndex': instance.lastReadChapterIndex,
     };

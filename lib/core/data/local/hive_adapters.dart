@@ -38,14 +38,46 @@ class ComicMetadataEntityAdapter extends TypeAdapter<ComicMetadataEntity> {
 
   @override
   ComicMetadataEntity read(BinaryReader reader) {
+    final id = reader.readString();
+    final dataSourceMode = DataSourceModeExtension.fromString(reader.readString());
+    final providerId = reader.readString();
+    final comicId = reader.readString();
+    final title = reader.readString();
+    final coverUrl = reader.readString();
+    final updatedAt = DateTime.fromMillisecondsSinceEpoch(reader.readInt());
+
+    DateTime? sourceUpdatedAt;
+    int? totalChapters;
+    String? latestChapterTitle;
+
+    try {
+      final sourceUpdatedEpoch = reader.readInt();
+      if (sourceUpdatedEpoch != 0) {
+        sourceUpdatedAt = DateTime.fromMillisecondsSinceEpoch(sourceUpdatedEpoch);
+      }
+      final total = reader.readInt();
+      if (total != -1) {
+        totalChapters = total;
+      }
+      final latest = reader.readString();
+      if (latest.isNotEmpty) {
+        latestChapterTitle = latest;
+      }
+    } catch (_) {
+      // Backward compatibility for old records
+    }
+
     return ComicMetadataEntity(
-      id: reader.readString(),
-      dataSourceMode: DataSourceModeExtension.fromString(reader.readString()),
-      providerId: reader.readString(),
-      comicId: reader.readString(),
-      title: reader.readString(),
-      coverUrl: reader.readString(),
-      updatedAt: DateTime.fromMillisecondsSinceEpoch(reader.readInt()),
+      id: id,
+      dataSourceMode: dataSourceMode,
+      providerId: providerId,
+      comicId: comicId,
+      title: title,
+      coverUrl: coverUrl,
+      updatedAt: updatedAt,
+      sourceUpdatedAt: sourceUpdatedAt,
+      totalChapters: totalChapters,
+      latestChapterTitle: latestChapterTitle,
     );
   }
 
@@ -58,7 +90,10 @@ class ComicMetadataEntityAdapter extends TypeAdapter<ComicMetadataEntity> {
       ..writeString(obj.comicId)
       ..writeString(obj.title)
       ..writeString(obj.coverUrl)
-      ..writeInt(obj.updatedAt.millisecondsSinceEpoch);
+      ..writeInt(obj.updatedAt.millisecondsSinceEpoch)
+      ..writeInt(obj.sourceUpdatedAt?.millisecondsSinceEpoch ?? 0)
+      ..writeInt(obj.totalChapters ?? -1)
+      ..writeString(obj.latestChapterTitle ?? '');
   }
 }
 
@@ -95,8 +130,13 @@ class HistoryEntityAdapter extends TypeAdapter<HistoryEntity> {
     final updatedAt = DateTime.fromMillisecondsSinceEpoch(reader.readInt());
 
     List<String> readChapterIds = [];
+    int? lastReadChapterIndex;
     try {
       readChapterIds = reader.readStringList();
+      final index = reader.readInt();
+      if (index != -1) {
+        lastReadChapterIndex = index;
+      }
     } catch (_) {
       // Backward compatibility for existing data
     }
@@ -108,6 +148,7 @@ class HistoryEntityAdapter extends TypeAdapter<HistoryEntity> {
       lastReadPageIndex: lastReadPageIndex,
       updatedAt: updatedAt,
       readChapterIds: readChapterIds,
+      lastReadChapterIndex: lastReadChapterIndex,
     );
   }
 
@@ -119,7 +160,8 @@ class HistoryEntityAdapter extends TypeAdapter<HistoryEntity> {
       ..writeString(obj.lastReadChapterTitle)
       ..writeInt(obj.lastReadPageIndex)
       ..writeInt(obj.updatedAt.millisecondsSinceEpoch)
-      ..writeStringList(obj.readChapterIds);
+      ..writeStringList(obj.readChapterIds)
+      ..writeInt(obj.lastReadChapterIndex ?? -1);
   }
 }
 

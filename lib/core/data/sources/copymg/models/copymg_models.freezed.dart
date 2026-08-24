@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'copymanga_models.dart';
+part of 'copymg_models.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -14,22 +14,22 @@ part of 'copymanga_models.dart';
 T _$identity<T>(T value) => value;
 
 /// @nodoc
-mixin _$CopymangaResponse<T> {
+mixin _$CopyMGResponse<T> {
 
  int get code; String get message; T? get results;
-/// Create a copy of CopymangaResponse
+/// Create a copy of CopyMGResponse
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-$CopymangaResponseCopyWith<T, CopymangaResponse<T>> get copyWith => _$CopymangaResponseCopyWithImpl<T, CopymangaResponse<T>>(this as CopymangaResponse<T>, _$identity);
+$CopyMGResponseCopyWith<T, CopyMGResponse<T>> get copyWith => _$CopyMGResponseCopyWithImpl<T, CopyMGResponse<T>>(this as CopyMGResponse<T>, _$identity);
 
-  /// Serializes this CopymangaResponse to a JSON map.
+  /// Serializes this CopyMGResponse to a JSON map.
   Map<String, dynamic> toJson(Object? Function(T) toJsonT);
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CopymangaResponse<T>&&(identical(other.code, code) || other.code == code)&&(identical(other.message, message) || other.message == message)&&const DeepCollectionEquality().equals(other.results, results));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CopyMGResponse<T>&&(identical(other.code, code) || other.code == code)&&(identical(other.message, message) || other.message == message)&&const DeepCollectionEquality().equals(other.results, results));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -38,15 +38,15 @@ int get hashCode => Object.hash(runtimeType,code,message,const DeepCollectionEqu
 
 @override
 String toString() {
-  return 'CopymangaResponse<$T>(code: $code, message: $message, results: $results)';
+  return 'CopyMGResponse<$T>(code: $code, message: $message, results: $results)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class $CopymangaResponseCopyWith<T,$Res>  {
-  factory $CopymangaResponseCopyWith(CopymangaResponse<T> value, $Res Function(CopymangaResponse<T>) _then) = _$CopymangaResponseCopyWithImpl;
+abstract mixin class $CopyMGResponseCopyWith<T,$Res>  {
+  factory $CopyMGResponseCopyWith(CopyMGResponse<T> value, $Res Function(CopyMGResponse<T>) _then) = _$CopyMGResponseCopyWithImpl;
 @useResult
 $Res call({
  int code, String message, T? results
@@ -57,17 +57,17 @@ $Res call({
 
 }
 /// @nodoc
-class _$CopymangaResponseCopyWithImpl<T,$Res>
-    implements $CopymangaResponseCopyWith<T, $Res> {
-  _$CopymangaResponseCopyWithImpl(this._self, this._then);
+class _$CopyMGResponseCopyWithImpl<T,$Res>
+    implements $CopyMGResponseCopyWith<T, $Res> {
+  _$CopyMGResponseCopyWithImpl(this._self, this._then);
 
-  final CopymangaResponse<T> _self;
-  final $Res Function(CopymangaResponse<T>) _then;
+  final CopyMGResponse<T> _self;
+  final $Res Function(CopyMGResponse<T>) _then;
 
-/// Create a copy of CopymangaResponse
+/// Create a copy of CopyMGResponse
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? code = null,Object? message = null,Object? results = freezed,}) {
-  return _then(CopymangaResponse(
+  return _then(CopyMGResponse(
 code: null == code ? _self.code : code // ignore: cast_nullable_to_non_nullable
 as int,message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
 as String,results: freezed == results ? _self.results : results // ignore: cast_nullable_to_non_nullable
@@ -78,8 +78,8 @@ as T?,
 }
 
 
-/// Adds pattern-matching-related methods to [CopymangaResponse].
-extension CopymangaResponsePatterns<T> on CopymangaResponse<T> {
+/// Adds pattern-matching-related methods to [CopyMGResponse].
+extension CopyMGResponsePatterns<T> on CopyMGResponse<T> {
 /// A variant of `map` that fallback to returning `orElse`.
 ///
 /// It is equivalent to doing:
@@ -92,10 +92,10 @@ extension CopymangaResponsePatterns<T> on CopymangaResponse<T> {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _CopymangaResponse<T> value)?  $default,{required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _CopyMGResponse<T> value)?  $default,{required TResult orElse(),}){
 final _that = this;
 switch (_that) {
-case _CopymangaResponse() when $default != null:
+case _CopyMGResponse() when $default != null:
 return $default(_that);case _:
   return orElse();
 
@@ -114,10 +114,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _CopymangaResponse<T> value)  $default,){
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _CopyMGResponse<T> value)  $default,){
 final _that = this;
 switch (_that) {
-case _CopymangaResponse():
+case _CopyMGResponse():
 return $default(_that);case _:
   throw StateError('Unexpected subclass');
 
@@ -135,10 +135,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _CopymangaResponse<T> value)?  $default,){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _CopyMGResponse<T> value)?  $default,){
 final _that = this;
 switch (_that) {
-case _CopymangaResponse() when $default != null:
+case _CopyMGResponse() when $default != null:
 return $default(_that);case _:
   return null;
 
@@ -158,7 +158,7 @@ return $default(_that);case _:
 
 @optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int code,  String message,  T? results)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
-case _CopymangaResponse() when $default != null:
+case _CopyMGResponse() when $default != null:
 return $default(_that.code,_that.message,_that.results);case _:
   return orElse();
 
@@ -179,7 +179,7 @@ return $default(_that.code,_that.message,_that.results);case _:
 
 @optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int code,  String message,  T? results)  $default,) {final _that = this;
 switch (_that) {
-case _CopymangaResponse():
+case _CopyMGResponse():
 return $default(_that.code,_that.message,_that.results);case _:
   throw StateError('Unexpected subclass');
 
@@ -199,7 +199,7 @@ return $default(_that.code,_that.message,_that.results);case _:
 
 @optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int code,  String message,  T? results)?  $default,) {final _that = this;
 switch (_that) {
-case _CopymangaResponse() when $default != null:
+case _CopyMGResponse() when $default != null:
 return $default(_that.code,_that.message,_that.results);case _:
   return null;
 
@@ -211,28 +211,28 @@ return $default(_that.code,_that.message,_that.results);case _:
 /// @nodoc
 @JsonSerializable(genericArgumentFactories: true)
 
-class _CopymangaResponse<T> implements CopymangaResponse<T> {
-  const _CopymangaResponse({this.code = 200, this.message = '', this.results});
-  factory _CopymangaResponse.fromJson(Map<String, dynamic> json,T Function(Object?) fromJsonT) => _$CopymangaResponseFromJson(json,fromJsonT);
+class _CopyMGResponse<T> implements CopyMGResponse<T> {
+  const _CopyMGResponse({this.code = 200, this.message = '', this.results});
+  factory _CopyMGResponse.fromJson(Map<String, dynamic> json,T Function(Object?) fromJsonT) => _$CopyMGResponseFromJson(json,fromJsonT);
 
 @override@JsonKey() final  int code;
 @override@JsonKey() final  String message;
 @override final  T? results;
 
-/// Create a copy of CopymangaResponse
+/// Create a copy of CopyMGResponse
 /// with the given fields replaced by the non-null parameter values.
 @override @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-_$CopymangaResponseCopyWith<T, _CopymangaResponse<T>> get copyWith => __$CopymangaResponseCopyWithImpl<T, _CopymangaResponse<T>>(this, _$identity);
+_$CopyMGResponseCopyWith<T, _CopyMGResponse<T>> get copyWith => __$CopyMGResponseCopyWithImpl<T, _CopyMGResponse<T>>(this, _$identity);
 
 @override
 Map<String, dynamic> toJson(Object? Function(T) toJsonT) {
-  return _$CopymangaResponseToJson<T>(this, toJsonT);
+  return _$CopyMGResponseToJson<T>(this, toJsonT);
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CopymangaResponse<T>&&(identical(other.code, code) || other.code == code)&&(identical(other.message, message) || other.message == message)&&const DeepCollectionEquality().equals(other.results, results));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CopyMGResponse<T>&&(identical(other.code, code) || other.code == code)&&(identical(other.message, message) || other.message == message)&&const DeepCollectionEquality().equals(other.results, results));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -241,15 +241,15 @@ int get hashCode => Object.hash(runtimeType,code,message,const DeepCollectionEqu
 
 @override
 String toString() {
-  return 'CopymangaResponse<$T>(code: $code, message: $message, results: $results)';
+  return 'CopyMGResponse<$T>(code: $code, message: $message, results: $results)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class _$CopymangaResponseCopyWith<T,$Res> implements $CopymangaResponseCopyWith<T, $Res> {
-  factory _$CopymangaResponseCopyWith(_CopymangaResponse<T> value, $Res Function(_CopymangaResponse<T>) _then) = __$CopymangaResponseCopyWithImpl;
+abstract mixin class _$CopyMGResponseCopyWith<T,$Res> implements $CopyMGResponseCopyWith<T, $Res> {
+  factory _$CopyMGResponseCopyWith(_CopyMGResponse<T> value, $Res Function(_CopyMGResponse<T>) _then) = __$CopyMGResponseCopyWithImpl;
 @override @useResult
 $Res call({
  int code, String message, T? results
@@ -260,17 +260,17 @@ $Res call({
 
 }
 /// @nodoc
-class __$CopymangaResponseCopyWithImpl<T,$Res>
-    implements _$CopymangaResponseCopyWith<T, $Res> {
-  __$CopymangaResponseCopyWithImpl(this._self, this._then);
+class __$CopyMGResponseCopyWithImpl<T,$Res>
+    implements _$CopyMGResponseCopyWith<T, $Res> {
+  __$CopyMGResponseCopyWithImpl(this._self, this._then);
 
-  final _CopymangaResponse<T> _self;
-  final $Res Function(_CopymangaResponse<T>) _then;
+  final _CopyMGResponse<T> _self;
+  final $Res Function(_CopyMGResponse<T>) _then;
 
-/// Create a copy of CopymangaResponse
+/// Create a copy of CopyMGResponse
 /// with the given fields replaced by the non-null parameter values.
 @override @pragma('vm:prefer-inline') $Res call({Object? code = null,Object? message = null,Object? results = freezed,}) {
-  return _then(_CopymangaResponse<T>(
+  return _then(_CopyMGResponse<T>(
 code: null == code ? _self.code : code // ignore: cast_nullable_to_non_nullable
 as int,message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
 as String,results: freezed == results ? _self.results : results // ignore: cast_nullable_to_non_nullable

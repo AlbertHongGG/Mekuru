@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mekuru/core/network/api_client.dart';
 import 'package:mekuru/core/data/sources/i_comic_provider.dart';
-import 'package:mekuru/core/data/sources/comicwifi/comicwifi_provider.dart';
+import 'package:mekuru/core/data/sources/comicwf/comicwf_provider.dart';
 import 'package:mekuru/core/data/sources/webtoon/webtoon_provider.dart';
-import 'package:mekuru/core/data/sources/copymanga/copymanga_provider.dart';
+import 'package:mekuru/core/data/sources/copymg/copymg_provider.dart';
 
 class ProviderRegistry {
   final Map<String, IComicProvider> _providers = {};
@@ -29,7 +29,7 @@ class ProviderRegistry {
 final providerRegistryProvider = Provider<ProviderRegistry>((ref) {
   final apiClient = ref.watch(apiClientProvider);
   return ProviderRegistry()
-    ..register(ComicWifiProvider(apiClient))
+    ..register(ComicWFProvider(apiClient))
     ..register(WebtoonProvider(apiClient))
-    ..register(CopymangaProvider(apiClient));
+    ..register(CopyMGProvider(apiClient));
 });

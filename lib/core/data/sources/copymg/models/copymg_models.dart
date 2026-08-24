@@ -1,18 +1,18 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-part 'copymanga_models.freezed.dart';
-part 'copymanga_models.g.dart';
+part 'copymg_models.freezed.dart';
+part 'copymg_models.g.dart';
 
 @Freezed(genericArgumentFactories: true)
-abstract class CopymangaResponse<T> with _$CopymangaResponse<T> {
-  const factory CopymangaResponse({
+abstract class CopyMGResponse<T> with _$CopyMGResponse<T> {
+  const factory CopyMGResponse({
     @Default(200) int code,
     @Default('') String message,
     T? results,
-  }) = _CopymangaResponse;
+  }) = _CopyMGResponse;
 
-  factory CopymangaResponse.fromJson(Map<String, dynamic> json, T Function(Object?) fromJsonT) =>
-      _$CopymangaResponseFromJson(json, fromJsonT);
+  factory CopyMGResponse.fromJson(Map<String, dynamic> json, T Function(Object?) fromJsonT) =>
+      _$CopyMGResponseFromJson(json, fromJsonT);
 }
 
 @freezed

@@ -1,10 +1,10 @@
 import 'package:dio/dio.dart';
-import 'package:mekuru/core/data/sources/comicwifi/models/comicwifi_models.dart';
+import 'package:mekuru/core/data/sources/comicwf/models/comicwf_models.dart';
 
-class ComicWifiApiClient {
+class ComicWFApiClient {
   final Dio _dio;
 
-  ComicWifiApiClient(this._dio);
+  ComicWFApiClient(this._dio);
 
   Future<CwComicDetail> getComicDetail(String comicId) async {
     final response = await _dio.post(

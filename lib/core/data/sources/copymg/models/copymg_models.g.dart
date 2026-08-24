@@ -1,22 +1,22 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'copymanga_models.dart';
+part of 'copymg_models.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-_CopymangaResponse<T> _$CopymangaResponseFromJson<T>(
+_CopyMGResponse<T> _$CopyMGResponseFromJson<T>(
   Map<String, dynamic> json,
   T Function(Object? json) fromJsonT,
-) => _CopymangaResponse<T>(
+) => _CopyMGResponse<T>(
   code: (json['code'] as num?)?.toInt() ?? 200,
   message: json['message'] as String? ?? '',
   results: _$nullableGenericFromJson(json['results'], fromJsonT),
 );
 
-Map<String, dynamic> _$CopymangaResponseToJson<T>(
-  _CopymangaResponse<T> instance,
+Map<String, dynamic> _$CopyMGResponseToJson<T>(
+  _CopyMGResponse<T> instance,
   Object? Function(T value) toJsonT,
 ) => <String, dynamic>{
   'code': instance.code,

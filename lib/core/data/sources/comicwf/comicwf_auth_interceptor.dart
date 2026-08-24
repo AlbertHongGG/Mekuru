@@ -2,12 +2,12 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 
-class ComicWifiAuthInterceptor extends Interceptor {
+class ComicWFAuthInterceptor extends Interceptor {
   static const String _salt = "#X2u%rXE^dk%FUpdRH8BvjmZnPDDXLhZ";
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    // Only process POST requests that match form-urlencoded body (or we can just apply to all specific comicwifi POSTs)
+    // Only process POST requests that match form-urlencoded body (or we can just apply to all specific comicwf POSTs)
     if (options.method == 'POST' && options.data is Map<String, dynamic>) {
       final Map<String, dynamic> data = Map.from(
         options.data as Map<String, dynamic>,

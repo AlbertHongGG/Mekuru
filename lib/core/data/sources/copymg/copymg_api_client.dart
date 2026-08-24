@@ -1,11 +1,11 @@
 import 'package:dio/dio.dart';
-import 'package:mekuru/core/data/sources/copymanga/models/copymanga_models.dart';
+import 'package:mekuru/core/data/sources/copymg/models/copymg_models.dart';
 import 'package:mekuru/core/data/sources/base_comic_provider.dart';
 
-class CopymangaApiClient {
+class CopyMGApiClient {
   final Dio _dio;
 
-  CopymangaApiClient(this._dio);
+  CopyMGApiClient(this._dio);
 
   void _checkResponse(Map<String, dynamic> data) {
     if (data['code'] != 200) {
@@ -13,7 +13,7 @@ class CopymangaApiClient {
     }
   }
 
-  Future<CopymangaResponse<CmExploreResult>> getExploreComics({
+  Future<CopyMGResponse<CmExploreResult>> getExploreComics({
     int limit = 18,
     int offset = 0,
   }) async {
@@ -29,22 +29,22 @@ class CopymangaApiClient {
       },
     );
     _checkResponse(response.data);
-    return CopymangaResponse<CmExploreResult>.fromJson(
+    return CopyMGResponse<CmExploreResult>.fromJson(
       response.data,
       (json) => CmExploreResult.fromJson(json as Map<String, dynamic>),
     );
   }
 
-  Future<CopymangaResponse<CmDetailResult>> getComicDetail(String pathWord) async {
+  Future<CopyMGResponse<CmDetailResult>> getComicDetail(String pathWord) async {
     final response = await _dio.get('/comic2/$pathWord');
     _checkResponse(response.data);
-    return CopymangaResponse<CmDetailResult>.fromJson(
+    return CopyMGResponse<CmDetailResult>.fromJson(
       response.data,
       (json) => CmDetailResult.fromJson(json as Map<String, dynamic>),
     );
   }
 
-  Future<CopymangaResponse<CmChapterListResult>> getChapterList(
+  Future<CopyMGResponse<CmChapterListResult>> getChapterList(
     String pathWord, {
     int limit = 100,
     int offset = 0,
@@ -57,25 +57,25 @@ class CopymangaApiClient {
       },
     );
     _checkResponse(response.data);
-    return CopymangaResponse<CmChapterListResult>.fromJson(
+    return CopyMGResponse<CmChapterListResult>.fromJson(
       response.data,
       (json) => CmChapterListResult.fromJson(json as Map<String, dynamic>),
     );
   }
 
-  Future<CopymangaResponse<CmChapterImageResult>> getChapterImages(
+  Future<CopyMGResponse<CmChapterImageResult>> getChapterImages(
     String pathWord,
     String chapterUuid,
   ) async {
     final response = await _dio.get('/comic/$pathWord/chapter2/$chapterUuid');
     _checkResponse(response.data);
-    return CopymangaResponse<CmChapterImageResult>.fromJson(
+    return CopyMGResponse<CmChapterImageResult>.fromJson(
       response.data,
       (json) => CmChapterImageResult.fromJson(json as Map<String, dynamic>),
     );
   }
 
-  Future<CopymangaResponse<CmSearchResult>> searchComics(
+  Future<CopyMGResponse<CmSearchResult>> searchComics(
     String keyword, {
     int limit = 18,
     int offset = 0,
@@ -90,7 +90,7 @@ class CopymangaApiClient {
       },
     );
     _checkResponse(response.data);
-    return CopymangaResponse<CmSearchResult>.fromJson(
+    return CopyMGResponse<CmSearchResult>.fromJson(
       response.data,
       (json) => CmSearchResult.fromJson(json as Map<String, dynamic>),
     );

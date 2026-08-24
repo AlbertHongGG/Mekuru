@@ -1,11 +1,11 @@
 import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
-import 'copymanga_signer.dart';
+import 'copymg_signer.dart';
 
-class CopymangaAuthInterceptor extends Interceptor {
-  final CopymangaSigner _signer;
+class CopyMGAuthInterceptor extends Interceptor {
+  final CopyMGSigner _signer;
 
-  CopymangaAuthInterceptor(this._signer);
+  CopyMGAuthInterceptor(this._signer);
 
   @override
   Future<void> onRequest(
@@ -22,7 +22,7 @@ class CopymangaAuthInterceptor extends Interceptor {
       "authorization": "Token",
       "versioncode": "83",
       "platform": "3",
-      "referer": "com.copymanga.app-3.0.9",
+      "referer": "com.copymg.app-3.0.9",
       "accept": "application/json",
       "version": "3.0.9",
       "region": "2",

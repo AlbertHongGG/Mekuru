@@ -6,10 +6,10 @@ import 'package:mekuru/core/error/result.dart';
 
 /// The standard contract that ALL comic providers must implement.
 abstract class IComicProvider {
-  /// A unique identifier for this provider (e.g., 'comicwifi', 'webtoon').
+  /// A unique identifier for this provider (e.g., 'comicwf', 'webtoon').
   String get providerId;
 
-  /// A human-readable name for this provider (e.g., 'ComicWifi Official').
+  /// A human-readable name for this provider (e.g., 'ComicWF').
   String get providerName;
 
   /// Headers required to fetch images from this provider (e.g., Referer).

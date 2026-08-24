@@ -1,9 +1,9 @@
 import 'package:mekuru/core/error/result.dart';
 import 'package:mekuru/core/error/failures.dart';
 import 'package:mekuru/core/data/sources/base_comic_provider.dart';
-import 'package:mekuru/core/data/sources/copymanga/copymanga_api_client.dart';
-import 'package:mekuru/core/data/sources/copymanga/copymanga_auth_interceptor.dart';
-import 'package:mekuru/core/data/sources/copymanga/copymanga_signer.dart';
+import 'package:mekuru/core/data/sources/copymg/copymg_api_client.dart';
+import 'package:mekuru/core/data/sources/copymg/copymg_auth_interceptor.dart';
+import 'package:mekuru/core/data/sources/copymg/copymg_signer.dart';
 import 'package:mekuru/core/models/comic_models.dart';
 import 'package:mekuru/core/models/chapter.dart';
 import 'package:mekuru/core/models/page.dart';
@@ -11,18 +11,18 @@ import 'package:mekuru/core/models/paginated_result.dart';
 
 import 'package:mekuru/core/network/api_client.dart';
 
-class CopymangaProvider extends BaseComicProvider {
-  static const String _id = 'copymanga';
-  static const String _name = 'Copymanga';
+class CopyMGProvider extends BaseComicProvider {
+  static const String _id = 'copymg';
+  static const String _name = 'CopyMG';
   
-  late final CopymangaApiClient _apiClient;
-  final CopymangaSigner _signer;
+  late final CopyMGApiClient _apiClient;
+  final CopyMGSigner _signer;
 
-  CopymangaProvider(ApiClient apiClient) : _signer = CopymangaSigner() {
+  CopyMGProvider(ApiClient apiClient) : _signer = CopyMGSigner() {
     final dio = apiClient.createProviderDio('https://api.copy202601.com/api/v3');
-    dio.interceptors.add(CopymangaAuthInterceptor(_signer));
+    dio.interceptors.add(CopyMGAuthInterceptor(_signer));
     
-    _apiClient = CopymangaApiClient(dio);
+    _apiClient = CopyMGApiClient(dio);
   }
 
   @override
@@ -99,7 +99,7 @@ class CopymangaProvider extends BaseComicProvider {
         offset += limit;
       }
       
-      // Copymanga default is ascending. Reverse it if descending is requested.
+      // CopyMG default is ascending. Reverse it if descending is requested.
       if (isDescending) {
         return chapters.reversed.toList();
       }

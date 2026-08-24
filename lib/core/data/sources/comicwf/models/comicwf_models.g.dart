@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'comicwifi_models.dart';
+part of 'comicwf_models.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator

@@ -50,7 +50,7 @@ class SettingsNotifier extends Notifier<SettingsState> {
     final modeStr = _settingsBox.get('dataSourceMode') as String? ?? 'source';
     final mode = DataSourceModeExtension.fromString(modeStr);
     
-    final defaultProviderId = 'comicwifi';
+    final defaultProviderId = 'comicwf';
     final sourceId = _settingsBox.get('currentSourceId') as String? ?? defaultProviderId;
 
     return SettingsState(

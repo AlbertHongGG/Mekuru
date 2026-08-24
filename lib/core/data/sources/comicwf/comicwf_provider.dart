@@ -1,8 +1,8 @@
 import 'package:mekuru/core/error/result.dart';
 import 'package:mekuru/core/error/failures.dart';
 import 'package:mekuru/core/data/sources/base_comic_provider.dart';
-import 'package:mekuru/core/data/sources/comicwifi/comicwifi_api_client.dart';
-import 'package:mekuru/core/data/sources/comicwifi/comicwifi_auth_interceptor.dart';
+import 'package:mekuru/core/data/sources/comicwf/comicwf_api_client.dart';
+import 'package:mekuru/core/data/sources/comicwf/comicwf_auth_interceptor.dart';
 import 'package:mekuru/core/models/comic_models.dart';
 import 'package:mekuru/core/models/chapter.dart';
 import 'package:mekuru/core/models/page.dart';
@@ -10,14 +10,14 @@ import 'package:mekuru/core/models/paginated_result.dart';
 
 import 'package:mekuru/core/network/api_client.dart';
 
-class ComicWifiProvider extends BaseComicProvider {
-  static const String _id = 'comicwifi';
-  static const String _name = 'ComicWifi Official';
+class ComicWFProvider extends BaseComicProvider {
+  static const String _id = 'comicwf';
+  static const String _name = 'ComicWF';
   
-  late final ComicWifiApiClient _apiClient;
+  late final ComicWFApiClient _apiClient;
 
-  ComicWifiProvider(ApiClient apiClient) {
-    final dio = apiClient.createProviderDio('https://api.comicwifi.com');
+  ComicWFProvider(ApiClient apiClient) {
+    final dio = apiClient.createProviderDio('https://api.comicwf.com');
     dio.options.headers.addAll({
           "accept": "application/json",
           "accept-charset": "UTF-8",
@@ -50,9 +50,9 @@ class ComicWifiProvider extends BaseComicProvider {
           "languagecode": "",
           "accept-encoding": "gzip",
         });
-    dio.interceptors.add(ComicWifiAuthInterceptor());
+    dio.interceptors.add(ComicWFAuthInterceptor());
     
-    _apiClient = ComicWifiApiClient(dio);
+    _apiClient = ComicWFApiClient(dio);
   }
 
   @override

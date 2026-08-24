@@ -1,7 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-part 'comicwifi_models.freezed.dart';
-part 'comicwifi_models.g.dart';
+part 'comicwf_models.freezed.dart';
+part 'comicwf_models.g.dart';
 
 @freezed
 abstract class CwComicDetail with _$CwComicDetail {

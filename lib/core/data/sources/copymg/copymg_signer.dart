@@ -4,7 +4,7 @@ import 'package:dio/dio.dart';
 
 import 'dart:io';
 
-class CopymangaSigner {
+class CopyMGSigner {
   // Fixed key extracted from the App
   static const String _fixedTapString = '3af08590311032efe0660550a0563a53';
   

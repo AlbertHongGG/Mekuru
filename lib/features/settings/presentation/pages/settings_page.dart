@@ -141,13 +141,13 @@ class SettingsPage extends ConsumerWidget {
     final items = providers.map((provider) {
       IconData icon;
       switch (provider.providerId) {
-        case 'comicwifi':
+        case 'comicwf':
           icon = Icons.wifi;
           break;
         case 'webtoon':
           icon = Icons.web;
           break;
-        case 'copymanga':
+        case 'copymg':
           icon = Icons.library_books;
           break;
         default:

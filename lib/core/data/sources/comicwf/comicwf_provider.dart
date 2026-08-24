@@ -1,4 +1,6 @@
 import 'package:mekuru/core/error/result.dart';
+import 'package:mekuru/core/data/local/models/comic_metadata_entity.dart';
+import 'package:mekuru/core/models/update_check_result.dart';
 import 'package:mekuru/core/error/failures.dart';
 import 'package:mekuru/core/data/sources/base_comic_provider.dart';
 import 'package:mekuru/core/data/sources/comicwf/comicwf_api_client.dart';
@@ -15,9 +17,8 @@ class ComicWFProvider extends BaseComicProvider {
   static const String _name = 'ComicWF';
   
   late final ComicWFApiClient _apiClient;
-
   ComicWFProvider(ApiClient apiClient) {
-    final dio = apiClient.createProviderDio('https://api.comicwf.com');
+    final dio = apiClient.createProviderDio('https://api.comicwifi.com');
     dio.options.headers.addAll({
           "accept": "application/json",
           "accept-charset": "UTF-8",
@@ -162,4 +163,39 @@ class ComicWFProvider extends BaseComicProvider {
       );
     });
   }
+
+  @override
+  Future<Result<UpdateCheckResult, Failure>> checkForUpdates(String comicId, ComicMetadataEntity currentMeta) async {
+    return handleApiCall(() async {
+      final rawList = await _apiClient.getChapterList(
+        comicId, 
+        1, 
+        pageSize: 1, 
+        order: 'desc',
+      );
+      
+      final int newTotal = rawList.total;
+      final int currentTotal = currentMeta.totalChapters ?? 0;
+      final bool hasNew = newTotal > currentTotal;
+      
+      String? latestTitle;
+      DateTime? latestTime;
+      
+      if (rawList.chapters.isNotEmpty) {
+        final ch = rawList.chapters.first;
+        latestTitle = ch.chapterName;
+        if (ch.createTime != null && ch.createTime!.isNotEmpty) {
+          latestTime = DateTime.tryParse(ch.createTime!);
+        }
+      }
+      
+      return UpdateCheckResult(
+        hasNew: hasNew,
+        newTotal: newTotal > 0 ? newTotal : currentTotal,
+        newSourceUpdatedAt: latestTime,
+        newLatestTitle: latestTitle,
+      );
+    });
+  }
+
 }

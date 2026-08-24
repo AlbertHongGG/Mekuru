@@ -574,7 +574,7 @@ as String?,
 /// @nodoc
 mixin _$CwChapterList {
 
- List<CwChapterInfo> get chapters;
+ List<CwChapterInfo> get chapters; int get total;
 /// Create a copy of CwChapterList
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -587,16 +587,16 @@ $CwChapterListCopyWith<CwChapterList> get copyWith => _$CwChapterListCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CwChapterList&&const DeepCollectionEquality().equals(other.chapters, chapters));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CwChapterList&&const DeepCollectionEquality().equals(other.chapters, chapters)&&(identical(other.total, total) || other.total == total));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(chapters));
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(chapters),total);
 
 @override
 String toString() {
-  return 'CwChapterList(chapters: $chapters)';
+  return 'CwChapterList(chapters: $chapters, total: $total)';
 }
 
 
@@ -607,7 +607,7 @@ abstract mixin class $CwChapterListCopyWith<$Res>  {
   factory $CwChapterListCopyWith(CwChapterList value, $Res Function(CwChapterList) _then) = _$CwChapterListCopyWithImpl;
 @useResult
 $Res call({
- List<CwChapterInfo> chapters
+ List<CwChapterInfo> chapters, int total
 });
 
 
@@ -624,10 +624,11 @@ class _$CwChapterListCopyWithImpl<$Res>
 
 /// Create a copy of CwChapterList
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? chapters = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? chapters = null,Object? total = null,}) {
   return _then(CwChapterList(
 chapters: null == chapters ? _self.chapters : chapters // ignore: cast_nullable_to_non_nullable
-as List<CwChapterInfo>,
+as List<CwChapterInfo>,total: null == total ? _self.total : total // ignore: cast_nullable_to_non_nullable
+as int,
   ));
 }
 
@@ -712,10 +713,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<CwChapterInfo> chapters)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<CwChapterInfo> chapters,  int total)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CwChapterList() when $default != null:
-return $default(_that.chapters);case _:
+return $default(_that.chapters,_that.total);case _:
   return orElse();
 
 }
@@ -733,10 +734,10 @@ return $default(_that.chapters);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<CwChapterInfo> chapters)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<CwChapterInfo> chapters,  int total)  $default,) {final _that = this;
 switch (_that) {
 case _CwChapterList():
-return $default(_that.chapters);case _:
+return $default(_that.chapters,_that.total);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -753,10 +754,10 @@ return $default(_that.chapters);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<CwChapterInfo> chapters)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<CwChapterInfo> chapters,  int total)?  $default,) {final _that = this;
 switch (_that) {
 case _CwChapterList() when $default != null:
-return $default(_that.chapters);case _:
+return $default(_that.chapters,_that.total);case _:
   return null;
 
 }
@@ -768,7 +769,7 @@ return $default(_that.chapters);case _:
 @JsonSerializable()
 
 class _CwChapterList implements CwChapterList {
-  const _CwChapterList({ List<CwChapterInfo> chapters = const []}): _chapters = chapters;
+  const _CwChapterList({ List<CwChapterInfo> chapters = const [], this.total = 0}): _chapters = chapters;
   factory _CwChapterList.fromJson(Map<String, dynamic> json) => _$CwChapterListFromJson(json);
 
  final  List<CwChapterInfo> _chapters;
@@ -778,6 +779,7 @@ class _CwChapterList implements CwChapterList {
   return EqualUnmodifiableListView(_chapters);
 }
 
+@override@JsonKey() final  int total;
 
 /// Create a copy of CwChapterList
 /// with the given fields replaced by the non-null parameter values.
@@ -792,16 +794,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CwChapterList&&const DeepCollectionEquality().equals(other._chapters, _chapters));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CwChapterList&&const DeepCollectionEquality().equals(other._chapters, _chapters)&&(identical(other.total, total) || other.total == total));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_chapters));
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_chapters),total);
 
 @override
 String toString() {
-  return 'CwChapterList(chapters: $chapters)';
+  return 'CwChapterList(chapters: $chapters, total: $total)';
 }
 
 
@@ -812,7 +814,7 @@ abstract mixin class _$CwChapterListCopyWith<$Res> implements $CwChapterListCopy
   factory _$CwChapterListCopyWith(_CwChapterList value, $Res Function(_CwChapterList) _then) = __$CwChapterListCopyWithImpl;
 @override @useResult
 $Res call({
- List<CwChapterInfo> chapters
+ List<CwChapterInfo> chapters, int total
 });
 
 
@@ -829,10 +831,11 @@ class __$CwChapterListCopyWithImpl<$Res>
 
 /// Create a copy of CwChapterList
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? chapters = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? chapters = null,Object? total = null,}) {
   return _then(_CwChapterList(
 chapters: null == chapters ? _self._chapters : chapters // ignore: cast_nullable_to_non_nullable
-as List<CwChapterInfo>,
+as List<CwChapterInfo>,total: null == total ? _self.total : total // ignore: cast_nullable_to_non_nullable
+as int,
   ));
 }
 

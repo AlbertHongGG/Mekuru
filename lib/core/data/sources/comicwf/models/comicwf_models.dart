@@ -33,6 +33,7 @@ abstract class CwChapterInfo with _$CwChapterInfo {
 abstract class CwChapterList with _$CwChapterList {
   const factory CwChapterList({
     @Default([]) List<CwChapterInfo> chapters,
+    @Default(0) int total,
   }) = _CwChapterList;
 
   factory CwChapterList.fromJson(Map<String, dynamic> json) => _$CwChapterListFromJson(json);

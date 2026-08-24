@@ -9,6 +9,7 @@ import 'package:mekuru/features/library/presentation/providers/library_provider.
 import 'package:mekuru/core/widgets/search_dialog.dart';
 import 'package:mekuru/core/widgets/app_bottom_sheet.dart';
 import 'package:mekuru/core/data/sources/provider_registry.dart';
+import 'package:mekuru/features/library/presentation/providers/library_update_provider.dart';
 
 class LibraryPage extends ConsumerStatefulWidget {
   const LibraryPage({super.key});
@@ -129,11 +130,42 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
         ],
       ),
       body: SafeArea(
-        child: state.isLoading && state.displayItems.isEmpty
-            ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
-            : state.error != null
-                ? Center(child: Text('錯誤: ${state.error}'))
-                : _buildGridView(state.displayItems),
+        child: Column(
+          children: [
+            Consumer(
+              builder: (context, ref, child) {
+                final updateState = ref.watch(libraryUpdateProvider);
+                if (!updateState.isUpdating) return const SizedBox.shrink();
+                return Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+                  color: AppColors.primary.withValues(alpha: 0.1),
+                  child: Row(
+                    children: [
+                      const SizedBox(
+                        width: 12,
+                        height: 12,
+                        child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        'Checking for updates (${updateState.completedTasks}/${updateState.totalTasks})...',
+                        style: const TextStyle(fontSize: 12, color: AppColors.primary),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+            Expanded(
+              child: state.isLoading && state.displayItems.isEmpty
+                  ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
+                  : state.error != null
+                      ? Center(child: Text('Error: ${state.error}'))
+                      : _buildGridView(state.displayItems),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -144,7 +176,10 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
     }
 
     return RefreshIndicator(
-      onRefresh: () async => ref.read(libraryProvider.notifier).loadLibrary(),
+      onRefresh: () async {
+        final favorites = ref.read(libraryProvider).rawFavorites;
+        await ref.read(libraryUpdateProvider.notifier).updateAll(favorites);
+      },
       color: AppColors.primary,
       child: ResponsiveComicGrid(
         comics: displayItems,

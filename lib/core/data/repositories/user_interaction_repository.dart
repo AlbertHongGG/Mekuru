@@ -83,6 +83,32 @@ class UserInteractionRepository {
     return records.where((r) => r.providerId == providerId).toList();
   }
 
+
+  Future<ComicMetadataEntity?> getMetadata(DataSourceMode dataSourceMode, String providerId, String comicId) async {
+    final id = _genId(dataSourceMode, providerId, comicId);
+    return _metadataBox.get(id);
+  }
+
+  Future<void> updateMetadataFields(
+    DataSourceMode dataSourceMode,
+    String providerId,
+    String comicId, {
+    int? totalChapters,
+    DateTime? sourceUpdatedAt,
+    String? latestChapterTitle,
+  }) async {
+    final id = _genId(dataSourceMode, providerId, comicId);
+    final existing = _metadataBox.get(id);
+    if (existing != null) {
+      final updated = existing.copyWith(
+        totalChapters: totalChapters ?? existing.totalChapters,
+        sourceUpdatedAt: sourceUpdatedAt ?? existing.sourceUpdatedAt,
+        latestChapterTitle: latestChapterTitle ?? existing.latestChapterTitle,
+      );
+      await _metadataBox.put(id, updated);
+    }
+  }
+
   Future<void> updateMetadata(DataSourceMode dataSourceMode, String providerId, IComicItem comic, {List<Chapter>? chapters, bool isChaptersDescending = false}) async {
     final id = _genId(dataSourceMode, providerId, comic.comicId);
     final now = DateTime.now();

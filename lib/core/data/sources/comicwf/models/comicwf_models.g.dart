@@ -49,10 +49,11 @@ _CwChapterList _$CwChapterListFromJson(Map<String, dynamic> json) =>
               ?.map((e) => CwChapterInfo.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
+      total: (json['total'] as num?)?.toInt() ?? 0,
     );
 
 Map<String, dynamic> _$CwChapterListToJson(_CwChapterList instance) =>
-    <String, dynamic>{'chapters': instance.chapters};
+    <String, dynamic>{'chapters': instance.chapters, 'total': instance.total};
 
 _CwChapterImage _$CwChapterImageFromJson(Map<String, dynamic> json) =>
     _CwChapterImage(

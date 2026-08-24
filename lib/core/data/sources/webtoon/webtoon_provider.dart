@@ -1,4 +1,6 @@
 import 'package:mekuru/core/error/result.dart';
+import 'package:mekuru/core/data/local/models/comic_metadata_entity.dart';
+import 'package:mekuru/core/models/update_check_result.dart';
 import 'package:mekuru/core/error/failures.dart';
 import 'package:mekuru/core/data/sources/base_comic_provider.dart';
 import 'package:mekuru/core/data/sources/webtoon/webtoon_api_client.dart';
@@ -184,4 +186,44 @@ class WebtoonProvider extends BaseComicProvider {
       );
     });
   }
+
+  @override
+  Future<Result<UpdateCheckResult, Failure>> checkForUpdates(String comicId, ComicMetadataEntity currentMeta) async {
+    return handleApiCall(() async {
+      final titleNo = int.parse(comicId);
+      final rawList = await _apiClient.titleHomeEpisodeListV3(
+        titleNo, 
+        offset: 0, 
+        pageSize: 1, 
+        ordering: 'LATEST',
+      );
+      
+      final currentTotal = currentMeta.totalChapters ?? 0;
+      bool hasNew = false;
+      
+      String? latestTitle;
+      DateTime? latestTime;
+      
+      if (rawList.episodeList.isNotEmpty) {
+        final ch = rawList.episodeList.first;
+        latestTitle = ch.episodeTitle;
+        if (ch.exposureYmdt != null) {
+          latestTime = DateTime.fromMillisecondsSinceEpoch(ch.exposureYmdt!);
+        }
+        
+        if (currentMeta.latestChapterTitle != latestTitle || 
+            (latestTime != null && currentMeta.sourceUpdatedAt != null && latestTime.isAfter(currentMeta.sourceUpdatedAt!))) {
+          hasNew = true;
+        }
+      }
+      
+      return UpdateCheckResult(
+        hasNew: hasNew,
+        newTotal: hasNew ? currentTotal + 1 : currentTotal, // we don't have exact new total, so just increment to signal update
+        newSourceUpdatedAt: latestTime,
+        newLatestTitle: latestTitle,
+      );
+    });
+  }
+
 }

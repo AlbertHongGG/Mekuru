@@ -1,4 +1,6 @@
 import 'package:mekuru/core/error/result.dart';
+import 'package:mekuru/core/data/local/models/comic_metadata_entity.dart';
+import 'package:mekuru/core/models/update_check_result.dart';
 import 'package:mekuru/core/error/failures.dart';
 import 'package:mekuru/core/data/sources/base_comic_provider.dart';
 import 'package:mekuru/core/data/sources/copymg/copymg_api_client.dart';
@@ -186,4 +188,39 @@ class CopyMGProvider extends BaseComicProvider {
       );
     });
   }
+
+  @override
+  Future<Result<UpdateCheckResult, Failure>> checkForUpdates(String comicId, ComicMetadataEntity currentMeta) async {
+    return handleApiCall(() async {
+      final currentTotal = currentMeta.totalChapters ?? 0;
+      final offset = currentTotal > 0 ? currentTotal - 1 : 0;
+      final rawList = await _apiClient.getChapterList(
+        comicId,
+        limit: 10,
+        offset: offset,
+      );
+      
+      final int newTotal = rawList.results?.total ?? 0;
+      final bool hasNew = newTotal > currentTotal;
+      
+      String? latestTitle;
+      DateTime? latestTime;
+      
+      if (rawList.results != null && rawList.results!.list.isNotEmpty) {
+        final ch = rawList.results!.list.last;
+        latestTitle = ch.name;
+        if (ch.datetimeCreated != null && ch.datetimeCreated!.isNotEmpty) {
+          latestTime = DateTime.tryParse(ch.datetimeCreated!);
+        }
+      }
+      
+      return UpdateCheckResult(
+        hasNew: hasNew,
+        newTotal: newTotal > 0 ? newTotal : currentTotal,
+        newSourceUpdatedAt: latestTime,
+        newLatestTitle: latestTitle,
+      );
+    });
+  }
+
 }

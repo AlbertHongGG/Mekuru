@@ -9,7 +9,7 @@ import 'package:mekuru/features/logger/domain/models/log_entry.dart';
 class DatabaseManager {
   static const String boxSettings = 'box_settings';
   static const String boxTags = 'box_tags';
-  static const String boxComicMetadata = 'box_comic_metadata';
+  static const String boxComicMetadata = 'box_comic_metadata_v2';
   static const String boxUserFavorites = 'box_user_favorites';
   static const String boxReadingHistory = 'box_reading_history';
   static const String boxSystemLogs = 'box_system_logs';
@@ -29,53 +29,6 @@ class DatabaseManager {
     await _safeOpenBox<HistoryEntity>(boxReadingHistory);
     await _safeOpenBox<LogEntry>(boxSystemLogs);
     await _safeOpenBox<LogEntry>(boxApiLogs);
-    await _runProviderRenameMigration();
-  }
-
-  static Future<void> _runProviderRenameMigration() async {
-    final metaBox = Hive.box<ComicMetadataEntity>(boxComicMetadata);
-    final histBox = Hive.box<HistoryEntity>(boxReadingHistory);
-    final favBox = Hive.box<FavoriteEntity>(boxUserFavorites);
-
-    for (final key in metaBox.keys.toList()) {
-      final strKey = key.toString();
-      if (strKey.contains('_comicwifi_') || strKey.contains('_copymanga_')) {
-        final newKey = strKey.replaceAll('_comicwifi_', '_comicwf_').replaceAll('_copymanga_', '_copymg_');
-        final val = metaBox.get(key);
-        if (val != null) {
-          final newVal = val.copyWith(
-            id: val.id.replaceAll('_comicwifi_', '_comicwf_').replaceAll('_copymanga_', '_copymg_'),
-            providerId: val.providerId.replaceAll('comicwifi', 'comicwf').replaceAll('copymanga', 'copymg'),
-          );
-          await metaBox.put(newKey, newVal);
-          await metaBox.delete(key);
-        }
-      }
-    }
-
-    for (final key in histBox.keys.toList()) {
-      final strKey = key.toString();
-      if (strKey.contains('_comicwifi_') || strKey.contains('_copymanga_')) {
-        final newKey = strKey.replaceAll('_comicwifi_', '_comicwf_').replaceAll('_copymanga_', '_copymg_');
-        final val = histBox.get(key);
-        if (val != null) {
-          await histBox.put(newKey, val);
-          await histBox.delete(key);
-        }
-      }
-    }
-
-    for (final key in favBox.keys.toList()) {
-      final strKey = key.toString();
-      if (strKey.contains('_comicwifi_') || strKey.contains('_copymanga_')) {
-        final newKey = strKey.replaceAll('_comicwifi_', '_comicwf_').replaceAll('_copymanga_', '_copymg_');
-        final val = favBox.get(key);
-        if (val != null) {
-          await favBox.put(newKey, val);
-          await favBox.delete(key);
-        }
-      }
-    }
   }
 
   static Future<void> _safeOpenBox<T>(String boxName) async {

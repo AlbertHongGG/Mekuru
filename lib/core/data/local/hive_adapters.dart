@@ -50,21 +50,19 @@ class ComicMetadataEntityAdapter extends TypeAdapter<ComicMetadataEntity> {
     int? totalChapters;
     String? latestChapterTitle;
 
-    try {
-      final sourceUpdatedEpoch = reader.readInt();
-      if (sourceUpdatedEpoch != 0) {
-        sourceUpdatedAt = DateTime.fromMillisecondsSinceEpoch(sourceUpdatedEpoch);
-      }
-      final total = reader.readInt();
-      if (total != -1) {
-        totalChapters = total;
-      }
-      final latest = reader.readString();
-      if (latest.isNotEmpty) {
-        latestChapterTitle = latest;
-      }
-    } catch (_) {
-      // Backward compatibility for old records
+    final sourceUpdatedEpoch = reader.readInt();
+    if (sourceUpdatedEpoch != 0) {
+      sourceUpdatedAt = DateTime.fromMillisecondsSinceEpoch(sourceUpdatedEpoch);
+    }
+    
+    final total = reader.readInt();
+    if (total != -1) {
+      totalChapters = total;
+    }
+    
+    final latest = reader.readString();
+    if (latest.isNotEmpty) {
+      latestChapterTitle = latest;
     }
 
     return ComicMetadataEntity(

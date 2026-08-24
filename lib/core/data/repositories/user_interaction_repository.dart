@@ -135,15 +135,19 @@ class UserInteractionRepository {
     final id = _genId(dataSourceMode, providerId, comicId);
     yield _buildRecord(id);
     
-    // Watch all boxes for changes to this ID
-    // Note: StreamGroup could be used here, but for simplicity we watch the metadata box which updates often
-    // Actually, watching all 3 is safer but tricky. I will yield when any changes.
-    // Riverpod is better suited for this, but to keep the Stream interface:
     yield* StreamGroup.merge([
       _metadataBox.watch(id),
       _favoritesBox.watch(id),
       _historyBox.watch(id),
     ]).map((_) => _buildRecord(id));
+  }
+
+  Stream<void> watchGlobalChanges() {
+    return StreamGroup.merge([
+      _metadataBox.watchAll(),
+      _favoritesBox.watchAll(),
+      _historyBox.watchAll(),
+    ]);
   }
 
   Future<void> toggleFavorite({

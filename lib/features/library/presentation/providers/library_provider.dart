@@ -56,6 +56,16 @@ class LibraryNotifier extends Notifier<LibraryState> {
   @override
   LibraryState build() {
     ref.watch(settingsProvider.select((s) => s.dataSourceMode));
+    
+    // Subscribe to DB changes so Library auto-updates when progress is saved or favorites are toggled
+    final subscription = ref.watch(userInteractionRepositoryProvider).watchGlobalChanges().listen((_) {
+      loadLibrary();
+    });
+    
+    ref.onDispose(() {
+      subscription.cancel();
+    });
+    
     Future.microtask(() => loadLibrary());
     return LibraryState();
   }
@@ -117,8 +127,17 @@ class LibraryNotifier extends Notifier<LibraryState> {
         final timeB = b.favoriteAt ?? b.updatedAt;
         return timeB.compareTo(timeA);
       } else if (state.sortMode == LibrarySortMode.read) {
-        final timeA = a.readAt ?? a.updatedAt;
-        final timeB = b.readAt ?? b.updatedAt;
+        // Unread comics sink to the bottom (Epoch 0)
+        final timeA = a.readAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+        final timeB = b.readAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+        
+        // If both are unread, sort by added time
+        if (timeA.millisecondsSinceEpoch == 0 && timeB.millisecondsSinceEpoch == 0) {
+          final addedA = a.favoriteAt ?? a.updatedAt;
+          final addedB = b.favoriteAt ?? b.updatedAt;
+          return addedB.compareTo(addedA);
+        }
+        
         return timeB.compareTo(timeA);
       } else if (state.sortMode == LibrarySortMode.updated) {
         final timeA = a.updatedAt;

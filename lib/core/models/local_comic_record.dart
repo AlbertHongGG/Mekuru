@@ -8,11 +8,11 @@ part 'local_comic_record.freezed.dart';
 part 'local_comic_record.g.dart';
 
 @freezed
-class LocalComicRecord extends HiveObject with _$LocalComicRecord implements IComicItem {
+abstract class LocalComicRecord extends HiveObject with _$LocalComicRecord implements IComicItem {
   LocalComicRecord._();
 
   @HiveType(typeId: 0)
-  const factory LocalComicRecord({
+  factory LocalComicRecord({
     @HiveField(0) required String id,
     @HiveField(1) required DataSourceMode dataSourceMode,
     @HiveField(2) required String providerId,

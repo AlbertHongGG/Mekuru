@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$LocalComicRecord {
 
- String get id; DataSourceMode get dataSourceMode; String get providerId; String get comicId; String get title; String get coverUrl; bool get isFavorite; String? get lastReadChapterId; String? get lastReadChapterTitle; int? get lastReadPageIndex; DateTime get updatedAt; DateTime? get favoriteAt;
+@HiveField(0) String get id;@HiveField(1) DataSourceMode get dataSourceMode;@HiveField(2) String get providerId;@HiveField(3) String get comicId;@HiveField(4) String get title;@HiveField(5) String get coverUrl;@HiveField(6) bool get isFavorite;@HiveField(7) String? get lastReadChapterId;@HiveField(8) String? get lastReadChapterTitle;@HiveField(9) int? get lastReadPageIndex;@HiveField(10) DateTime get updatedAt;@HiveField(11) DateTime? get favoriteAt;
 /// Create a copy of LocalComicRecord
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -49,7 +49,7 @@ abstract mixin class $LocalComicRecordCopyWith<$Res>  {
   factory $LocalComicRecordCopyWith(LocalComicRecord value, $Res Function(LocalComicRecord) _then) = _$LocalComicRecordCopyWithImpl;
 @useResult
 $Res call({
- String id, DataSourceMode dataSourceMode, String providerId, String comicId, String title, String coverUrl, bool isFavorite, String? lastReadChapterId, String? lastReadChapterTitle, int? lastReadPageIndex, DateTime updatedAt, DateTime? favoriteAt
+@HiveField(0) String id,@HiveField(1) DataSourceMode dataSourceMode,@HiveField(2) String providerId,@HiveField(3) String comicId,@HiveField(4) String title,@HiveField(5) String coverUrl,@HiveField(6) bool isFavorite,@HiveField(7) String? lastReadChapterId,@HiveField(8) String? lastReadChapterTitle,@HiveField(9) int? lastReadPageIndex,@HiveField(10) DateTime updatedAt,@HiveField(11) DateTime? favoriteAt
 });
 
 
@@ -69,8 +69,8 @@ class _$LocalComicRecordCopyWithImpl<$Res>
 @pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? dataSourceMode = null,Object? providerId = null,Object? comicId = null,Object? title = null,Object? coverUrl = null,Object? isFavorite = null,Object? lastReadChapterId = freezed,Object? lastReadChapterTitle = freezed,Object? lastReadPageIndex = freezed,Object? updatedAt = null,Object? favoriteAt = freezed,}) {
   return _then(LocalComicRecord(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as DataSourceMode,dataSourceMode: null == dataSourceMode ? _self.dataSourceMode : dataSourceMode // ignore: cast_nullable_to_non_nullable
-as String,providerId: null == providerId ? _self.providerId : providerId // ignore: cast_nullable_to_non_nullable
+as String,dataSourceMode: null == dataSourceMode ? _self.dataSourceMode : dataSourceMode // ignore: cast_nullable_to_non_nullable
+as DataSourceMode,providerId: null == providerId ? _self.providerId : providerId // ignore: cast_nullable_to_non_nullable
 as String,comicId: null == comicId ? _self.comicId : comicId // ignore: cast_nullable_to_non_nullable
 as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,coverUrl: null == coverUrl ? _self.coverUrl : coverUrl // ignore: cast_nullable_to_non_nullable
@@ -165,7 +165,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  DataSourceMode dataSourceMode,  String providerId,  String comicId,  String title,  String coverUrl,  bool isFavorite,  String? lastReadChapterId,  String? lastReadChapterTitle,  int? lastReadPageIndex,  DateTime updatedAt,  DateTime? favoriteAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@HiveField(0)  String id, @HiveField(1)  DataSourceMode dataSourceMode, @HiveField(2)  String providerId, @HiveField(3)  String comicId, @HiveField(4)  String title, @HiveField(5)  String coverUrl, @HiveField(6)  bool isFavorite, @HiveField(7)  String? lastReadChapterId, @HiveField(8)  String? lastReadChapterTitle, @HiveField(9)  int? lastReadPageIndex, @HiveField(10)  DateTime updatedAt, @HiveField(11)  DateTime? favoriteAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _LocalComicRecord() when $default != null:
 return $default(_that.id,_that.dataSourceMode,_that.providerId,_that.comicId,_that.title,_that.coverUrl,_that.isFavorite,_that.lastReadChapterId,_that.lastReadChapterTitle,_that.lastReadPageIndex,_that.updatedAt,_that.favoriteAt);case _:
@@ -186,7 +186,7 @@ return $default(_that.id,_that.dataSourceMode,_that.providerId,_that.comicId,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  DataSourceMode dataSourceMode,  String providerId,  String comicId,  String title,  String coverUrl,  bool isFavorite,  String? lastReadChapterId,  String? lastReadChapterTitle,  int? lastReadPageIndex,  DateTime updatedAt,  DateTime? favoriteAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@HiveField(0)  String id, @HiveField(1)  DataSourceMode dataSourceMode, @HiveField(2)  String providerId, @HiveField(3)  String comicId, @HiveField(4)  String title, @HiveField(5)  String coverUrl, @HiveField(6)  bool isFavorite, @HiveField(7)  String? lastReadChapterId, @HiveField(8)  String? lastReadChapterTitle, @HiveField(9)  int? lastReadPageIndex, @HiveField(10)  DateTime updatedAt, @HiveField(11)  DateTime? favoriteAt)  $default,) {final _that = this;
 switch (_that) {
 case _LocalComicRecord():
 return $default(_that.id,_that.dataSourceMode,_that.providerId,_that.comicId,_that.title,_that.coverUrl,_that.isFavorite,_that.lastReadChapterId,_that.lastReadChapterTitle,_that.lastReadPageIndex,_that.updatedAt,_that.favoriteAt);case _:
@@ -206,7 +206,7 @@ return $default(_that.id,_that.dataSourceMode,_that.providerId,_that.comicId,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  DataSourceMode dataSourceMode,  String providerId,  String comicId,  String title,  String coverUrl,  bool isFavorite,  String? lastReadChapterId,  String? lastReadChapterTitle,  int? lastReadPageIndex,  DateTime updatedAt,  DateTime? favoriteAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@HiveField(0)  String id, @HiveField(1)  DataSourceMode dataSourceMode, @HiveField(2)  String providerId, @HiveField(3)  String comicId, @HiveField(4)  String title, @HiveField(5)  String coverUrl, @HiveField(6)  bool isFavorite, @HiveField(7)  String? lastReadChapterId, @HiveField(8)  String? lastReadChapterTitle, @HiveField(9)  int? lastReadPageIndex, @HiveField(10)  DateTime updatedAt, @HiveField(11)  DateTime? favoriteAt)?  $default,) {final _that = this;
 switch (_that) {
 case _LocalComicRecord() when $default != null:
 return $default(_that.id,_that.dataSourceMode,_that.providerId,_that.comicId,_that.title,_that.coverUrl,_that.isFavorite,_that.lastReadChapterId,_that.lastReadChapterTitle,_that.lastReadPageIndex,_that.updatedAt,_that.favoriteAt);case _:
@@ -219,23 +219,23 @@ return $default(_that.id,_that.dataSourceMode,_that.providerId,_that.comicId,_th
 
 /// @nodoc
 @JsonSerializable()
-
-class _LocalComicRecord implements LocalComicRecord {
-  const _LocalComicRecord({required this.id, required this.dataSourceMode, required this.providerId, required this.comicId, required this.title, required this.coverUrl, this.isFavorite = false, this.lastReadChapterId, this.lastReadChapterTitle, this.lastReadPageIndex, required this.updatedAt, this.favoriteAt});
+@HiveType(typeId: 0)
+class _LocalComicRecord extends LocalComicRecord {
+   _LocalComicRecord({@HiveField(0) required this.id, @HiveField(1) required this.dataSourceMode, @HiveField(2) required this.providerId, @HiveField(3) required this.comicId, @HiveField(4) required this.title, @HiveField(5) required this.coverUrl, @HiveField(6) this.isFavorite = false, @HiveField(7) this.lastReadChapterId, @HiveField(8) this.lastReadChapterTitle, @HiveField(9) this.lastReadPageIndex, @HiveField(10) required this.updatedAt, @HiveField(11) this.favoriteAt}): super._();
   factory _LocalComicRecord.fromJson(Map<String, dynamic> json) => _$LocalComicRecordFromJson(json);
 
-@override final  String id;
-@override final  String dataSourceMode;
-@override final  String providerId;
-@override final  String comicId;
-@override final  String title;
-@override final  String coverUrl;
-@override@JsonKey() final  bool isFavorite;
-@override final  String? lastReadChapterId;
-@override final  String? lastReadChapterTitle;
-@override final  int? lastReadPageIndex;
-@override final  DateTime updatedAt;
-@override final  DateTime? favoriteAt;
+@override@HiveField(0) final  String id;
+@override@HiveField(1) final  DataSourceMode dataSourceMode;
+@override@HiveField(2) final  String providerId;
+@override@HiveField(3) final  String comicId;
+@override@HiveField(4) final  String title;
+@override@HiveField(5) final  String coverUrl;
+@override@JsonKey()@HiveField(6) final  bool isFavorite;
+@override@HiveField(7) final  String? lastReadChapterId;
+@override@HiveField(8) final  String? lastReadChapterTitle;
+@override@HiveField(9) final  int? lastReadPageIndex;
+@override@HiveField(10) final  DateTime updatedAt;
+@override@HiveField(11) final  DateTime? favoriteAt;
 
 /// Create a copy of LocalComicRecord
 /// with the given fields replaced by the non-null parameter values.
@@ -270,7 +270,7 @@ abstract mixin class _$LocalComicRecordCopyWith<$Res> implements $LocalComicReco
   factory _$LocalComicRecordCopyWith(_LocalComicRecord value, $Res Function(_LocalComicRecord) _then) = __$LocalComicRecordCopyWithImpl;
 @override @useResult
 $Res call({
- String id, DataSourceMode dataSourceMode, String providerId, String comicId, String title, String coverUrl, bool isFavorite, String? lastReadChapterId, String? lastReadChapterTitle, int? lastReadPageIndex, DateTime updatedAt, DateTime? favoriteAt
+@HiveField(0) String id,@HiveField(1) DataSourceMode dataSourceMode,@HiveField(2) String providerId,@HiveField(3) String comicId,@HiveField(4) String title,@HiveField(5) String coverUrl,@HiveField(6) bool isFavorite,@HiveField(7) String? lastReadChapterId,@HiveField(8) String? lastReadChapterTitle,@HiveField(9) int? lastReadPageIndex,@HiveField(10) DateTime updatedAt,@HiveField(11) DateTime? favoriteAt
 });
 
 
@@ -290,8 +290,8 @@ class __$LocalComicRecordCopyWithImpl<$Res>
 @override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? dataSourceMode = null,Object? providerId = null,Object? comicId = null,Object? title = null,Object? coverUrl = null,Object? isFavorite = null,Object? lastReadChapterId = freezed,Object? lastReadChapterTitle = freezed,Object? lastReadPageIndex = freezed,Object? updatedAt = null,Object? favoriteAt = freezed,}) {
   return _then(_LocalComicRecord(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as DataSourceMode,dataSourceMode: null == dataSourceMode ? _self.dataSourceMode : dataSourceMode // ignore: cast_nullable_to_non_nullable
-as String,providerId: null == providerId ? _self.providerId : providerId // ignore: cast_nullable_to_non_nullable
+as String,dataSourceMode: null == dataSourceMode ? _self.dataSourceMode : dataSourceMode // ignore: cast_nullable_to_non_nullable
+as DataSourceMode,providerId: null == providerId ? _self.providerId : providerId // ignore: cast_nullable_to_non_nullable
 as String,comicId: null == comicId ? _self.comicId : comicId // ignore: cast_nullable_to_non_nullable
 as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,coverUrl: null == coverUrl ? _self.coverUrl : coverUrl // ignore: cast_nullable_to_non_nullable

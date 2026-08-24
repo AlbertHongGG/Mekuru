@@ -1,4 +1,3 @@
-import 'package:mekuru/core/models/enums/data_source_mode.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 part of 'local_comic_record.dart';
@@ -10,7 +9,10 @@ part of 'local_comic_record.dart';
 _LocalComicRecord _$LocalComicRecordFromJson(Map<String, dynamic> json) =>
     _LocalComicRecord(
       id: json['id'] as String,
-      dataSourceMode: DataSourceModeExtension.fromString(json['dataSourceMode'] as String),
+      dataSourceMode: $enumDecode(
+        _$DataSourceModeEnumMap,
+        json['dataSourceMode'],
+      ),
       providerId: json['providerId'] as String,
       comicId: json['comicId'] as String,
       title: json['title'] as String,
@@ -28,7 +30,7 @@ _LocalComicRecord _$LocalComicRecordFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$LocalComicRecordToJson(_LocalComicRecord instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'dataSourceMode': instance.dataSourceMode,
+      'dataSourceMode': _$DataSourceModeEnumMap[instance.dataSourceMode]!,
       'providerId': instance.providerId,
       'comicId': instance.comicId,
       'title': instance.title,
@@ -40,3 +42,8 @@ Map<String, dynamic> _$LocalComicRecordToJson(_LocalComicRecord instance) =>
       'updatedAt': instance.updatedAt.toIso8601String(),
       'favoriteAt': instance.favoriteAt?.toIso8601String(),
     };
+
+const _$DataSourceModeEnumMap = {
+  DataSourceMode.source: 'source',
+  DataSourceMode.db: 'db',
+};

@@ -13,25 +13,30 @@ class UserInteractionRepository {
     return '${dataSourceMode}_${providerId}_$comicId';
   }
 
-  Future<List<LocalComicRecord>> getFavorites({
-    required String dataSourceMode,
-    String? providerId,
-  }) async {
+  Future<List<LocalComicRecord>> getAllFavorites(String dataSourceMode) async {
     return _box.values
-        .where((r) => r.dataSourceMode == dataSourceMode && 
-                     r.isFavorite && 
-                     (providerId == null || r.providerId == providerId))
+        .where((r) => r.dataSourceMode == dataSourceMode && r.isFavorite)
+        .toList()
+      ..sort((a, b) => (b.favoriteAt ?? b.updatedAt).compareTo(a.favoriteAt ?? a.updatedAt));
+  }
+
+  Future<List<LocalComicRecord>> getFavoritesByProvider(String dataSourceMode, String providerId) async {
+    return _box.values
+        .where((r) => r.dataSourceMode == dataSourceMode && r.isFavorite && r.providerId == providerId)
         .toList()
       ..sort((a, b) => (b.favoriteAt ?? b.updatedAt).compareTo(a.favoriteAt ?? a.updatedAt));
   }
   
-  Future<List<LocalComicRecord>> getHistory({
-    required String dataSourceMode,
-    String? providerId,
-  }) async {
+  Future<List<LocalComicRecord>> getAllHistory(String dataSourceMode) async {
     return _box.values
-        .where((r) => r.dataSourceMode == dataSourceMode &&
-                     (providerId == null || r.providerId == providerId))
+        .where((r) => r.dataSourceMode == dataSourceMode)
+        .toList()
+      ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+  }
+
+  Future<List<LocalComicRecord>> getHistoryByProvider(String dataSourceMode, String providerId) async {
+    return _box.values
+        .where((r) => r.dataSourceMode == dataSourceMode && r.providerId == providerId)
         .toList()
       ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
   }

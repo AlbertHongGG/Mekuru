@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:mekuru/domain/models/comic_base.dart';
+import 'package:mekuru/core/models/comic_card_data.dart';
 import 'package:mekuru/core/widgets/comic_card.dart';
 import 'package:mekuru/core/theme/app_colors.dart';
 
 class ResponsiveComicGrid extends StatelessWidget {
-  final List<IComicItem> comics;
+  final List<ComicCardData> comics;
   final ScrollController? controller;
   final bool hasNext;
   final VoidCallback? onLoadMore;
-  final void Function(IComicItem) onTap;
+  final void Function(ComicCardData) onTap;
 
   const ResponsiveComicGrid({
     super.key,
@@ -38,10 +38,10 @@ class ResponsiveComicGrid extends StatelessWidget {
               (context, index) {
                 // Unified polymorphic builder sink
                 if (index < comics.length) {
-                  final comic = comics[index];
+                  final data = comics[index];
                   return ComicCard(
-                    comic: comic,
-                    onTap: () => onTap(comic),
+                    data: data,
+                    onTap: () => onTap(data),
                   );
                 } else {
                   return const _ShimmerComicCard();

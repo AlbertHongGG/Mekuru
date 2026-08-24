@@ -4,11 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mekuru/core/theme/app_colors.dart';
 import 'package:mekuru/core/widgets/responsive_comic_grid.dart';
 import 'package:mekuru/features/explore/presentation/providers/explore_provider.dart';
-import 'package:mekuru/core/widgets/comic_card.dart';
 import 'package:mekuru/core/widgets/search_dialog.dart';
 import 'package:mekuru/core/widgets/app_multi_select_bottom_sheet.dart';
-import 'package:mekuru/domain/models/comic_base.dart';
-import 'package:mekuru/domain/models/comic_models.dart';
 import 'package:mekuru/features/settings/presentation/providers/settings_provider.dart';
 
 class ExplorePage extends ConsumerStatefulWidget {
@@ -50,22 +47,15 @@ class _ExplorePageState extends ConsumerState<ExplorePage> {
     final notifier = ref.read(exploreProvider(currentSourceId).notifier);
 
     // Apply client-side tag filtering
-    List<IComicItem> displayComics = state.comics;
+    List<ComicCardData> displayComics = state.comics;
     if (state.activeTags.isNotEmpty) {
       displayComics = displayComics.where((comic) {
-        List<String> tags = [];
-        if (comic is ComicExploreResult) tags = comic.tags;
-        else if (comic is ComicSearchResult) tags = comic.tags;
-        else if (comic is ComicDetail) tags = comic.tags;
-
-        if (tags.isEmpty) return state.isExcludeMode; // If no tags, include if excluding, exclude if including
-        
         if (state.isExcludeMode) {
-          // EXCLUDE logic: comic must NOT have ANY of the active tags
-          return !state.activeTags.any((tag) => tags.contains(tag));
+          // If any of the comic's tags is in activeTags, exclude it
+          return !comic.tags.any((tag) => state.activeTags.contains(tag));
         } else {
-          // INCLUDE logic: comic must have ALL active tags
-          return state.activeTags.any((tag) => tags.contains(tag));
+          // Comic must contain ALL active tags
+          return state.activeTags.every((tag) => comic.tags.contains(tag));
         }
       }).toList();
     }
@@ -162,7 +152,7 @@ class _ExplorePageState extends ConsumerState<ExplorePage> {
     );
   }
 
-  Widget _buildBody(ExploreState state, List<IComicItem> displayComics, ExploreNotifier notifier) {
+  Widget _buildBody(ExploreState state, List<ComicCardData> displayComics, ExploreNotifier notifier) {
     if (state.error != null) {
       return Center(
         child: Column(
@@ -197,8 +187,8 @@ class _ExplorePageState extends ConsumerState<ExplorePage> {
         comics: displayComics,
         hasNext: state.hasNext,
         
-        onTap: (comic) {
-          context.push('/details/${comic.providerId ?? "comicwifi"}/${comic.comicId}');
+        onTap: (data) {
+          context.push('/details/${data.providerId}/${data.comicId}');
         },
       ),
     );

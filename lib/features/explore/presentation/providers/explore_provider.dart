@@ -2,13 +2,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:mekuru/data/providers/repository_providers.dart';
 import 'package:mekuru/core/notifications/presentation/controllers/notification_controller.dart';
-import 'package:mekuru/domain/models/comic_base.dart';
-import 'package:mekuru/domain/models/comic_models.dart';
-import 'package:mekuru/features/settings/presentation/providers/settings_provider.dart';
+import 'package:mekuru/core/models/comic_card_data.dart';
 
 class ExploreState {
   final bool isLoading;
-  final List<IComicItem> comics;
+  final List<ComicCardData> comics;
   final String? error;
   final int page;
   final bool hasNext;
@@ -31,7 +29,7 @@ class ExploreState {
 
   ExploreState copyWith({
     bool? isLoading,
-    List<IComicItem>? comics,
+    List<ComicCardData>? comics,
     String? error,
     int? page,
     bool? hasNext,
@@ -77,17 +75,12 @@ class ExploreNotifier extends AutoDisposeFamilyNotifier<ExploreState, String> {
     );
   }
 
-  void _extractTags(List<IComicItem> fetchedComics) {
+  void _extractTags(List<ComicCardData> fetchedComics) {
     final currentKnown = Set<String>.from(state.knownTags);
     bool addedNew = false;
     
     for (final comic in fetchedComics) {
-      List<String> tags = [];
-      if (comic is ComicExploreResult) tags = comic.tags;
-      else if (comic is ComicSearchResult) tags = comic.tags;
-      else if (comic is ComicDetail) tags = comic.tags;
-
-      for (final tag in tags) {
+      for (final tag in comic.tags) {
         if (!currentKnown.contains(tag)) {
           currentKnown.add(tag);
           addedNew = true;
@@ -140,10 +133,11 @@ class ExploreNotifier extends AutoDisposeFamilyNotifier<ExploreState, String> {
     
     result.fold(
       (paginated) {
-        _extractTags(paginated.items);
+        final cardDataList = paginated.items.map((c) => ComicCardData.fromComic(c)).toList();
+        _extractTags(cardDataList);
         state = state.copyWith(
           isLoading: false,
-          comics: loadMore ? [...state.comics, ...paginated.items] : paginated.items,
+          comics: loadMore ? [...state.comics, ...cardDataList] : cardDataList,
           page: paginated.page,
           hasNext: paginated.hasNext,
         );
@@ -168,10 +162,11 @@ class ExploreNotifier extends AutoDisposeFamilyNotifier<ExploreState, String> {
     
     result.fold(
       (paginated) {
-        _extractTags(paginated.items);
+        final cardDataList = paginated.items.map((c) => ComicCardData.fromComic(c)).toList();
+        _extractTags(cardDataList);
         state = state.copyWith(
           isLoading: false,
-          comics: paginated.items,
+          comics: cardDataList,
           page: paginated.page,
           hasNext: paginated.hasNext,
         );

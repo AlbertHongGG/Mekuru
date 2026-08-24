@@ -110,71 +110,6 @@ class ComicDetailsPage extends ConsumerWidget {
       }
     }
 
-    // Build Status Chips
-    final List<Widget> statusChips = [];
-    
-    // 1. Status (連載中 / 完結)
-    if (comic.status.isNotEmpty) {
-      statusChips.add(
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          decoration: BoxDecoration(
-            color: isDark ? Colors.white24 : Colors.black12,
-            borderRadius: BorderRadius.circular(4),
-          ),
-          child: Text(
-            comic.status,
-            style: TextStyle(
-              fontSize: 11, 
-              color: isDark ? Colors.white : Colors.black87,
-              fontWeight: FontWeight.bold
-            ),
-          ),
-        )
-      );
-      statusChips.add(const SizedBox(width: 8));
-    }
-
-    // 2. Chapters Count (更新至 X 話)
-    if (state.chapters.isNotEmpty) {
-      statusChips.add(
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          decoration: BoxDecoration(
-            color: AppColors.primary.withValues(alpha: 0.8),
-            borderRadius: BorderRadius.circular(4),
-          ),
-          child: Text(
-            '更新至 ${state.chapters.length} 話',
-            style: const TextStyle(
-              fontSize: 11, 
-              color: Colors.white,
-              fontWeight: FontWeight.bold
-            ),
-          ),
-        )
-      );
-      statusChips.add(const SizedBox(width: 8));
-    }
-    
-    // 3. Date
-    statusChips.add(
-      Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.update_rounded, size: 14, color: isDark ? Colors.white54 : Colors.black54),
-          const SizedBox(width: 4),
-          Text(
-            updatedTimeStr,
-            style: TextStyle(
-              fontSize: 12,
-              color: isDark ? Colors.white54 : Colors.black54,
-            ),
-          ),
-        ],
-      )
-    );
-
     return Scaffold(
       body: Stack(
         children: [
@@ -186,7 +121,7 @@ class ComicDetailsPage extends ConsumerWidget {
               right: 0,
               height: MediaQuery.of(context).size.height * 0.5,
               child: ImageFiltered(
-                imageFilter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                imageFilter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
                 child: ComicImage(
                   imageUrl: comic.coverUrl!,
                   providerId: comic.providerId,
@@ -194,14 +129,14 @@ class ComicDetailsPage extends ConsumerWidget {
                 ),
               ),
             ),
-          // Darken overlay
+          // Darken overlay to ensure text contrast for app bar icons
           Positioned(
             top: 0,
             left: 0,
             right: 0,
             height: MediaQuery.of(context).size.height * 0.5,
             child: Container(
-              color: isDark ? Colors.black.withValues(alpha: 0.5) : Colors.white.withValues(alpha: 0.3),
+              color: isDark ? Colors.black.withValues(alpha: 0.6) : Colors.white.withValues(alpha: 0.3),
             ),
           ),
           
@@ -245,151 +180,170 @@ class ComicDetailsPage extends ConsumerWidget {
                 ],
               ),
               
-              // Spacer to expose the blurred background
+              // Spacer to expose the blurred background above the card
               const SliverToBoxAdapter(
-                child: SizedBox(height: 40),
+                child: SizedBox(height: 20),
               ),
               
               // The White/Dark Card Wrapper
               SliverToBoxAdapter(
                 child: Stack(
+                  alignment: Alignment.topCenter,
                   clipBehavior: Clip.none,
                   children: [
                     // Card Background
                     Container(
-                      margin: const EdgeInsets.only(top: 60), // Space for poster to pop out
+                      margin: const EdgeInsets.only(top: 100), // Push card down to let poster pop out
                       constraints: BoxConstraints(
                         minHeight: MediaQuery.of(context).size.height * 0.7,
                       ),
+                      width: double.infinity,
                       decoration: BoxDecoration(
                         color: Theme.of(context).scaffoldBackgroundColor,
                         borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withValues(alpha: 0.1),
-                            blurRadius: 10,
+                            blurRadius: 15,
                             offset: const Offset(0, -5),
                           ),
                         ],
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Structural Row for the Header
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                      // Card Content
+                      child: Padding(
+                        // Poster height = 196. Poster top = 0. Card top = 100.
+                        // Overlap into card = 96. Padding = 96 + 24 = 120.
+                        padding: const EdgeInsets.fromLTRB(24, 120, 24, 40),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            // Title
+                            Text(
+                              comic.title,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                height: 1.3,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            
+                            // Author
+                            if (comic.author != null && comic.author!.isNotEmpty) ...[
+                              Text(
+                                comic.author!,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  color: isDark ? Colors.white60 : Colors.black54,
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                            ],
+                            
+                            // Status & Date Row
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                // Placeholder for the poster
-                                const SizedBox(width: 120, height: 120), // 180 height - 60 popped out = 120 inside
-                                const SizedBox(width: 16),
-                                // Metadata (Title, Author, Status)
-                                Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(top: 24, bottom: 16),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          comic.title,
-                                          style: const TextStyle(
-                                            fontSize: 22,
-                                            fontWeight: FontWeight.bold,
-                                            height: 1.3,
-                                          ),
-                                          maxLines: 3,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                        const SizedBox(height: 8),
-                                        if (comic.author != null && comic.author!.isNotEmpty)
-                                          Text(
-                                            comic.author!,
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              color: isDark ? Colors.white54 : Colors.black54,
-                                            ),
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        const SizedBox(height: 12),
-                                        Wrap(
-                                          crossAxisAlignment: WrapCrossAlignment.center,
-                                          runSpacing: 8,
-                                          children: statusChips,
-                                        ),
-                                      ],
+                                if (comic.status.isNotEmpty) ...[
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: isDark ? Colors.white12 : Colors.black.withValues(alpha: 0.05),
+                                      borderRadius: BorderRadius.circular(6),
+                                      border: Border.all(
+                                        color: isDark ? Colors.white24 : Colors.black12,
+                                      ),
                                     ),
+                                    child: Text(
+                                      comic.status,
+                                      style: TextStyle(
+                                        fontSize: 12, 
+                                        color: isDark ? Colors.white : Colors.black87,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                ],
+                                Icon(Icons.update_rounded, size: 16, color: isDark ? Colors.white54 : Colors.black54),
+                                const SizedBox(width: 6),
+                                Text(
+                                  updatedTimeStr,
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: isDark ? Colors.white54 : Colors.black54,
+                                    fontWeight: FontWeight.w500,
                                   ),
                                 ),
                               ],
                             ),
-                          ),
-                          
-                          // Tags & Description
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                if (comic.tags != null && comic.tags!.isNotEmpty) ...[
-                                  Wrap(
-                                    spacing: 8,
-                                    runSpacing: 8,
-                                    children: comic.tags!.map((tag) {
-                                      return Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                        decoration: BoxDecoration(
-                                          color: isDark 
-                                              ? Colors.white10 
-                                              : Colors.black.withValues(alpha: 0.05),
-                                          borderRadius: BorderRadius.circular(16),
-                                        ),
-                                        child: Text(
-                                          tag,
-                                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
-                                        ),
-                                      );
-                                    }).toList(),
-                                  ),
-                                  const SizedBox(height: 24),
-                                ],
-                                
-                                if (comic.description != null && comic.description!.isNotEmpty)
-                                  ExpandableText(
-                                    text: comic.description!,
-                                    maxLines: 4,
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      height: 1.6,
-                                      color: isDark ? Colors.white70 : Colors.black87,
+                            
+                            const SizedBox(height: 28),
+                            
+                            // Tags
+                            if (comic.tags != null && comic.tags!.isNotEmpty) ...[
+                              Wrap(
+                                alignment: WrapAlignment.center,
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: comic.tags!.map((tag) {
+                                  return Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                    decoration: BoxDecoration(
+                                      color: isDark 
+                                          ? Colors.white10 
+                                          : Colors.black.withValues(alpha: 0.05),
+                                      borderRadius: BorderRadius.circular(16),
                                     ),
+                                    child: Text(
+                                      tag,
+                                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+                              const SizedBox(height: 32),
+                            ],
+                            
+                            // Description (Left aligned for better readability)
+                            if (comic.description != null && comic.description!.isNotEmpty) ...[
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: ExpandableText(
+                                  text: comic.description!,
+                                  maxLines: 4,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    height: 1.8, // Slightly taller line height for readability
+                                    color: isDark ? Colors.white70 : Colors.black87,
                                   ),
-                                  
-                                const SizedBox(height: 40),
-                              ],
-                            ),
-                          ),
-                        ],
+                                ),
+                              ),
+                            ],
+                            
+                            const SizedBox(height: 40),
+                          ],
+                        ),
                       ),
                     ),
                     
-                    // The Actual Poster overlapping the card bounds safely
+                    // Centered Poster Overlapping the Card
                     Positioned(
                       top: 0,
-                      left: 16,
                       child: Hero(
                         tag: 'cover_${comic.comicId}',
                         child: Container(
-                          width: 120,
-                          height: 180,
+                          width: 140,
+                          height: 196,
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(16),
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.black.withValues(alpha: 0.3),
-                                blurRadius: 15,
-                                offset: const Offset(0, 8),
+                                blurRadius: 20,
+                                offset: const Offset(0, 10),
                               ),
                             ],
                           ),

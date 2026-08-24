@@ -41,6 +41,7 @@ class ComicDetailsPage extends ConsumerWidget {
                   comicId: comicId,
                   chapters: bottomState.chapters,
                   lastReadChapterId: bottomState.interaction?.lastReadChapterId,
+                  readChapterIds: bottomState.interaction?.readChapterIds ?? [],
                   isSortDescending: bottomState.isChapterSortDescending,
                   onToggleSort: () => bottomNotifier.toggleChapterSort(),
                   onChapterTap: (chapter) async {

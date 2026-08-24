@@ -160,6 +160,7 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
                   comicId: widget.comicId,
                   chapters: currentDetailsState.chapters,
                   lastReadChapterId: widget.chapterId,
+                  readChapterIds: currentDetailsState.interaction?.readChapterIds ?? [],
                   isSortDescending: currentDetailsState.isChapterSortDescending,
                   onToggleSort: () => ref.read(comicDetailsProvider(detailsArg).notifier).toggleChapterSort(),
                   onChapterTap: (chapter) {

@@ -8,6 +8,7 @@ class ChapterListBottomSheet extends StatefulWidget {
   final String comicId;
   final List<Chapter> chapters;
   final String? lastReadChapterId;
+  final List<String> readChapterIds;
   final bool isSortDescending;
   final VoidCallback onToggleSort;
   final void Function(Chapter)? onChapterTap;
@@ -18,6 +19,7 @@ class ChapterListBottomSheet extends StatefulWidget {
     required this.comicId,
     required this.chapters,
     required this.lastReadChapterId,
+    this.readChapterIds = const [],
     required this.isSortDescending,
     required this.onToggleSort,
     this.onChapterTap,
@@ -148,6 +150,7 @@ class _ChapterListBottomSheetState extends State<ChapterListBottomSheet> {
                   itemBuilder: (context, index) {
                     final chapter = widget.chapters[index];
                     final isLastRead = chapter.id == widget.lastReadChapterId;
+                    final isRead = widget.readChapterIds.contains(chapter.id);
 
                     return Container(
                       margin: const EdgeInsets.only(bottom: 8),
@@ -182,7 +185,9 @@ class _ChapterListBottomSheetState extends State<ChapterListBottomSheet> {
                                       fontWeight: isLastRead ? FontWeight.bold : FontWeight.w500,
                                       color: isLastRead 
                                           ? AppColors.primary 
-                                          : (isDark ? Colors.white : Colors.black87),
+                                          : isRead 
+                                              ? (isDark ? Colors.white30 : Colors.black38)
+                                              : (isDark ? Colors.white : Colors.black87),
                                     ),
                                   ),
                                 ),

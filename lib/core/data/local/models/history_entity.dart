@@ -10,7 +10,8 @@ abstract class HistoryEntity with _$HistoryEntity {
     required String lastReadChapterId,
     required String lastReadChapterTitle,
     required int lastReadPageIndex,
-    required DateTime updatedAt, // 更新進度的時間
+    required DateTime updatedAt, // 最新進度更新時間
+    @Default([]) List<String> readChapterIds, // 所有看過的章節 ID 列表
   }) = _HistoryEntity;
 
   factory HistoryEntity.fromJson(Map<String, dynamic> json) => 

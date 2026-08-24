@@ -40,6 +40,7 @@ class UserInteractionRepository {
       lastReadChapterTitle: history?.lastReadChapterTitle,
       lastReadPageIndex: history?.lastReadPageIndex,
       readAt: history?.updatedAt,
+      readChapterIds: history?.readChapterIds ?? [],
     );
   }
 
@@ -109,12 +110,18 @@ class UserInteractionRepository {
     await _updateMetadata(id, dataSourceMode, providerId, comic);
     
     final existingHistory = _historyBox.get(id);
+    final readChapterIds = existingHistory?.readChapterIds.toList() ?? [];
+    if (!readChapterIds.contains(chapterId)) {
+      readChapterIds.add(chapterId);
+    }
+    
     await _historyBox.put(id, HistoryEntity(
       comicId: comicId,
       lastReadChapterId: chapterId,
       lastReadChapterTitle: chapterTitle,
       lastReadPageIndex: pageIndex ?? existingHistory?.lastReadPageIndex ?? 0,
       updatedAt: DateTime.now(),
+      readChapterIds: readChapterIds,
     ));
   }
 

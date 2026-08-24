@@ -88,12 +88,26 @@ class HistoryEntityAdapter extends TypeAdapter<HistoryEntity> {
 
   @override
   HistoryEntity read(BinaryReader reader) {
+    final comicId = reader.readString();
+    final lastReadChapterId = reader.readString();
+    final lastReadChapterTitle = reader.readString();
+    final lastReadPageIndex = reader.readInt();
+    final updatedAt = DateTime.fromMillisecondsSinceEpoch(reader.readInt());
+
+    List<String> readChapterIds = [];
+    try {
+      readChapterIds = reader.readStringList();
+    } catch (_) {
+      // Backward compatibility for existing data
+    }
+
     return HistoryEntity(
-      comicId: reader.readString(),
-      lastReadChapterId: reader.readString(),
-      lastReadChapterTitle: reader.readString(),
-      lastReadPageIndex: reader.readInt(),
-      updatedAt: DateTime.fromMillisecondsSinceEpoch(reader.readInt()),
+      comicId: comicId,
+      lastReadChapterId: lastReadChapterId,
+      lastReadChapterTitle: lastReadChapterTitle,
+      lastReadPageIndex: lastReadPageIndex,
+      updatedAt: updatedAt,
+      readChapterIds: readChapterIds,
     );
   }
 
@@ -104,7 +118,8 @@ class HistoryEntityAdapter extends TypeAdapter<HistoryEntity> {
       ..writeString(obj.lastReadChapterId)
       ..writeString(obj.lastReadChapterTitle)
       ..writeInt(obj.lastReadPageIndex)
-      ..writeInt(obj.updatedAt.millisecondsSinceEpoch);
+      ..writeInt(obj.updatedAt.millisecondsSinceEpoch)
+      ..writeStringList(obj.readChapterIds);
   }
 }
 

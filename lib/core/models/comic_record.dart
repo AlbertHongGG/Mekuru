@@ -22,5 +22,6 @@ abstract class ComicRecord with _$ComicRecord implements IComicItem {
     required DateTime updatedAt,
     DateTime? favoriteAt,
     DateTime? readAt,
+    @Default([]) List<String> readChapterIds,
   }) = _ComicRecord;
 }

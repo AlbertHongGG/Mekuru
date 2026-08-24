@@ -13,6 +13,7 @@ import 'package:mekuru/core/widgets/app_bottom_sheet.dart';
 import 'package:mekuru/core/data/sources/provider_registry.dart';
 import 'package:mekuru/core/notifications/presentation/screens/system_log_viewer_screen.dart';
 import 'package:mekuru/core/network/presentation/pages/api_log_list_page.dart';
+import 'package:mekuru/features/backup/presentation/widgets/backup_section.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
@@ -100,6 +101,8 @@ class SettingsPage extends ConsumerWidget {
               ),
             ],
           ),
+          const SizedBox(height: 16),
+          const BackupSection(),
         ],
       ),
     );

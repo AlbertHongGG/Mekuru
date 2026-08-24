@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
-import 'package:mekuru/data/sources/copymanga/models/copymanga_models.dart';
-import 'package:mekuru/data/sources/base_comic_provider.dart';
+import 'package:mekuru/core/data/sources/copymanga/models/copymanga_models.dart';
+import 'package:mekuru/core/data/sources/base_comic_provider.dart';
 
 class CopymangaApiClient {
   final Dio _dio;

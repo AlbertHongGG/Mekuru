@@ -1,4 +1,6 @@
+import 'package:mekuru/core/models/enums/library_sort_mode.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mekuru/core/models/comic_card_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mekuru/core/theme/app_colors.dart';
@@ -6,7 +8,7 @@ import 'package:mekuru/core/widgets/responsive_comic_grid.dart';
 import 'package:mekuru/features/library/presentation/providers/library_provider.dart';
 import 'package:mekuru/core/widgets/search_dialog.dart';
 import 'package:mekuru/core/widgets/app_bottom_sheet.dart';
-import 'package:mekuru/data/sources/provider_registry.dart';
+import 'package:mekuru/core/data/sources/provider_registry.dart';
 
 class LibraryPage extends ConsumerStatefulWidget {
   const LibraryPage({super.key});
@@ -50,27 +52,15 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
     );
   }
 
-  void _showSortBottomSheet(String currentSortMode) {
+  void _showSortBottomSheet(LibrarySortMode currentSortMode) {
     AppBottomSheet.show(
       context: context,
       title: '排序',
-      items: [
-        AppBottomSheetItemData(
-          title: '近期加入',
-          leadingIcon: Icons.add,
-          value: 'added',
-        ),
-        AppBottomSheetItemData(
-          title: '最近更新',
-          leadingIcon: Icons.local_fire_department,
-          value: 'updated',
-        ),
-        AppBottomSheetItemData(
-          title: '近期閱讀',
-          leadingIcon: Icons.schedule,
-          value: 'read',
-        ),
-      ],
+      items: LibrarySortMode.values.map((mode) => AppBottomSheetItemData(
+        title: mode.label,
+        leadingIcon: mode.icon,
+        value: mode,
+      )).toList(),
       selectedValue: currentSortMode,
       onItemSelected: (val) {
         ref.read(libraryProvider.notifier).setSortMode(val);

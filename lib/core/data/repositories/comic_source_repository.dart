@@ -1,13 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:mekuru/core/error/result.dart';
-import 'package:mekuru/domain/models/chapter.dart';
-import 'package:mekuru/domain/models/comic_models.dart';
-import 'package:mekuru/domain/models/page.dart';
-import 'package:mekuru/domain/models/paginated_result.dart';
-import 'package:mekuru/data/sources/provider_registry.dart';
+import 'package:mekuru/core/models/chapter.dart';
+import 'package:mekuru/core/models/comic_models.dart';
+import 'package:mekuru/core/models/page.dart';
+import 'package:mekuru/core/models/paginated_result.dart';
+import 'package:mekuru/core/data/sources/provider_registry.dart';
 
-import 'package:mekuru/data/repositories/i_comic_repository.dart';
+import 'package:mekuru/core/data/repositories/i_comic_repository.dart';
 
 class ComicSourceRepository implements IComicRepository {
   final ProviderRegistry _registry;

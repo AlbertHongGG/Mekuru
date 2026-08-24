@@ -1,9 +1,11 @@
+import 'package:mekuru/core/models/enums/library_sort_mode.dart';
+import 'package:mekuru/core/models/enums/data_source_mode.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mekuru/data/repositories/user_interaction_repository.dart';
-import 'package:mekuru/domain/models/local_comic_record.dart';
+import 'package:mekuru/core/data/repositories/user_interaction_repository.dart';
+import 'package:mekuru/core/models/local_comic_record.dart';
 import 'package:mekuru/features/settings/presentation/providers/settings_provider.dart';
 import 'package:mekuru/core/models/comic_card_data.dart';
-import 'package:mekuru/data/sources/provider_registry.dart';
+import 'package:mekuru/core/data/sources/provider_registry.dart';
 
 class LibraryState {
   final bool isLoading;
@@ -12,7 +14,7 @@ class LibraryState {
   final List<String> availableProviders;
   final String? activeProviderFilter;
   final String searchQuery;
-  final String sortMode;
+  final LibrarySortMode sortMode;
   final String? error;
 
   LibraryState({
@@ -22,7 +24,7 @@ class LibraryState {
     this.availableProviders = const [],
     this.activeProviderFilter,
     this.searchQuery = '',
-    this.sortMode = 'added',
+    this.sortMode = LibrarySortMode.added,
     this.error,
   });
 
@@ -34,7 +36,7 @@ class LibraryState {
     String? activeProviderFilter,
     bool clearProviderFilter = false,
     String? searchQuery,
-    String? sortMode,
+    LibrarySortMode? sortMode,
     String? error,
   }) {
     return LibraryState(
@@ -71,7 +73,7 @@ class LibraryNotifier extends Notifier<LibraryState> {
     _updateDisplayItems();
   }
 
-  void setSortMode(String sortMode) {
+  void setSortMode(LibrarySortMode sortMode) {
     state = state.copyWith(sortMode: sortMode);
     _updateDisplayItems();
   }
@@ -110,11 +112,11 @@ class LibraryNotifier extends Notifier<LibraryState> {
     }
     
     result.sort((a, b) {
-      if (state.sortMode == 'added') {
+      if (state.sortMode == LibrarySortMode.added) {
         final timeA = a.favoriteAt ?? a.updatedAt;
         final timeB = b.favoriteAt ?? b.updatedAt;
         return timeB.compareTo(timeA);
-      } else if (state.sortMode == 'read' || state.sortMode == 'updated') {
+      } else if (state.sortMode == LibrarySortMode.read || state.sortMode == LibrarySortMode.updated) {
         final timeA = a.updatedAt;
         final timeB = b.updatedAt;
         return timeB.compareTo(timeA);

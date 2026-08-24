@@ -1,3 +1,4 @@
+import 'package:mekuru/core/models/enums/data_source_mode.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 part of 'local_comic_record.dart';
@@ -9,7 +10,7 @@ part of 'local_comic_record.dart';
 _LocalComicRecord _$LocalComicRecordFromJson(Map<String, dynamic> json) =>
     _LocalComicRecord(
       id: json['id'] as String,
-      dataSourceMode: json['dataSourceMode'] as String,
+      dataSourceMode: DataSourceModeExtension.fromString(json['dataSourceMode'] as String),
       providerId: json['providerId'] as String,
       comicId: json['comicId'] as String,
       title: json['title'] as String,

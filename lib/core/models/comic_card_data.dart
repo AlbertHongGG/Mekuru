@@ -1,5 +1,5 @@
-import 'package:mekuru/domain/models/comic_base.dart';
-import 'package:mekuru/domain/models/comic_models.dart';
+import 'package:mekuru/core/models/comic_base.dart';
+import 'package:mekuru/core/models/comic_models.dart';
 
 class ComicCardData {
   final String comicId;

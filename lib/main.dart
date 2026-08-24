@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:mekuru/domain/models/local_comic_record.dart';
+import 'package:mekuru/core/models/local_comic_record.dart';
 import 'package:mekuru/core/theme/app_theme.dart';
 import 'package:mekuru/features/settings/presentation/providers/settings_provider.dart';
 import 'package:mekuru/features/settings/presentation/pages/settings_page.dart';

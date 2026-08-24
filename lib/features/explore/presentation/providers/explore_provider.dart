@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:mekuru/data/providers/repository_providers.dart';
+import 'package:mekuru/core/data/providers/repository_providers.dart';
 import 'package:mekuru/core/notifications/presentation/controllers/notification_controller.dart';
 import 'package:mekuru/core/models/comic_card_data.dart';
 

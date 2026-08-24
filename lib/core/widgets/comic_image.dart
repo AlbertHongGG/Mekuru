@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:extended_image/extended_image.dart';
-import 'package:mekuru/data/sources/provider_registry.dart';
+import 'package:mekuru/core/data/sources/provider_registry.dart';
 
 class ComicImage extends ConsumerWidget {
   final String imageUrl;
@@ -27,7 +27,7 @@ class ComicImage extends ConsumerWidget {
     
     if (providerId != null) {
       try {
-        final registry = ref.read(providerRegistryProvider);
+        final registry = ref.watch(providerRegistryProvider);
         headers = registry.getProvider(providerId!).imageHeaders;
       } catch (e) {
         // Fallback to no headers if provider is missing

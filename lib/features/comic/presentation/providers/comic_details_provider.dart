@@ -1,11 +1,12 @@
+import 'package:mekuru/core/models/enums/data_source_mode.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mekuru/data/providers/repository_providers.dart';
-import 'package:mekuru/data/repositories/user_interaction_repository.dart';
-import 'package:mekuru/domain/models/comic_models.dart';
-import 'package:mekuru/domain/models/chapter.dart';
+import 'package:mekuru/core/data/providers/repository_providers.dart';
+import 'package:mekuru/core/data/repositories/user_interaction_repository.dart';
+import 'package:mekuru/core/models/comic_models.dart';
+import 'package:mekuru/core/models/chapter.dart';
 import 'package:mekuru/core/notifications/presentation/controllers/notification_controller.dart';
-import 'package:mekuru/domain/models/local_comic_record.dart';
-import 'package:mekuru/domain/models/paginated_result.dart';
+import 'package:mekuru/core/models/local_comic_record.dart';
+import 'package:mekuru/core/models/paginated_result.dart';
 import 'package:mekuru/features/library/presentation/providers/library_provider.dart';
 import 'package:mekuru/features/settings/presentation/providers/settings_provider.dart';
 

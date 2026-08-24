@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:mekuru/data/sources/webtoon/models/webtoon_models.dart';
+import 'package:mekuru/core/data/sources/webtoon/models/webtoon_models.dart';
 
 class WebtoonApiClient {
   final Dio _dio;

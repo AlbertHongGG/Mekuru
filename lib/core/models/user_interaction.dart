@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:mekuru/domain/models/comic_models.dart';
+import 'package:mekuru/core/models/comic_models.dart';
 
 part 'user_interaction.freezed.dart';
 part 'user_interaction.g.dart';

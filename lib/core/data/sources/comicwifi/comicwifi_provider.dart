@@ -1,13 +1,13 @@
 import 'package:dio/dio.dart';
 import 'package:mekuru/core/error/result.dart';
 import 'package:mekuru/core/error/failures.dart';
-import 'package:mekuru/data/sources/base_comic_provider.dart';
-import 'package:mekuru/data/sources/comicwifi/comicwifi_api_client.dart';
-import 'package:mekuru/data/sources/comicwifi/comicwifi_auth_interceptor.dart';
-import 'package:mekuru/domain/models/comic_models.dart';
-import 'package:mekuru/domain/models/chapter.dart';
-import 'package:mekuru/domain/models/page.dart';
-import 'package:mekuru/domain/models/paginated_result.dart';
+import 'package:mekuru/core/data/sources/base_comic_provider.dart';
+import 'package:mekuru/core/data/sources/comicwifi/comicwifi_api_client.dart';
+import 'package:mekuru/core/data/sources/comicwifi/comicwifi_auth_interceptor.dart';
+import 'package:mekuru/core/models/comic_models.dart';
+import 'package:mekuru/core/models/chapter.dart';
+import 'package:mekuru/core/models/page.dart';
+import 'package:mekuru/core/models/paginated_result.dart';
 
 class ComicWifiProvider extends BaseComicProvider {
   static const String _id = 'comicwifi';

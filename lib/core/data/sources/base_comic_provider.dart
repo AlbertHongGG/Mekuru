@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:mekuru/core/error/failures.dart';
 import 'package:mekuru/core/error/result.dart';
-import 'package:mekuru/data/sources/i_comic_provider.dart';
+import 'package:mekuru/core/data/sources/i_comic_provider.dart';
 
 abstract class BaseComicProvider implements IComicProvider {
   @override

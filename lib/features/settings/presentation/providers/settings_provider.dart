@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:mekuru/core/models/enums/data_source_mode.dart';
 
 class SettingsState {
   final ThemeMode themeMode;
   final String serverUrl;
-  final String dataSourceMode;
+  final DataSourceMode dataSourceMode;
   final String currentSourceId;
 
   const SettingsState({
@@ -18,7 +19,7 @@ class SettingsState {
   SettingsState copyWith({
     ThemeMode? themeMode,
     String? serverUrl,
-    String? dataSourceMode,
+    DataSourceMode? dataSourceMode,
     String? currentSourceId,
   }) {
     return SettingsState(
@@ -43,7 +44,10 @@ class SettingsNotifier extends Notifier<SettingsState> {
 
     // Default server URL
     final url = _settingsBox.get('serverUrl', defaultValue: 'http://10.0.2.2:8000') as String;
-    final mode = _settingsBox.get('dataSourceMode', defaultValue: 'source') as String;
+    
+    final modeStr = _settingsBox.get('dataSourceMode', defaultValue: 'source') as String;
+    final mode = DataSourceModeExtension.fromString(modeStr);
+    
     final sourceId = _settingsBox.get('currentSourceId', defaultValue: 'comicwifi') as String;
 
     return SettingsState(
@@ -64,8 +68,8 @@ class SettingsNotifier extends Notifier<SettingsState> {
     state = state.copyWith(serverUrl: url);
   }
 
-  void updateDataSourceMode(String mode) {
-    _settingsBox.put('dataSourceMode', mode);
+  void updateDataSourceMode(DataSourceMode mode) {
+    _settingsBox.put('dataSourceMode', mode.name);
     state = state.copyWith(dataSourceMode: mode);
   }
 

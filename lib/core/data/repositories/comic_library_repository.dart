@@ -3,11 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mekuru/core/network/api_client.dart';
 import 'package:mekuru/core/error/result.dart';
 import 'package:mekuru/core/error/failures.dart';
-import 'package:mekuru/domain/models/comic_models.dart';
-import 'package:mekuru/domain/models/chapter.dart';
-import 'package:mekuru/domain/models/page.dart';
-import 'package:mekuru/domain/models/paginated_result.dart';
-import 'package:mekuru/data/repositories/i_comic_repository.dart';
+import 'package:mekuru/core/models/comic_models.dart';
+import 'package:mekuru/core/models/chapter.dart';
+import 'package:mekuru/core/models/page.dart';
+import 'package:mekuru/core/models/paginated_result.dart';
+import 'package:mekuru/core/data/repositories/i_comic_repository.dart';
 
 class ComicLibraryRepository implements IComicRepository {
   final Dio _dio;

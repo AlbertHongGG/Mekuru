@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:mekuru/data/sources/comicwifi/models/comicwifi_models.dart';
+import 'package:mekuru/core/data/sources/comicwifi/models/comicwifi_models.dart';
 
 class ComicWifiApiClient {
   final Dio _dio;

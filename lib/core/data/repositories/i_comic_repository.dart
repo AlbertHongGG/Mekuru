@@ -1,7 +1,7 @@
-import 'package:mekuru/domain/models/comic_models.dart';
-import 'package:mekuru/domain/models/paginated_result.dart';
-import 'package:mekuru/domain/models/chapter.dart';
-import 'package:mekuru/domain/models/page.dart';
+import 'package:mekuru/core/models/comic_models.dart';
+import 'package:mekuru/core/models/paginated_result.dart';
+import 'package:mekuru/core/models/chapter.dart';
+import 'package:mekuru/core/models/page.dart';
 import 'package:mekuru/core/error/result.dart';
 
 abstract class IComicRepository {

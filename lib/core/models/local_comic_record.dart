@@ -1,26 +1,30 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:mekuru/core/models/enums/data_source_mode.dart';
 
-import 'package:mekuru/domain/models/comic_base.dart';
+import 'package:mekuru/core/models/comic_base.dart';
 
 part 'local_comic_record.freezed.dart';
 part 'local_comic_record.g.dart';
 
 @freezed
-abstract class LocalComicRecord with _$LocalComicRecord implements IComicItem {
+class LocalComicRecord extends HiveObject with _$LocalComicRecord implements IComicItem {
+  LocalComicRecord._();
+
+  @HiveType(typeId: 0)
   const factory LocalComicRecord({
-    required String id,
-    required String dataSourceMode,
-    required String providerId,
-    required String comicId,
-    required String title,
-    required String coverUrl,
-    @Default(false) bool isFavorite,
-    String? lastReadChapterId,
-    String? lastReadChapterTitle,
-    int? lastReadPageIndex,
-    required DateTime updatedAt,
-    DateTime? favoriteAt,
+    @HiveField(0) required String id,
+    @HiveField(1) required DataSourceMode dataSourceMode,
+    @HiveField(2) required String providerId,
+    @HiveField(3) required String comicId,
+    @HiveField(4) required String title,
+    @HiveField(5) required String coverUrl,
+    @HiveField(6) @Default(false) bool isFavorite,
+    @HiveField(7) String? lastReadChapterId,
+    @HiveField(8) String? lastReadChapterTitle,
+    @HiveField(9) int? lastReadPageIndex,
+    @HiveField(10) required DateTime updatedAt,
+    @HiveField(11) DateTime? favoriteAt,
   }) = _LocalComicRecord;
 
   factory LocalComicRecord.fromJson(Map<String, dynamic> json) => 
@@ -39,7 +43,7 @@ class LocalComicRecordAdapter extends TypeAdapter<LocalComicRecord> {
     };
     return LocalComicRecord(
       id: fields[0] as String,
-      dataSourceMode: fields[1] as String,
+      dataSourceMode: DataSourceModeExtension.fromString(fields[1] as String),
       providerId: fields[2] as String,
       comicId: fields[3] as String,
       title: fields[4] as String,
@@ -57,9 +61,12 @@ class LocalComicRecordAdapter extends TypeAdapter<LocalComicRecord> {
   void write(BinaryWriter writer, LocalComicRecord obj) {
     writer
       ..writeByte(12)
-      ..writeByte(0)..write(obj.id)
-      ..writeByte(1)..write(obj.dataSourceMode)
-      ..writeByte(2)..write(obj.providerId)
+      ..writeByte(0)
+      ..write(obj.id)
+      ..writeByte(1)
+      ..write(obj.dataSourceMode.name)
+      ..writeByte(2)
+      ..write(obj.providerId)
       ..writeByte(3)..write(obj.comicId)
       ..writeByte(4)..write(obj.title)
       ..writeByte(5)..write(obj.coverUrl)
@@ -67,7 +74,7 @@ class LocalComicRecordAdapter extends TypeAdapter<LocalComicRecord> {
       ..writeByte(7)..write(obj.lastReadChapterId)
       ..writeByte(8)..write(obj.lastReadChapterTitle)
       ..writeByte(9)..write(obj.lastReadPageIndex)
-      ..writeByte(10)..write(obj.updatedAt.millisecondsSinceEpoch)
+      ..writeByte(10)..write(obj.updatedAt)
       ..writeByte(11)..write(obj.favoriteAt?.millisecondsSinceEpoch);
   }
 }

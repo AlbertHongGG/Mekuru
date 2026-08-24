@@ -1,11 +1,11 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:mekuru/core/theme/app_colors.dart';
 
-class AppBottomSheetItemData {
+class AppBottomSheetItemData<T> {
   final String title;
   final String? subtitle;
   final IconData leadingIcon;
-  final String value;
+  final T value;
 
   AppBottomSheetItemData({
     required this.title,
@@ -15,11 +15,11 @@ class AppBottomSheetItemData {
   });
 }
 
-class AppBottomSheet extends StatelessWidget {
+class AppBottomSheet<T> extends StatelessWidget {
   final String title;
-  final List<AppBottomSheetItemData> items;
-  final String selectedValue;
-  final ValueChanged<String> onItemSelected;
+  final List<AppBottomSheetItemData<T>> items;
+  final T selectedValue;
+  final ValueChanged<T> onItemSelected;
 
   const AppBottomSheet({
     super.key,
@@ -29,12 +29,12 @@ class AppBottomSheet extends StatelessWidget {
     required this.onItemSelected,
   });
 
-  static void show({
+  static void show<T>({
     required BuildContext context,
     required String title,
-    required List<AppBottomSheetItemData> items,
-    required String selectedValue,
-    required ValueChanged<String> onItemSelected,
+    required List<AppBottomSheetItemData<T>> items,
+    required T selectedValue,
+    required ValueChanged<T> onItemSelected,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     showModalBottomSheet(

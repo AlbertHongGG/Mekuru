@@ -1,6 +1,7 @@
+import 'package:mekuru/core/models/enums/data_source_mode.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mekuru/data/repositories/archive_repository.dart';
-import 'package:mekuru/domain/models/archive_task.dart';
+import 'package:mekuru/core/data/repositories/archive_repository.dart';
+import 'package:mekuru/core/models/archive_task.dart';
 import 'dart:async';
 
 class ArchiveState {

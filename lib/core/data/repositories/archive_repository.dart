@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mekuru/core/network/api_client.dart';
-import 'package:mekuru/domain/models/archive_task.dart';
+import 'package:mekuru/core/models/archive_task.dart';
 
 class ArchiveRepository {
   final Dio _dio;

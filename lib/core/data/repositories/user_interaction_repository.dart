@@ -1,40 +1,41 @@
+import 'package:mekuru/core/models/enums/data_source_mode.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:mekuru/domain/models/local_comic_record.dart';
-import 'package:mekuru/domain/models/comic_base.dart';
-import 'package:mekuru/domain/models/chapter.dart';
+import 'package:mekuru/core/models/local_comic_record.dart';
+import 'package:mekuru/core/models/comic_base.dart';
+import 'package:mekuru/core/models/chapter.dart';
 
 class UserInteractionRepository {
   final Box<LocalComicRecord> _box;
 
   UserInteractionRepository(this._box);
 
-  String _genId(String dataSourceMode, String providerId, String comicId) {
+  String _genId(DataSourceMode dataSourceMode, String providerId, String comicId) {
     return '${dataSourceMode}_${providerId}_$comicId';
   }
 
-  Future<List<LocalComicRecord>> getAllFavorites(String dataSourceMode) async {
+  Future<List<LocalComicRecord>> getAllFavorites(DataSourceMode dataSourceMode) async {
     return _box.values
         .where((r) => r.dataSourceMode == dataSourceMode && r.isFavorite)
         .toList()
       ..sort((a, b) => (b.favoriteAt ?? b.updatedAt).compareTo(a.favoriteAt ?? a.updatedAt));
   }
 
-  Future<List<LocalComicRecord>> getFavoritesByProvider(String dataSourceMode, String providerId) async {
+  Future<List<LocalComicRecord>> getFavoritesByProvider(DataSourceMode dataSourceMode, String providerId) async {
     return _box.values
         .where((r) => r.dataSourceMode == dataSourceMode && r.isFavorite && r.providerId == providerId)
         .toList()
       ..sort((a, b) => (b.favoriteAt ?? b.updatedAt).compareTo(a.favoriteAt ?? a.updatedAt));
   }
   
-  Future<List<LocalComicRecord>> getAllHistory(String dataSourceMode) async {
+  Future<List<LocalComicRecord>> getAllHistory(DataSourceMode dataSourceMode) async {
     return _box.values
         .where((r) => r.dataSourceMode == dataSourceMode)
         .toList()
       ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
   }
 
-  Future<List<LocalComicRecord>> getHistoryByProvider(String dataSourceMode, String providerId) async {
+  Future<List<LocalComicRecord>> getHistoryByProvider(DataSourceMode dataSourceMode, String providerId) async {
     return _box.values
         .where((r) => r.dataSourceMode == dataSourceMode && r.providerId == providerId)
         .toList()
@@ -42,7 +43,7 @@ class UserInteractionRepository {
   }
 
   Future<void> markRead({
-    required String dataSourceMode,
+    required DataSourceMode dataSourceMode,
     required String providerId,
     required String comicId,
     required IComicItem comic,
@@ -82,7 +83,7 @@ class UserInteractionRepository {
   }
 
   Future<LocalComicRecord?> getInteraction({
-    required String dataSourceMode,
+    required DataSourceMode dataSourceMode,
     required String providerId,
     required String comicId,
   }) async {
@@ -91,7 +92,7 @@ class UserInteractionRepository {
   }
 
   Stream<LocalComicRecord?> watchInteraction({
-    required String dataSourceMode,
+    required DataSourceMode dataSourceMode,
     required String providerId,
     required String comicId,
   }) async* {
@@ -103,7 +104,7 @@ class UserInteractionRepository {
   }
 
   Future<void> toggleFavorite({
-    required String dataSourceMode,
+    required DataSourceMode dataSourceMode,
     required String providerId,
     required String comicId,
     required IComicItem comic,

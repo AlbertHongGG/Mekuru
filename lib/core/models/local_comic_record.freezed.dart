@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$LocalComicRecord {
 
- String get id; String get dataSourceMode; String get providerId; String get comicId; String get title; String get coverUrl; bool get isFavorite; String? get lastReadChapterId; String? get lastReadChapterTitle; int? get lastReadPageIndex; DateTime get updatedAt; DateTime? get favoriteAt;
+ String get id; DataSourceMode get dataSourceMode; String get providerId; String get comicId; String get title; String get coverUrl; bool get isFavorite; String? get lastReadChapterId; String? get lastReadChapterTitle; int? get lastReadPageIndex; DateTime get updatedAt; DateTime? get favoriteAt;
 /// Create a copy of LocalComicRecord
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -49,7 +49,7 @@ abstract mixin class $LocalComicRecordCopyWith<$Res>  {
   factory $LocalComicRecordCopyWith(LocalComicRecord value, $Res Function(LocalComicRecord) _then) = _$LocalComicRecordCopyWithImpl;
 @useResult
 $Res call({
- String id, String dataSourceMode, String providerId, String comicId, String title, String coverUrl, bool isFavorite, String? lastReadChapterId, String? lastReadChapterTitle, int? lastReadPageIndex, DateTime updatedAt, DateTime? favoriteAt
+ String id, DataSourceMode dataSourceMode, String providerId, String comicId, String title, String coverUrl, bool isFavorite, String? lastReadChapterId, String? lastReadChapterTitle, int? lastReadPageIndex, DateTime updatedAt, DateTime? favoriteAt
 });
 
 
@@ -69,7 +69,7 @@ class _$LocalComicRecordCopyWithImpl<$Res>
 @pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? dataSourceMode = null,Object? providerId = null,Object? comicId = null,Object? title = null,Object? coverUrl = null,Object? isFavorite = null,Object? lastReadChapterId = freezed,Object? lastReadChapterTitle = freezed,Object? lastReadPageIndex = freezed,Object? updatedAt = null,Object? favoriteAt = freezed,}) {
   return _then(LocalComicRecord(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,dataSourceMode: null == dataSourceMode ? _self.dataSourceMode : dataSourceMode // ignore: cast_nullable_to_non_nullable
+as DataSourceMode,dataSourceMode: null == dataSourceMode ? _self.dataSourceMode : dataSourceMode // ignore: cast_nullable_to_non_nullable
 as String,providerId: null == providerId ? _self.providerId : providerId // ignore: cast_nullable_to_non_nullable
 as String,comicId: null == comicId ? _self.comicId : comicId // ignore: cast_nullable_to_non_nullable
 as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
@@ -165,7 +165,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String dataSourceMode,  String providerId,  String comicId,  String title,  String coverUrl,  bool isFavorite,  String? lastReadChapterId,  String? lastReadChapterTitle,  int? lastReadPageIndex,  DateTime updatedAt,  DateTime? favoriteAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  DataSourceMode dataSourceMode,  String providerId,  String comicId,  String title,  String coverUrl,  bool isFavorite,  String? lastReadChapterId,  String? lastReadChapterTitle,  int? lastReadPageIndex,  DateTime updatedAt,  DateTime? favoriteAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _LocalComicRecord() when $default != null:
 return $default(_that.id,_that.dataSourceMode,_that.providerId,_that.comicId,_that.title,_that.coverUrl,_that.isFavorite,_that.lastReadChapterId,_that.lastReadChapterTitle,_that.lastReadPageIndex,_that.updatedAt,_that.favoriteAt);case _:
@@ -186,7 +186,7 @@ return $default(_that.id,_that.dataSourceMode,_that.providerId,_that.comicId,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String dataSourceMode,  String providerId,  String comicId,  String title,  String coverUrl,  bool isFavorite,  String? lastReadChapterId,  String? lastReadChapterTitle,  int? lastReadPageIndex,  DateTime updatedAt,  DateTime? favoriteAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  DataSourceMode dataSourceMode,  String providerId,  String comicId,  String title,  String coverUrl,  bool isFavorite,  String? lastReadChapterId,  String? lastReadChapterTitle,  int? lastReadPageIndex,  DateTime updatedAt,  DateTime? favoriteAt)  $default,) {final _that = this;
 switch (_that) {
 case _LocalComicRecord():
 return $default(_that.id,_that.dataSourceMode,_that.providerId,_that.comicId,_that.title,_that.coverUrl,_that.isFavorite,_that.lastReadChapterId,_that.lastReadChapterTitle,_that.lastReadPageIndex,_that.updatedAt,_that.favoriteAt);case _:
@@ -206,7 +206,7 @@ return $default(_that.id,_that.dataSourceMode,_that.providerId,_that.comicId,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String dataSourceMode,  String providerId,  String comicId,  String title,  String coverUrl,  bool isFavorite,  String? lastReadChapterId,  String? lastReadChapterTitle,  int? lastReadPageIndex,  DateTime updatedAt,  DateTime? favoriteAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  DataSourceMode dataSourceMode,  String providerId,  String comicId,  String title,  String coverUrl,  bool isFavorite,  String? lastReadChapterId,  String? lastReadChapterTitle,  int? lastReadPageIndex,  DateTime updatedAt,  DateTime? favoriteAt)?  $default,) {final _that = this;
 switch (_that) {
 case _LocalComicRecord() when $default != null:
 return $default(_that.id,_that.dataSourceMode,_that.providerId,_that.comicId,_that.title,_that.coverUrl,_that.isFavorite,_that.lastReadChapterId,_that.lastReadChapterTitle,_that.lastReadPageIndex,_that.updatedAt,_that.favoriteAt);case _:
@@ -270,7 +270,7 @@ abstract mixin class _$LocalComicRecordCopyWith<$Res> implements $LocalComicReco
   factory _$LocalComicRecordCopyWith(_LocalComicRecord value, $Res Function(_LocalComicRecord) _then) = __$LocalComicRecordCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String dataSourceMode, String providerId, String comicId, String title, String coverUrl, bool isFavorite, String? lastReadChapterId, String? lastReadChapterTitle, int? lastReadPageIndex, DateTime updatedAt, DateTime? favoriteAt
+ String id, DataSourceMode dataSourceMode, String providerId, String comicId, String title, String coverUrl, bool isFavorite, String? lastReadChapterId, String? lastReadChapterTitle, int? lastReadPageIndex, DateTime updatedAt, DateTime? favoriteAt
 });
 
 
@@ -290,7 +290,7 @@ class __$LocalComicRecordCopyWithImpl<$Res>
 @override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? dataSourceMode = null,Object? providerId = null,Object? comicId = null,Object? title = null,Object? coverUrl = null,Object? isFavorite = null,Object? lastReadChapterId = freezed,Object? lastReadChapterTitle = freezed,Object? lastReadPageIndex = freezed,Object? updatedAt = null,Object? favoriteAt = freezed,}) {
   return _then(_LocalComicRecord(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,dataSourceMode: null == dataSourceMode ? _self.dataSourceMode : dataSourceMode // ignore: cast_nullable_to_non_nullable
+as DataSourceMode,dataSourceMode: null == dataSourceMode ? _self.dataSourceMode : dataSourceMode // ignore: cast_nullable_to_non_nullable
 as String,providerId: null == providerId ? _self.providerId : providerId // ignore: cast_nullable_to_non_nullable
 as String,comicId: null == comicId ? _self.comicId : comicId // ignore: cast_nullable_to_non_nullable
 as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable

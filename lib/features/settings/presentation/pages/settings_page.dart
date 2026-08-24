@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:mekuru/core/models/enums/data_source_mode.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mekuru/features/settings/presentation/providers/settings_provider.dart';
@@ -11,7 +12,7 @@ import 'package:mekuru/core/widgets/app_switch.dart';
 import 'package:mekuru/core/widgets/app_bottom_sheet.dart';
 import 'package:mekuru/core/notifications/presentation/screens/system_log_viewer_screen.dart';
 import 'package:mekuru/core/network/presentation/pages/api_log_list_page.dart';
-import 'package:mekuru/data/sources/provider_registry.dart';
+import 'package:mekuru/core/data/sources/provider_registry.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
@@ -37,37 +38,37 @@ class SettingsPage extends ConsumerWidget {
             title: '偏好設定',
             subtitle: 'SYSTEM CONFIGURATION',
           ),
-          SettingsSection(
-            title: '系統',
-            children: [
-              SettingsTile(
-                icon: Icons.source,
-                iconColor: AppColors.primary,
-                title: '資料來源模式',
-                subtitle: settingsState.dataSourceMode == 'db' ? 'DB Server' : 'Provider Source',
-                onTap: () => _showModeBottomSheet(context, ref, settingsState.dataSourceMode),
-              ),
-              if (settingsState.dataSourceMode == 'source')
+            SettingsSection(
+              title: '系統',
+              children: [
                 SettingsTile(
-                  icon: Icons.api_rounded,
+                  icon: Icons.source,
                   iconColor: AppColors.primary,
-                  title: '選擇漫畫來源',
-                  subtitle: _getProviderName(settingsState.currentSourceId),
-                  onTap: () => _showSourceProviderBottomSheet(context, ref, settingsState.currentSourceId),
+                  title: '資料來源模式',
+                  subtitle: settingsState.dataSourceMode.label,
+                  onTap: () => _showModeBottomSheet(context, ref, settingsState.dataSourceMode),
                 ),
-              if (settingsState.dataSourceMode == 'db')
+                if (settingsState.dataSourceMode == DataSourceMode.source)
+                  SettingsTile(
+                    icon: Icons.api_rounded,
+                    iconColor: AppColors.primary,
+                    title: '選擇漫畫來源',
+                    subtitle: _getProviderName(settingsState.currentSourceId),
+                    onTap: () => _showSourceProviderBottomSheet(context, ref, settingsState.currentSourceId),
+                  ),
+                if (settingsState.dataSourceMode == DataSourceMode.db)
+                  SettingsTile(
+                    icon: Icons.link,
+                    iconColor: AppColors.primary,
+                    title: '伺服器網址',
+                    subtitle: settingsState.serverUrl,
+                    onTap: () => _showUrlBottomSheet(context, ref, settingsState.serverUrl),
+                  ),
                 SettingsTile(
-                  icon: Icons.link,
+                  icon: Icons.dark_mode_rounded,
                   iconColor: AppColors.primary,
-                  title: '伺服器網址',
-                  subtitle: settingsState.serverUrl,
-                  onTap: () => _showUrlBottomSheet(context, ref, settingsState.serverUrl),
-                ),
-              SettingsTile(
-                icon: Icons.dark_mode_rounded,
-                iconColor: AppColors.primary,
-                title: '深色模式',
-                trailing: AppSwitch(
+                  title: '深色模式',
+                  trailing: AppSwitch(
                   value: settingsState.themeMode == ThemeMode.dark,
                   onChanged: (val) {
                     notifier.updateThemeMode(val ? ThemeMode.dark : ThemeMode.light);
@@ -103,22 +104,22 @@ class SettingsPage extends ConsumerWidget {
     );
   }
 
-  void _showModeBottomSheet(BuildContext context, WidgetRef ref, String currentMode) {
+  void _showModeBottomSheet(BuildContext context, WidgetRef ref, DataSourceMode currentMode) {
     AppBottomSheet.show(
       context: context,
-      title: '選擇資料來源',
+      title: '選擇資料來源模式',
       items: [
         AppBottomSheetItemData(
           title: 'Provider Source',
           subtitle: '直接透過 App 連線到各大漫畫源',
           leadingIcon: Icons.cloud_outlined,
-          value: 'source',
+          value: DataSourceMode.source,
         ),
         AppBottomSheetItemData(
           title: 'DB Server',
           subtitle: '從本地端 Library API 取得資料',
           leadingIcon: Icons.storage_outlined,
-          value: 'db',
+          value: DataSourceMode.db,
         ),
       ],
       selectedValue: currentMode,

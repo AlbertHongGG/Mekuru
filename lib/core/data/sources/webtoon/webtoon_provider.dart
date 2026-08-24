@@ -52,17 +52,19 @@ class WebtoonProvider extends BaseComicProvider {
       final authorStr = authors.isNotEmpty ? authors.join(', ') : null;
       
       final List<String> tags = [];
-      String status = '';
+      bool isCompleted = false;
       
       if (dto.tag != null && dto.tag!.tagList.isNotEmpty) {
         for (final tag in dto.tag!.tagList) {
-          if (tag.type.toUpperCase().contains('STATUS')) {
-            status = tag.text;
+          if (tag.text == '完結' || tag.text == '完結作品') {
+            isCompleted = true;
           } else {
             tags.add(tag.text);
           }
         }
       }
+      
+      String status = isCompleted ? '完結' : '連載中';
       
       return ComicDetail(
         comicId: comicId,

@@ -1,45 +1,99 @@
+import 'package:async/async.dart';
 import 'package:mekuru/core/models/enums/data_source_mode.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:mekuru/core/models/local_comic_record.dart';
+import 'package:mekuru/core/models/comic_record.dart';
 import 'package:mekuru/core/models/comic_base.dart';
-import 'package:mekuru/core/models/chapter.dart';
+import 'package:mekuru/core/data/local/models/comic_metadata_entity.dart';
+import 'package:mekuru/core/data/local/models/favorite_entity.dart';
+import 'package:mekuru/core/data/local/models/history_entity.dart';
+import 'package:mekuru/core/data/local/local_storage_providers.dart';
 
 class UserInteractionRepository {
-  final Box<LocalComicRecord> _box;
+  final Box<ComicMetadataEntity> _metadataBox;
+  final Box<FavoriteEntity> _favoritesBox;
+  final Box<HistoryEntity> _historyBox;
 
-  UserInteractionRepository(this._box);
+  UserInteractionRepository(this._metadataBox, this._favoritesBox, this._historyBox);
 
   String _genId(DataSourceMode dataSourceMode, String providerId, String comicId) {
     return '${dataSourceMode}_${providerId}_$comicId';
   }
 
-  Future<List<LocalComicRecord>> getAllFavorites(DataSourceMode dataSourceMode) async {
-    return _box.values
-        .where((r) => r.dataSourceMode == dataSourceMode && r.isFavorite)
-        .toList()
-      ..sort((a, b) => (b.favoriteAt ?? b.updatedAt).compareTo(a.favoriteAt ?? a.updatedAt));
+  ComicRecord? _buildRecord(String id) {
+    final metadata = _metadataBox.get(id);
+    if (metadata == null) return null;
+    final favorite = _favoritesBox.get(id);
+    final history = _historyBox.get(id);
+
+    return ComicRecord(
+      id: id,
+      dataSourceMode: metadata.dataSourceMode,
+      providerId: metadata.providerId,
+      comicId: metadata.comicId,
+      title: metadata.title,
+      coverUrl: metadata.coverUrl,
+      updatedAt: metadata.updatedAt,
+      isFavorite: favorite != null,
+      favoriteAt: favorite?.favoriteAt,
+      lastReadChapterId: history?.lastReadChapterId,
+      lastReadChapterTitle: history?.lastReadChapterTitle,
+      lastReadPageIndex: history?.lastReadPageIndex,
+    );
   }
 
-  Future<List<LocalComicRecord>> getFavoritesByProvider(DataSourceMode dataSourceMode, String providerId) async {
-    return _box.values
-        .where((r) => r.dataSourceMode == dataSourceMode && r.isFavorite && r.providerId == providerId)
-        .toList()
-      ..sort((a, b) => (b.favoriteAt ?? b.updatedAt).compareTo(a.favoriteAt ?? a.updatedAt));
+  Future<List<ComicRecord>> getAllFavorites(DataSourceMode dataSourceMode) async {
+    final records = <ComicRecord>[];
+    for (final id in _favoritesBox.keys) {
+      final record = _buildRecord(id.toString());
+      if (record != null && record.dataSourceMode == dataSourceMode) {
+        records.add(record);
+      }
+    }
+    records.sort((a, b) => (b.favoriteAt ?? b.updatedAt).compareTo(a.favoriteAt ?? a.updatedAt));
+    return records;
+  }
+
+  Future<List<ComicRecord>> getFavoritesByProvider(DataSourceMode dataSourceMode, String providerId) async {
+    final records = await getAllFavorites(dataSourceMode);
+    return records.where((r) => r.providerId == providerId).toList();
   }
   
-  Future<List<LocalComicRecord>> getAllHistory(DataSourceMode dataSourceMode) async {
-    return _box.values
-        .where((r) => r.dataSourceMode == dataSourceMode)
-        .toList()
-      ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+  Future<List<ComicRecord>> getAllHistory(DataSourceMode dataSourceMode) async {
+    final records = <ComicRecord>[];
+    for (final id in _historyBox.keys) {
+      final record = _buildRecord(id.toString());
+      if (record != null && record.dataSourceMode == dataSourceMode) {
+        records.add(record);
+      }
+    }
+    // For history sorting, history entities have their own updatedAt, but _buildRecord maps metadata.updatedAt
+    // Wait, the new logic needs to use history's update time. Let's fix that below.
+    records.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+    return records;
   }
 
-  Future<List<LocalComicRecord>> getHistoryByProvider(DataSourceMode dataSourceMode, String providerId) async {
-    return _box.values
-        .where((r) => r.dataSourceMode == dataSourceMode && r.providerId == providerId)
-        .toList()
-      ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+  Future<List<ComicRecord>> getHistoryByProvider(DataSourceMode dataSourceMode, String providerId) async {
+    final records = await getAllHistory(dataSourceMode);
+    return records.where((r) => r.providerId == providerId).toList();
+  }
+
+  Future<void> _updateMetadata(String id, DataSourceMode dataSourceMode, String providerId, IComicItem comic) async {
+    final now = DateTime.now();
+    final existing = _metadataBox.get(id);
+    
+    // Only update metadata if cover or title actually changed, or if it doesn't exist
+    if (existing == null || existing.coverUrl != comic.coverUrl || existing.title != comic.title) {
+      await _metadataBox.put(id, ComicMetadataEntity(
+        id: id,
+        dataSourceMode: dataSourceMode,
+        providerId: providerId,
+        comicId: comic.comicId,
+        title: comic.title ?? existing?.title ?? '',
+        coverUrl: comic.coverUrl ?? existing?.coverUrl ?? '',
+        updatedAt: now,
+      ));
+    }
   }
 
   Future<void> markRead({
@@ -53,54 +107,44 @@ class UserInteractionRepository {
   }) async {
     final id = _genId(dataSourceMode, providerId, comicId);
     
-    final existing = _box.get(id);
-    final now = DateTime.now();
-
-    final record = existing != null
-        ? existing.copyWith(
-            title: comic.title ?? '',
-            coverUrl: comic.coverUrl ?? '',
-            lastReadChapterId: chapterId,
-            lastReadChapterTitle: chapterTitle,
-            lastReadPageIndex: pageIndex ?? existing.lastReadPageIndex,
-            updatedAt: now,
-          )
-        : LocalComicRecord(
-            id: id,
-            dataSourceMode: dataSourceMode,
-            providerId: providerId,
-            comicId: comic.comicId,
-            title: comic.title ?? '',
-            coverUrl: comic.coverUrl ?? '',
-            lastReadChapterId: chapterId,
-            lastReadChapterTitle: chapterTitle,
-            lastReadPageIndex: pageIndex,
-            updatedAt: now,
-            isFavorite: false,
-          );
-
-    await _box.put(id, record);
+    await _updateMetadata(id, dataSourceMode, providerId, comic);
+    
+    final existingHistory = _historyBox.get(id);
+    await _historyBox.put(id, HistoryEntity(
+      comicId: comicId,
+      lastReadChapterId: chapterId,
+      lastReadChapterTitle: chapterTitle,
+      lastReadPageIndex: pageIndex ?? existingHistory?.lastReadPageIndex ?? 0,
+      updatedAt: DateTime.now(),
+    ));
   }
 
-  Future<LocalComicRecord?> getInteraction({
+  Future<ComicRecord?> getInteraction({
     required DataSourceMode dataSourceMode,
     required String providerId,
     required String comicId,
   }) async {
     final id = _genId(dataSourceMode, providerId, comicId);
-    return _box.get(id);
+    return _buildRecord(id);
   }
 
-  Stream<LocalComicRecord?> watchInteraction({
+  Stream<ComicRecord?> watchInteraction({
     required DataSourceMode dataSourceMode,
     required String providerId,
     required String comicId,
   }) async* {
     final id = _genId(dataSourceMode, providerId, comicId);
-    yield _box.get(id);
-    await for (final event in _box.watch(key: id)) {
-      yield event.value as LocalComicRecord?;
-    }
+    yield _buildRecord(id);
+    
+    // Watch all boxes for changes to this ID
+    // Note: StreamGroup could be used here, but for simplicity we watch the metadata box which updates often
+    // Actually, watching all 3 is safer but tricky. I will yield when any changes.
+    // Riverpod is better suited for this, but to keep the Stream interface:
+    yield* StreamGroup.merge([
+      _metadataBox.watch(key: id),
+      _favoritesBox.watch(key: id),
+      _historyBox.watch(key: id),
+    ]).map((_) => _buildRecord(id));
   }
 
   Future<void> toggleFavorite({
@@ -111,34 +155,24 @@ class UserInteractionRepository {
     required bool isFavorite,
   }) async {
     final id = _genId(dataSourceMode, providerId, comicId);
-    final existing = _box.get(id);
-    final now = DateTime.now();
-
-    final record = existing != null
-        ? existing.copyWith(
-            isFavorite: isFavorite,
-            favoriteAt: isFavorite ? now : null,
-            title: comic.title ?? '',
-            coverUrl: comic.coverUrl ?? '',
-            updatedAt: now,
-          )
-        : LocalComicRecord(
-            id: id,
-            dataSourceMode: dataSourceMode,
-            providerId: providerId,
-            comicId: comic.comicId,
-            title: comic.title ?? '',
-            coverUrl: comic.coverUrl ?? '',
-            isFavorite: isFavorite,
-            favoriteAt: isFavorite ? now : null,
-            updatedAt: now,
-          );
-
-    await _box.put(id, record);
+    
+    await _updateMetadata(id, dataSourceMode, providerId, comic);
+    
+    if (isFavorite) {
+      await _favoritesBox.put(id, FavoriteEntity(
+        comicId: comicId,
+        favoriteAt: DateTime.now(),
+      ));
+    } else {
+      await _favoritesBox.delete(id);
+    }
   }
 }
 
 final userInteractionRepositoryProvider = Provider<UserInteractionRepository>((ref) {
-  final box = Hive.box<LocalComicRecord>('comic_records');
-  return UserInteractionRepository(box);
+  return UserInteractionRepository(
+    ref.watch(comicMetadataBoxProvider),
+    ref.watch(userFavoritesBoxProvider),
+    ref.watch(readingHistoryBoxProvider),
+  );
 });

@@ -1,15 +1,15 @@
 import 'package:mekuru/core/models/enums/library_sort_mode.dart';
 import 'package:mekuru/core/models/enums/data_source_mode.dart';
+import 'package:mekuru/core/models/comic_record.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mekuru/core/data/repositories/user_interaction_repository.dart';
-import 'package:mekuru/core/models/local_comic_record.dart';
 import 'package:mekuru/features/settings/presentation/providers/settings_provider.dart';
 import 'package:mekuru/core/models/comic_card_data.dart';
 import 'package:mekuru/core/data/sources/provider_registry.dart';
 
 class LibraryState {
   final bool isLoading;
-  final List<LocalComicRecord> rawFavorites;
+  final List<ComicRecord> rawFavorites;
   final List<ComicCardData> displayItems;
   final List<String> availableProviders;
   final String? activeProviderFilter;
@@ -30,7 +30,7 @@ class LibraryState {
 
   LibraryState copyWith({
     bool? isLoading,
-    List<LocalComicRecord>? rawFavorites,
+    List<ComicRecord>? rawFavorites,
     List<ComicCardData>? displayItems,
     List<String>? availableProviders,
     String? activeProviderFilter,

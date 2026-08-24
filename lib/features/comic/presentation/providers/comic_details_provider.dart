@@ -5,7 +5,7 @@ import 'package:mekuru/core/data/repositories/user_interaction_repository.dart';
 import 'package:mekuru/core/models/comic_models.dart';
 import 'package:mekuru/core/models/chapter.dart';
 import 'package:mekuru/core/notifications/presentation/controllers/notification_controller.dart';
-import 'package:mekuru/core/models/local_comic_record.dart';
+import 'package:mekuru/core/models/comic_record.dart';
 import 'package:mekuru/core/models/paginated_result.dart';
 import 'package:mekuru/features/library/presentation/providers/library_provider.dart';
 import 'package:mekuru/features/settings/presentation/providers/settings_provider.dart';
@@ -15,7 +15,7 @@ class ComicDetailsState {
   final bool isLoading;
   final ComicDetail? comic;
   final List<Chapter> chapters;
-  final LocalComicRecord? interaction;
+  final ComicRecord? interaction;
   final String? error;
   final bool isChapterSortDescending;
 
@@ -32,7 +32,7 @@ class ComicDetailsState {
     bool? isLoading,
     ComicDetail? comic,
     List<Chapter>? chapters,
-    LocalComicRecord? interaction,
+    ComicRecord? interaction,
     String? error,
     bool? isChapterSortDescending,
   }) {

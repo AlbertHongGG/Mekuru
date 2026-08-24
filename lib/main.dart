@@ -15,23 +15,11 @@ import 'package:mekuru/features/viewer/presentation/pages/comic_viewer_page.dart
 import 'package:mekuru/core/notifications/presentation/widgets/global_notification_overlay.dart';
 
 
-import 'package:mekuru/core/models/enums/data_source_mode.dart';
+import 'package:mekuru/core/data/local/database_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Hive.initFlutter();
-  Hive.registerAdapter(LocalComicRecordAdapter());
-  await Hive.openBox('settings');
-  await Hive.openBox('tags');
-  
-  try {
-    await Hive.openBox<LocalComicRecord>('comic_records');
-  } catch (e) {
-    print('Failed to open comic_records box, deleting to start fresh: $e');
-    await Hive.deleteBoxFromDisk('comic_records');
-    await Hive.openBox<LocalComicRecord>('comic_records');
-  }
-
+  await DatabaseManager.init();
   runApp(const ProviderScope(child: MekuruApp()));
 }
 

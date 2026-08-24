@@ -45,32 +45,9 @@ class BackupSection extends ConsumerWidget {
           title: '匯入備份',
           subtitle: '從備份檔還原資料 (將覆寫現有資料)',
           trailing: isImporting ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.chevron_right, color: Colors.grey),
-          onTap: isLoading ? null : () => _confirmImport(context, notifier),
+          onTap: isLoading ? null : () => notifier.importBackup(),
         ),
       ],
-    );
-  }
-
-  void _confirmImport(BuildContext context, BackupNotifier notifier) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('確認還原'),
-        content: const Text('這將會清空您目前的書庫與歷史紀錄，並完全被備份檔覆寫。您確定要繼續嗎？'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('取消'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              notifier.importBackup();
-            },
-            child: const Text('確定還原', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
     );
   }
 }

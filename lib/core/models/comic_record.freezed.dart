@@ -217,8 +217,8 @@ return $default(_that.id,_that.dataSourceMode,_that.providerId,_that.comicId,_th
 /// @nodoc
 
 
-class _ComicRecord implements ComicRecord {
-  const _ComicRecord({required this.id, required this.dataSourceMode, required this.providerId, required this.comicId, required this.title, required this.coverUrl, this.isFavorite = false, this.lastReadChapterId, this.lastReadChapterTitle, this.lastReadPageIndex, required this.updatedAt, this.favoriteAt});
+class _ComicRecord extends ComicRecord {
+  const _ComicRecord({required this.id, required this.dataSourceMode, required this.providerId, required this.comicId, required this.title, required this.coverUrl, this.isFavorite = false, this.lastReadChapterId, this.lastReadChapterTitle, this.lastReadPageIndex, required this.updatedAt, this.favoriteAt}): super._();
   
 
 @override final  String id;

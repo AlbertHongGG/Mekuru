@@ -1,10 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mekuru/features/logger/domain/models/log_entry.dart';
 import 'package:mekuru/features/logger/domain/repositories/i_logger_repository.dart';
+import 'package:mekuru/core/data/local/local_storage_providers.dart';
 import 'package:mekuru/features/logger/data/repositories/logger_repository_impl.dart';
 
 final loggerRepositoryProvider = Provider<ILoggerRepository>((ref) {
-  return LoggerRepositoryImpl();
+  return LoggerRepositoryImpl(
+    apiBox: ref.watch(apiLogsBoxProvider),
+    systemBox: ref.watch(systemLogsBoxProvider),
+  );
 });
 
 class LoggerNotifier extends StateNotifier<AsyncValue<List<LogEntry>>> {

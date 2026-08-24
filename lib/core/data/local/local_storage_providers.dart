@@ -1,34 +1,38 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:mekuru/core/data/local/database_manager.dart';
+import 'package:mekuru/core/data/local/i_local_storage.dart';
+import 'package:mekuru/core/data/local/hive_local_storage.dart';
 import 'package:mekuru/core/data/local/models/comic_metadata_entity.dart';
 import 'package:mekuru/core/data/local/models/favorite_entity.dart';
 import 'package:mekuru/core/data/local/models/history_entity.dart';
 
-final settingsBoxProvider = Provider<Box<dynamic>>((ref) {
-  return Hive.box<dynamic>(DatabaseManager.boxSettings);
+import 'package:mekuru/features/logger/domain/models/log_entry.dart';
+
+final settingsBoxProvider = Provider<ILocalStorage<dynamic>>((ref) {
+  return HiveLocalStorage<dynamic>(Hive.box<dynamic>(DatabaseManager.boxSettings));
 });
 
-final tagsBoxProvider = Provider<Box<dynamic>>((ref) {
-  return Hive.box<dynamic>(DatabaseManager.boxTags);
+final tagsBoxProvider = Provider<ILocalStorage<dynamic>>((ref) {
+  return HiveLocalStorage<dynamic>(Hive.box<dynamic>(DatabaseManager.boxTags));
 });
 
-final comicMetadataBoxProvider = Provider<Box<ComicMetadataEntity>>((ref) {
-  return Hive.box<ComicMetadataEntity>(DatabaseManager.boxComicMetadata);
+final comicMetadataBoxProvider = Provider<ILocalStorage<ComicMetadataEntity>>((ref) {
+  return HiveLocalStorage<ComicMetadataEntity>(Hive.box<ComicMetadataEntity>(DatabaseManager.boxComicMetadata));
 });
 
-final userFavoritesBoxProvider = Provider<Box<FavoriteEntity>>((ref) {
-  return Hive.box<FavoriteEntity>(DatabaseManager.boxUserFavorites);
+final userFavoritesBoxProvider = Provider<ILocalStorage<FavoriteEntity>>((ref) {
+  return HiveLocalStorage<FavoriteEntity>(Hive.box<FavoriteEntity>(DatabaseManager.boxUserFavorites));
 });
 
-final readingHistoryBoxProvider = Provider<Box<HistoryEntity>>((ref) {
-  return Hive.box<HistoryEntity>(DatabaseManager.boxReadingHistory);
+final readingHistoryBoxProvider = Provider<ILocalStorage<HistoryEntity>>((ref) {
+  return HiveLocalStorage<HistoryEntity>(Hive.box<HistoryEntity>(DatabaseManager.boxReadingHistory));
 });
 
-final systemLogsBoxProvider = Provider<Box<dynamic>>((ref) {
-  return Hive.box<dynamic>(DatabaseManager.boxSystemLogs);
+final systemLogsBoxProvider = Provider<ILocalStorage<LogEntry>>((ref) {
+  return HiveLocalStorage<LogEntry>(Hive.box<LogEntry>(DatabaseManager.boxSystemLogs));
 });
 
-final apiLogsBoxProvider = Provider<Box<dynamic>>((ref) {
-  return Hive.box<dynamic>(DatabaseManager.boxApiLogs);
+final apiLogsBoxProvider = Provider<ILocalStorage<LogEntry>>((ref) {
+  return HiveLocalStorage<LogEntry>(Hive.box<LogEntry>(DatabaseManager.boxApiLogs));
 });

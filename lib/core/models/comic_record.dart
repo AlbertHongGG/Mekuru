@@ -5,7 +5,9 @@ import 'package:mekuru/core/models/comic_base.dart';
 part 'comic_record.freezed.dart';
 
 @freezed
-class ComicRecord with _$ComicRecord implements IComicItem {
+abstract class ComicRecord with _$ComicRecord implements IComicItem {
+  const ComicRecord._();
+
   const factory ComicRecord({
     required String id,
     required DataSourceMode dataSourceMode,

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:mekuru/core/data/local/models/comic_metadata_entity.dart';
 import 'package:mekuru/core/data/local/models/favorite_entity.dart';
@@ -118,7 +119,11 @@ class ApiLogEntryAdapter extends TypeAdapter<ApiLogEntry> {
       method: reader.readString(),
       url: reader.readString(),
       timestamp: DateTime.fromMillisecondsSinceEpoch(reader.readInt()),
+      requestHeaders: Map<String, dynamic>.from(jsonDecode(reader.readString())),
+      requestBody: jsonDecode(reader.readString()),
       statusCode: reader.readBool() ? reader.readInt() : null,
+      responseHeaders: reader.readBool() ? Map<String, dynamic>.from(jsonDecode(reader.readString())) : null,
+      responseBody: reader.readBool() ? jsonDecode(reader.readString()) : null,
       responseTime: reader.readBool() ? DateTime.fromMillisecondsSinceEpoch(reader.readInt()) : null,
       error: reader.readBool() ? reader.readString() : null,
     );
@@ -131,8 +136,16 @@ class ApiLogEntryAdapter extends TypeAdapter<ApiLogEntry> {
       ..writeString(obj.method)
       ..writeString(obj.url)
       ..writeInt(obj.timestamp.millisecondsSinceEpoch)
+      ..writeString(jsonEncode(obj.requestHeaders))
+      ..writeString(jsonEncode(obj.requestBody))
       ..writeBool(obj.statusCode != null);
     if (obj.statusCode != null) writer.writeInt(obj.statusCode!);
+
+    writer.writeBool(obj.responseHeaders != null);
+    if (obj.responseHeaders != null) writer.writeString(jsonEncode(obj.responseHeaders));
+
+    writer.writeBool(obj.responseBody != null);
+    if (obj.responseBody != null) writer.writeString(jsonEncode(obj.responseBody));
 
     writer.writeBool(obj.responseTime != null);
     if (obj.responseTime != null) writer.writeInt(obj.responseTime!.millisecondsSinceEpoch);
@@ -152,6 +165,7 @@ class SystemLogEntryAdapter extends TypeAdapter<SystemLogEntry> {
       id: reader.readString(),
       eventType: reader.readString(),
       timestamp: DateTime.fromMillisecondsSinceEpoch(reader.readInt()),
+      data: jsonDecode(reader.readString()),
     );
   }
 
@@ -160,6 +174,7 @@ class SystemLogEntryAdapter extends TypeAdapter<SystemLogEntry> {
     writer
       ..writeString(obj.id)
       ..writeString(obj.eventType)
-      ..writeInt(obj.timestamp.millisecondsSinceEpoch);
+      ..writeInt(obj.timestamp.millisecondsSinceEpoch)
+      ..writeString(jsonEncode(obj.data));
   }
 }

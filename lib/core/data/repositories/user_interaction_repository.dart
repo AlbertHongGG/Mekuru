@@ -1,7 +1,7 @@
 import 'package:async/async.dart';
 import 'package:mekuru/core/models/enums/data_source_mode.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:mekuru/core/data/local/i_local_storage.dart';
 import 'package:mekuru/core/models/comic_record.dart';
 import 'package:mekuru/core/models/comic_base.dart';
 import 'package:mekuru/core/data/local/models/comic_metadata_entity.dart';
@@ -10,9 +10,9 @@ import 'package:mekuru/core/data/local/models/history_entity.dart';
 import 'package:mekuru/core/data/local/local_storage_providers.dart';
 
 class UserInteractionRepository {
-  final Box<ComicMetadataEntity> _metadataBox;
-  final Box<FavoriteEntity> _favoritesBox;
-  final Box<HistoryEntity> _historyBox;
+  final ILocalStorage<ComicMetadataEntity> _metadataBox;
+  final ILocalStorage<FavoriteEntity> _favoritesBox;
+  final ILocalStorage<HistoryEntity> _historyBox;
 
   UserInteractionRepository(this._metadataBox, this._favoritesBox, this._historyBox);
 
@@ -45,7 +45,7 @@ class UserInteractionRepository {
   Future<List<ComicRecord>> getAllFavorites(DataSourceMode dataSourceMode) async {
     final records = <ComicRecord>[];
     for (final id in _favoritesBox.keys) {
-      final record = _buildRecord(id.toString());
+      final record = _buildRecord(id);
       if (record != null && record.dataSourceMode == dataSourceMode) {
         records.add(record);
       }
@@ -62,13 +62,11 @@ class UserInteractionRepository {
   Future<List<ComicRecord>> getAllHistory(DataSourceMode dataSourceMode) async {
     final records = <ComicRecord>[];
     for (final id in _historyBox.keys) {
-      final record = _buildRecord(id.toString());
+      final record = _buildRecord(id);
       if (record != null && record.dataSourceMode == dataSourceMode) {
         records.add(record);
       }
     }
-    // For history sorting, history entities have their own updatedAt, but _buildRecord maps metadata.updatedAt
-    // Wait, the new logic needs to use history's update time. Let's fix that below.
     records.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
     return records;
   }
@@ -141,9 +139,9 @@ class UserInteractionRepository {
     // Actually, watching all 3 is safer but tricky. I will yield when any changes.
     // Riverpod is better suited for this, but to keep the Stream interface:
     yield* StreamGroup.merge([
-      _metadataBox.watch(key: id),
-      _favoritesBox.watch(key: id),
-      _historyBox.watch(key: id),
+      _metadataBox.watch(id),
+      _favoritesBox.watch(id),
+      _historyBox.watch(id),
     ]).map((_) => _buildRecord(id));
   }
 

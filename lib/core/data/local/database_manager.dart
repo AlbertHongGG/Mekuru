@@ -1,6 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:mekuru/core/data/local/hive_adapters.dart';
+import 'package:mekuru/core/data/local/models/comic_metadata_entity.dart';
+import 'package:mekuru/core/data/local/models/favorite_entity.dart';
+import 'package:mekuru/core/data/local/models/history_entity.dart';
+import 'package:mekuru/features/logger/domain/models/log_entry.dart';
 
 class DatabaseManager {
   static const String boxSettings = 'box_settings';
@@ -20,11 +24,11 @@ class DatabaseManager {
     // Safely open all required boxes
     await _safeOpenBox<dynamic>(boxSettings);
     await _safeOpenBox<dynamic>(boxTags);
-    await _safeOpenBox<dynamic>(boxComicMetadata);
-    await _safeOpenBox<dynamic>(boxUserFavorites);
-    await _safeOpenBox<dynamic>(boxReadingHistory);
-    await _safeOpenBox<dynamic>(boxSystemLogs);
-    await _safeOpenBox<dynamic>(boxApiLogs);
+    await _safeOpenBox<ComicMetadataEntity>(boxComicMetadata);
+    await _safeOpenBox<FavoriteEntity>(boxUserFavorites);
+    await _safeOpenBox<HistoryEntity>(boxReadingHistory);
+    await _safeOpenBox<LogEntry>(boxSystemLogs);
+    await _safeOpenBox<LogEntry>(boxApiLogs);
   }
 
   static Future<void> _safeOpenBox<T>(String boxName) async {

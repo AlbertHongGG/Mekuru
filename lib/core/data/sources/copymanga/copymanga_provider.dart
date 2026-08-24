@@ -99,6 +99,10 @@ class CopymangaProvider extends BaseComicProvider {
         offset += limit;
       }
       
+      // Copymanga default is ascending. Reverse it if descending is requested.
+      if (isDescending) {
+        return chapters.reversed.toList();
+      }
       return chapters;
     });
   }

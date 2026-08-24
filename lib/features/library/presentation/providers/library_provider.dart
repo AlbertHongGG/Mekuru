@@ -116,7 +116,11 @@ class LibraryNotifier extends Notifier<LibraryState> {
         final timeA = a.favoriteAt ?? a.updatedAt;
         final timeB = b.favoriteAt ?? b.updatedAt;
         return timeB.compareTo(timeA);
-      } else if (state.sortMode == LibrarySortMode.read || state.sortMode == LibrarySortMode.updated) {
+      } else if (state.sortMode == LibrarySortMode.read) {
+        final timeA = a.readAt ?? a.updatedAt;
+        final timeB = b.readAt ?? b.updatedAt;
+        return timeB.compareTo(timeA);
+      } else if (state.sortMode == LibrarySortMode.updated) {
         final timeA = a.updatedAt;
         final timeB = b.updatedAt;
         return timeB.compareTo(timeA);

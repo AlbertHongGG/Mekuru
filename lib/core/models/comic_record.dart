@@ -21,5 +21,6 @@ abstract class ComicRecord with _$ComicRecord implements IComicItem {
     int? lastReadPageIndex,
     required DateTime updatedAt,
     DateTime? favoriteAt,
+    DateTime? readAt,
   }) = _ComicRecord;
 }

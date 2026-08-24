@@ -88,7 +88,7 @@ class ComicWifiProvider extends BaseComicProvider {
         comicId, 
         1, 
         pageSize: pageSize, 
-        order: isDescending ? 'desc' : 'asc'
+        order: 'asc', // ALWAYS fetch ascending first
       );
       final List<Chapter> chapters = [];
       for (int i = 0; i < rawList.chapters.length; i++) {
@@ -98,6 +98,10 @@ class ComicWifiProvider extends BaseComicProvider {
           title: ch.chapterName ?? 'Chapter ${i + 1}',
           publishedAt: ch.createTime ?? '',
         ));
+      }
+      
+      if (isDescending) {
+        return chapters.reversed.toList();
       }
       return chapters;
     });

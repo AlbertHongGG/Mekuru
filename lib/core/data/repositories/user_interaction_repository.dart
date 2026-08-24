@@ -39,6 +39,7 @@ class UserInteractionRepository {
       lastReadChapterId: history?.lastReadChapterId,
       lastReadChapterTitle: history?.lastReadChapterTitle,
       lastReadPageIndex: history?.lastReadPageIndex,
+      readAt: history?.updatedAt,
     );
   }
 

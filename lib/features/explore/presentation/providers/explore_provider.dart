@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:mekuru/core/data/local/i_local_storage.dart';
+import 'package:mekuru/core/data/local/local_storage_providers.dart';
 import 'package:mekuru/core/data/providers/repository_providers.dart';
 import 'package:mekuru/core/notifications/presentation/controllers/notification_controller.dart';
 import 'package:mekuru/core/models/comic_card_data.dart';
@@ -53,7 +54,7 @@ class ExploreState {
 }
 
 class ExploreNotifier extends AutoDisposeFamilyNotifier<ExploreState, String> {
-  late Box _tagsBox;
+  late ILocalStorage<dynamic> _tagsBox;
 
   String get _knownTagsKey => '${arg}_knownTags';
   String get _activeTagsKey => '${arg}_activeTags';
@@ -61,11 +62,11 @@ class ExploreNotifier extends AutoDisposeFamilyNotifier<ExploreState, String> {
 
   @override
   ExploreState build(String arg) {
-    _tagsBox = Hive.box('tags');
+    _tagsBox = ref.watch(tagsBoxProvider);
     
-    final List<String> loadedKnownTags = _tagsBox.get(_knownTagsKey, defaultValue: <String>[])?.cast<String>();
-    final List<String> loadedActiveTags = _tagsBox.get(_activeTagsKey, defaultValue: <String>[])?.cast<String>();
-    final bool loadedExcludeMode = _tagsBox.get(_isExcludeModeKey, defaultValue: false);
+    final List<String> loadedKnownTags = (_tagsBox.get(_knownTagsKey) as List?)?.cast<String>() ?? <String>[];
+    final List<String> loadedActiveTags = (_tagsBox.get(_activeTagsKey) as List?)?.cast<String>() ?? <String>[];
+    final bool loadedExcludeMode = _tagsBox.get(_isExcludeModeKey) as bool? ?? false;
 
     Future.microtask(() => loadExplore());
     return ExploreState(

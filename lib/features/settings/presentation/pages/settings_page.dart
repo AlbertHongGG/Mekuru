@@ -70,7 +70,7 @@ class SettingsPage extends ConsumerWidget {
                   trailing: AppSwitch(
                   value: settingsState.themeMode == ThemeMode.dark,
                   onChanged: (val) {
-                    notifier.updateThemeMode(val ? ThemeMode.dark : ThemeMode.light);
+                    notifier.updateTheme(val ? ThemeMode.dark : ThemeMode.light);
                   },
                 ),
               ),

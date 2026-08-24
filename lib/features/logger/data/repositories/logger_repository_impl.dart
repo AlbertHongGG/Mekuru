@@ -44,6 +44,16 @@ class LoggerRepositoryImpl implements ILoggerRepository {
     }
   }
 
+  @override
+  Future<void> deleteLog(String id, {String? type}) async {
+    if (type == null || type == 'api') {
+      await apiBox.delete(id);
+    }
+    if (type == null || type == 'system') {
+      await systemBox.delete(id);
+    }
+  }
+
   Future<void> _enforceRetentionPolicy(ILocalStorage<LogEntry> box) async {
     final allValues = box.getAll();
     if (allValues.length <= maxLogs) return;

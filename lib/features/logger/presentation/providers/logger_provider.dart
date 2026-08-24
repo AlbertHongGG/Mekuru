@@ -33,6 +33,11 @@ class LoggerNotifier extends StateNotifier<AsyncValue<List<LogEntry>>> {
     await repository.clearLogs(type: filterType);
     await loadLogs();
   }
+
+  Future<void> removeLog(String id) async {
+    await repository.deleteLog(id, type: filterType);
+    await loadLogs();
+  }
 }
 
 final apiLogsProvider = StateNotifierProvider<LoggerNotifier, AsyncValue<List<LogEntry>>>((ref) {

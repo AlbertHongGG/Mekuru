@@ -9,4 +9,7 @@ abstract class ILoggerRepository {
 
   /// Clear logs, optionally filtered by type string
   Future<void> clearLogs({String? type});
+
+  /// Delete a specific log by id
+  Future<void> deleteLog(String id, {String? type});
 }

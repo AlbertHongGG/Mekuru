@@ -11,7 +11,8 @@ import 'package:mekuru/core/widgets/premium_config_header.dart';
 import 'package:mekuru/core/widgets/app_switch.dart';
 import 'package:mekuru/core/widgets/app_bottom_sheet.dart';
 import 'package:mekuru/core/data/sources/provider_registry.dart';
-import 'package:mekuru/features/logger/presentation/pages/logger_dashboard_page.dart';
+import 'package:mekuru/core/notifications/presentation/screens/system_log_viewer_screen.dart';
+import 'package:mekuru/core/network/presentation/pages/api_log_list_page.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
@@ -75,13 +76,24 @@ class SettingsPage extends ConsumerWidget {
                 ),
               ),
               SettingsTile(
-                icon: Icons.developer_board_rounded,
+                icon: Icons.history_rounded,
                 iconColor: AppColors.primary,
-                title: 'DevTools (Logs)',
+                title: 'APP 系統日誌',
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const LoggerDashboardPage()),
+                    MaterialPageRoute(builder: (context) => const SystemLogViewerScreen()),
+                  );
+                },
+              ),
+              SettingsTile(
+                icon: Icons.network_ping_rounded,
+                iconColor: AppColors.primary,
+                title: 'API 網路日誌',
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const ApiLogListPage()),
                   );
                 },
               ),

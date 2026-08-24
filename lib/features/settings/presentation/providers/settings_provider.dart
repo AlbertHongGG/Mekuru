@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mekuru/core/models/enums/data_source_mode.dart';
 import 'package:mekuru/core/data/local/i_local_storage.dart';
 import 'package:mekuru/core/data/local/local_storage_providers.dart';
+import 'package:mekuru/core/data/sources/provider_registry.dart';
 
 class SettingsState {
   final ThemeMode themeMode;
@@ -49,7 +50,8 @@ class SettingsNotifier extends Notifier<SettingsState> {
     final modeStr = _settingsBox.get('dataSourceMode') as String? ?? 'source';
     final mode = DataSourceModeExtension.fromString(modeStr);
     
-    final sourceId = _settingsBox.get('currentSourceId') as String? ?? 'mangadex';
+    final defaultProviderId = providerRegistry.getAllProviders().firstOrNull?.providerId ?? 'comicwifi';
+    final sourceId = _settingsBox.get('currentSourceId') as String? ?? defaultProviderId;
 
     return SettingsState(
       themeMode: theme, 

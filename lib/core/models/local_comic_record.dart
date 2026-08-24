@@ -11,20 +11,19 @@ part 'local_comic_record.g.dart';
 abstract class LocalComicRecord extends HiveObject with _$LocalComicRecord implements IComicItem {
   LocalComicRecord._();
 
-  @HiveType(typeId: 0)
   factory LocalComicRecord({
-    @HiveField(0) required String id,
-    @HiveField(1) required DataSourceMode dataSourceMode,
-    @HiveField(2) required String providerId,
-    @HiveField(3) required String comicId,
-    @HiveField(4) required String title,
-    @HiveField(5) required String coverUrl,
-    @HiveField(6) @Default(false) bool isFavorite,
-    @HiveField(7) String? lastReadChapterId,
-    @HiveField(8) String? lastReadChapterTitle,
-    @HiveField(9) int? lastReadPageIndex,
-    @HiveField(10) required DateTime updatedAt,
-    @HiveField(11) DateTime? favoriteAt,
+    required String id,
+    required DataSourceMode dataSourceMode,
+    required String providerId,
+    required String comicId,
+    required String title,
+    required String coverUrl,
+    @Default(false) bool isFavorite,
+    String? lastReadChapterId,
+    String? lastReadChapterTitle,
+    int? lastReadPageIndex,
+    required DateTime updatedAt,
+    DateTime? favoriteAt,
   }) = _LocalComicRecord;
 
   factory LocalComicRecord.fromJson(Map<String, dynamic> json) => 
@@ -74,7 +73,7 @@ class LocalComicRecordAdapter extends TypeAdapter<LocalComicRecord> {
       ..writeByte(7)..write(obj.lastReadChapterId)
       ..writeByte(8)..write(obj.lastReadChapterTitle)
       ..writeByte(9)..write(obj.lastReadPageIndex)
-      ..writeByte(10)..write(obj.updatedAt)
+      ..writeByte(10)..write(obj.updatedAt.millisecondsSinceEpoch)
       ..writeByte(11)..write(obj.favoriteAt?.millisecondsSinceEpoch);
   }
 }

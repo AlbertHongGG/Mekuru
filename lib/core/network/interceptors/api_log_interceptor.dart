@@ -1,27 +1,30 @@
-﻿import 'package:dio/dio.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/api_log_entry.dart';
-import '../providers/api_logger_provider.dart';
+import 'package:mekuru/features/logger/domain/models/log_entry.dart';
+import 'package:mekuru/features/logger/domain/repositories/i_logger_repository.dart';
+import 'package:uuid/uuid.dart';
 
 class ApiLogInterceptor extends Interceptor {
+  final ProviderListenable<ILoggerRepository> loggerRepositoryProvider;
   final Ref ref;
 
-  ApiLogInterceptor(this.ref);
+  ApiLogInterceptor(this.ref, this.loggerRepositoryProvider);
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    final entry = ApiLogEntry(
+    final entry = LogEntry.api(
+      id: const Uuid().v4(),
       method: options.method,
       url: options.uri.toString(),
       requestHeaders: options.headers,
       requestBody: options.data,
-      requestTime: DateTime.now(),
+      timestamp: DateTime.now(),
     );
 
-    // Save ID in extra to retrieve it in response
-    options.extra['api_log_id'] = entry.id;
+    // Save entire entry in extra to retrieve it in response
+    options.extra['api_log_entry'] = entry;
     
-    ref.read(apiLoggerProvider.notifier).addLog(entry);
+    ref.read(loggerRepositoryProvider).log(entry);
     
     super.onRequest(options, handler);
   }
@@ -39,14 +42,9 @@ class ApiLogInterceptor extends Interceptor {
   }
 
   void _updateLog(RequestOptions options, Response? response, {String? error}) {
-    final id = options.extra['api_log_id'] as String?;
-    if (id == null) return;
+    final existingLog = options.extra['api_log_entry'] as LogEntry?;
+    if (existingLog == null || existingLog is! ApiLogEntry) return;
 
-    final logs = ref.read(apiLoggerProvider);
-    final existingLogIndex = logs.indexWhere((l) => l.id == id);
-    if (existingLogIndex == -1) return;
-
-    final existingLog = logs[existingLogIndex];
     final updatedLog = existingLog.copyWith(
       statusCode: response?.statusCode,
       responseHeaders: response?.headers.map,
@@ -55,6 +53,7 @@ class ApiLogInterceptor extends Interceptor {
       error: error,
     );
 
-    ref.read(apiLoggerProvider.notifier).updateLog(updatedLog);
+    ref.read(loggerRepositoryProvider).log(updatedLog);
   }
 }
+

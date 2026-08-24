@@ -1,15 +1,24 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mekuru/features/logger/domain/models/log_entry.dart';
+import 'package:mekuru/features/logger/presentation/providers/logger_provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:mekuru/core/notifications/models/app_notification.dart';
-import 'package:mekuru/core/notifications/infrastructure/notification_logger.dart';
 
 class NotificationController extends Notifier<List<AppNotification>> {
-  final NotificationLogger _logger = NotificationLogger();
-
   @override
   List<AppNotification> build() {
     return [];
+  }
+
+  void _logNotification(String type, String message) {
+    final entry = LogEntry.system(
+      id: const Uuid().v4(),
+      timestamp: DateTime.now(),
+      eventType: 'notification',
+      data: {'type': type, 'message': message},
+    );
+    ref.read(loggerRepositoryProvider).log(entry);
   }
 
   void _addNotification(AppNotification notification) {
@@ -30,7 +39,7 @@ class NotificationController extends Notifier<List<AppNotification>> {
   }
 
   void showSuccess(String message, {Duration duration = const Duration(seconds: 4)}) {
-    _logger.logNotification('success', message);
+    _logNotification('success', message);
     _addNotification(AppNotification(
       id: const Uuid().v4(),
       type: NotificationType.success,
@@ -40,7 +49,7 @@ class NotificationController extends Notifier<List<AppNotification>> {
   }
 
   void showError(String message, {Duration duration = const Duration(seconds: 5)}) {
-    _logger.logNotification('error', message);
+    _logNotification('error', message);
     _addNotification(AppNotification(
       id: const Uuid().v4(),
       type: NotificationType.error,
@@ -50,7 +59,7 @@ class NotificationController extends Notifier<List<AppNotification>> {
   }
 
   void showWarning(String message, {Duration duration = const Duration(seconds: 4)}) {
-    _logger.logNotification('warning', message);
+    _logNotification('warning', message);
     _addNotification(AppNotification(
       id: const Uuid().v4(),
       type: NotificationType.warning,
@@ -60,7 +69,7 @@ class NotificationController extends Notifier<List<AppNotification>> {
   }
 
   void showInfo(String message, {Duration duration = const Duration(seconds: 4)}) {
-    _logger.logNotification('info', message);
+    _logNotification('info', message);
     _addNotification(AppNotification(
       id: const Uuid().v4(),
       type: NotificationType.info,

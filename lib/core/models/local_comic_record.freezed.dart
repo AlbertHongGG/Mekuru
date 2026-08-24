@@ -219,7 +219,7 @@ return $default(_that.id,_that.dataSourceMode,_that.providerId,_that.comicId,_th
 
 /// @nodoc
 @JsonSerializable()
-@HiveType(typeId: 0)
+
 class _LocalComicRecord extends LocalComicRecord {
    _LocalComicRecord({@HiveField(0) required this.id, @HiveField(1) required this.dataSourceMode, @HiveField(2) required this.providerId, @HiveField(3) required this.comicId, @HiveField(4) required this.title, @HiveField(5) required this.coverUrl, @HiveField(6) this.isFavorite = false, @HiveField(7) this.lastReadChapterId, @HiveField(8) this.lastReadChapterTitle, @HiveField(9) this.lastReadPageIndex, @HiveField(10) required this.updatedAt, @HiveField(11) this.favoriteAt}): super._();
   factory _LocalComicRecord.fromJson(Map<String, dynamic> json) => _$LocalComicRecordFromJson(json);

@@ -1,0 +1,40 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mekuru/features/logger/domain/models/log_entry.dart';
+import 'package:mekuru/features/logger/domain/repositories/i_logger_repository.dart';
+import 'package:mekuru/features/logger/data/repositories/logger_repository_impl.dart';
+
+final loggerRepositoryProvider = Provider<ILoggerRepository>((ref) {
+  return LoggerRepositoryImpl();
+});
+
+class LoggerNotifier extends StateNotifier<AsyncValue<List<LogEntry>>> {
+  final ILoggerRepository repository;
+  final String? filterType;
+
+  LoggerNotifier(this.repository, {this.filterType}) : super(const AsyncValue.loading()) {
+    loadLogs();
+  }
+
+  Future<void> loadLogs() async {
+    state = const AsyncValue.loading();
+    try {
+      final logs = await repository.getLogs(type: filterType);
+      state = AsyncValue.data(logs);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
+
+  Future<void> clearLogs() async {
+    await repository.clearLogs(type: filterType);
+    await loadLogs();
+  }
+}
+
+final apiLogsProvider = StateNotifierProvider<LoggerNotifier, AsyncValue<List<LogEntry>>>((ref) {
+  return LoggerNotifier(ref.watch(loggerRepositoryProvider), filterType: 'api');
+});
+
+final systemLogsProvider = StateNotifierProvider<LoggerNotifier, AsyncValue<List<LogEntry>>>((ref) {
+  return LoggerNotifier(ref.watch(loggerRepositoryProvider), filterType: 'system');
+});

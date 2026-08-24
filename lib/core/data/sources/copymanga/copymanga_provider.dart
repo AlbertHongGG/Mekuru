@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:mekuru/core/error/result.dart';
 import 'package:mekuru/core/error/failures.dart';
 import 'package:mekuru/core/data/sources/base_comic_provider.dart';
@@ -10,6 +9,8 @@ import 'package:mekuru/core/models/chapter.dart';
 import 'package:mekuru/core/models/page.dart';
 import 'package:mekuru/core/models/paginated_result.dart';
 
+import 'package:mekuru/core/network/api_client.dart';
+
 class CopymangaProvider extends BaseComicProvider {
   static const String _id = 'copymanga';
   static const String _name = 'Copymanga';
@@ -17,14 +18,8 @@ class CopymangaProvider extends BaseComicProvider {
   late final CopymangaApiClient _apiClient;
   final CopymangaSigner _signer;
 
-  CopymangaProvider() : _signer = CopymangaSigner() {
-    final dio = Dio(
-      BaseOptions(
-        baseUrl: 'https://api.copy202601.com/api/v3',
-        connectTimeout: const Duration(seconds: 15),
-        receiveTimeout: const Duration(seconds: 15),
-      ),
-    );
+  CopymangaProvider(ApiClient apiClient) : _signer = CopymangaSigner() {
+    final dio = apiClient.createProviderDio('https://api.copy202601.com/api/v3');
     dio.interceptors.add(CopymangaAuthInterceptor(_signer));
     
     _apiClient = CopymangaApiClient(dio);

@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:mekuru/core/error/result.dart';
 import 'package:mekuru/core/error/failures.dart';
 import 'package:mekuru/core/data/sources/base_comic_provider.dart';
@@ -9,20 +8,16 @@ import 'package:mekuru/core/models/chapter.dart';
 import 'package:mekuru/core/models/page.dart';
 import 'package:mekuru/core/models/paginated_result.dart';
 
+import 'package:mekuru/core/network/api_client.dart';
+
 class WebtoonProvider extends BaseComicProvider {
   static const String _id = 'webtoon';
   static const String _name = 'Webtoon';
 
   late final WebtoonApiClient _apiClient;
 
-  WebtoonProvider() {
-    final dio = Dio(
-      BaseOptions(
-        baseUrl: 'https://global.apis.naver.com',
-        connectTimeout: const Duration(seconds: 15),
-        receiveTimeout: const Duration(seconds: 15),
-      ),
-    );
+  WebtoonProvider(ApiClient apiClient) {
+    final dio = apiClient.createProviderDio('https://global.apis.naver.com');
     dio.interceptors.add(WebtoonAuthInterceptor());
     _apiClient = WebtoonApiClient(dio);
   }

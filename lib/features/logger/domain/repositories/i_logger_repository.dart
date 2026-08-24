@@ -12,4 +12,7 @@ abstract class ILoggerRepository {
 
   /// Delete a specific log by id
   Future<void> deleteLog(String id, {String? type});
+
+  /// Watch for changes in logs
+  Stream<void> watchLogs({String? type});
 }

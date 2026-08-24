@@ -17,9 +17,10 @@ import 'package:mekuru/core/network/presentation/pages/api_log_list_page.dart';
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
 
-  String _getProviderName(String providerId) {
+  String _getProviderName(WidgetRef ref, String providerId) {
     try {
-      return providerRegistry.getProvider(providerId).providerName;
+      final registry = ref.read(providerRegistryProvider);
+      return registry.getProvider(providerId).providerName;
     } catch (e) {
       return providerId;
     }
@@ -52,8 +53,8 @@ class SettingsPage extends ConsumerWidget {
                   SettingsTile(
                     icon: Icons.api_rounded,
                     iconColor: AppColors.primary,
-                    title: '選擇漫畫來源',
-                    subtitle: _getProviderName(settingsState.currentSourceId),
+                    title: '來源選擇',
+                    subtitle: _getProviderName(ref, settingsState.currentSourceId),
                     onTap: () => _showSourceProviderBottomSheet(context, ref, settingsState.currentSourceId),
                   ),
                 if (settingsState.dataSourceMode == DataSourceMode.db)
@@ -130,7 +131,8 @@ class SettingsPage extends ConsumerWidget {
   }
 
   void _showSourceProviderBottomSheet(BuildContext context, WidgetRef ref, String currentSourceId) {
-    final providers = providerRegistry.getAllProviders();
+    final registry = ref.read(providerRegistryProvider);
+    final providers = registry.getAllProviders();
     
     // Auto generate items from registry
     final items = providers.map((provider) {

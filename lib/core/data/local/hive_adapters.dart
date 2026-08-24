@@ -129,6 +129,15 @@ class ApiLogEntryAdapter extends TypeAdapter<ApiLogEntry> {
     );
   }
 
+  String _safeEncode(dynamic obj) {
+    if (obj == null) return 'null';
+    try {
+      return jsonEncode(obj);
+    } catch (_) {
+      return '"<Unencodable data: ${obj.runtimeType}>"';
+    }
+  }
+
   @override
   void write(BinaryWriter writer, ApiLogEntry obj) {
     writer
@@ -136,16 +145,16 @@ class ApiLogEntryAdapter extends TypeAdapter<ApiLogEntry> {
       ..writeString(obj.method)
       ..writeString(obj.url)
       ..writeInt(obj.timestamp.millisecondsSinceEpoch)
-      ..writeString(jsonEncode(obj.requestHeaders))
-      ..writeString(jsonEncode(obj.requestBody))
+      ..writeString(_safeEncode(obj.requestHeaders))
+      ..writeString(_safeEncode(obj.requestBody))
       ..writeBool(obj.statusCode != null);
     if (obj.statusCode != null) writer.writeInt(obj.statusCode!);
 
     writer.writeBool(obj.responseHeaders != null);
-    if (obj.responseHeaders != null) writer.writeString(jsonEncode(obj.responseHeaders));
+    if (obj.responseHeaders != null) writer.writeString(_safeEncode(obj.responseHeaders));
 
     writer.writeBool(obj.responseBody != null);
-    if (obj.responseBody != null) writer.writeString(jsonEncode(obj.responseBody));
+    if (obj.responseBody != null) writer.writeString(_safeEncode(obj.responseBody));
 
     writer.writeBool(obj.responseTime != null);
     if (obj.responseTime != null) writer.writeInt(obj.responseTime!.millisecondsSinceEpoch);
@@ -169,12 +178,21 @@ class SystemLogEntryAdapter extends TypeAdapter<SystemLogEntry> {
     );
   }
 
+  String _safeEncode(dynamic obj) {
+    if (obj == null) return 'null';
+    try {
+      return jsonEncode(obj);
+    } catch (_) {
+      return '"<Unencodable data: ${obj.runtimeType}>"';
+    }
+  }
+
   @override
   void write(BinaryWriter writer, SystemLogEntry obj) {
     writer
       ..writeString(obj.id)
       ..writeString(obj.eventType)
       ..writeInt(obj.timestamp.millisecondsSinceEpoch)
-      ..writeString(jsonEncode(obj.data));
+      ..writeString(_safeEncode(obj.data));
   }
 }

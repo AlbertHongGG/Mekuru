@@ -135,7 +135,9 @@ class _SystemLogViewerScreenState extends ConsumerState<SystemLogViewerScreen> {
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {
                           final log = systemLogs[index];
-                          final type = log.eventType;
+                          final type = (log.data != null && log.data is Map<String, dynamic>) 
+                            ? (log.data['type'] as String? ?? log.eventType) 
+                            : log.eventType;
                           final message = (log.data != null && log.data is Map<String, dynamic>) 
                             ? (log.data['message'] as String? ?? '') 
                             : '';

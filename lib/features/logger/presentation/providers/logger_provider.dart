@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mekuru/features/logger/domain/models/log_entry.dart';
 import 'package:mekuru/features/logger/domain/repositories/i_logger_repository.dart';
@@ -14,13 +15,22 @@ final loggerRepositoryProvider = Provider<ILoggerRepository>((ref) {
 class LoggerNotifier extends StateNotifier<AsyncValue<List<LogEntry>>> {
   final ILoggerRepository repository;
   final String? filterType;
+  StreamSubscription<void>? _subscription;
 
   LoggerNotifier(this.repository, {this.filterType}) : super(const AsyncValue.loading()) {
     loadLogs();
+    _subscription = repository.watchLogs(type: filterType).listen((_) {
+      loadLogs();
+    });
+  }
+
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    super.dispose();
   }
 
   Future<void> loadLogs() async {
-    state = const AsyncValue.loading();
     try {
       final logs = await repository.getLogs(type: filterType);
       state = AsyncValue.data(logs);

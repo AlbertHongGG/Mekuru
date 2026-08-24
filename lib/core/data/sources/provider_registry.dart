@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mekuru/core/network/api_client.dart';
 import 'package:mekuru/core/data/sources/i_comic_provider.dart';
 import 'package:mekuru/core/data/sources/comicwifi/comicwifi_provider.dart';
 import 'package:mekuru/core/data/sources/webtoon/webtoon_provider.dart';
@@ -24,13 +25,11 @@ class ProviderRegistry {
   }
 }
 
-// Global instance to hold the registry
-final providerRegistry = ProviderRegistry()
-  ..register(ComicWifiProvider())
-  ..register(WebtoonProvider())
-  ..register(CopymangaProvider());
-
 // Riverpod provider for the registry
 final providerRegistryProvider = Provider<ProviderRegistry>((ref) {
-  return providerRegistry;
+  final apiClient = ref.watch(apiClientProvider);
+  return ProviderRegistry()
+    ..register(ComicWifiProvider(apiClient))
+    ..register(WebtoonProvider(apiClient))
+    ..register(CopymangaProvider(apiClient));
 });

@@ -54,6 +54,21 @@ class LoggerRepositoryImpl implements ILoggerRepository {
     }
   }
 
+  @override
+  Stream<void> watchLogs({String? type}) async* {
+    if (type == 'api') {
+      yield* apiBox.watchAll();
+    } else if (type == 'system') {
+      yield* systemBox.watchAll();
+    } else {
+      // Very basic merging for both
+      // In practice, since we only subscribe to specific types in this app, this is rarely hit.
+      // But we can yield whenever either changes by using a small listener pattern.
+      // Since we don't have rxdart handy, we can just yield on apiBox for now.
+      yield* apiBox.watchAll();
+    }
+  }
+
   Future<void> _enforceRetentionPolicy(ILocalStorage<LogEntry> box) async {
     final allValues = box.getAll();
     if (allValues.length <= maxLogs) return;

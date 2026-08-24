@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:mekuru/core/error/result.dart';
 import 'package:mekuru/core/error/failures.dart';
 import 'package:mekuru/core/data/sources/base_comic_provider.dart';
@@ -9,19 +8,17 @@ import 'package:mekuru/core/models/chapter.dart';
 import 'package:mekuru/core/models/page.dart';
 import 'package:mekuru/core/models/paginated_result.dart';
 
+import 'package:mekuru/core/network/api_client.dart';
+
 class ComicWifiProvider extends BaseComicProvider {
   static const String _id = 'comicwifi';
   static const String _name = 'ComicWifi Official';
   
   late final ComicWifiApiClient _apiClient;
 
-  ComicWifiProvider() {
-    final dio = Dio(
-      BaseOptions(
-        baseUrl: 'https://api.comicwifi.com',
-        connectTimeout: const Duration(seconds: 15),
-        receiveTimeout: const Duration(seconds: 15),
-        headers: {
+  ComicWifiProvider(ApiClient apiClient) {
+    final dio = apiClient.createProviderDio('https://api.comicwifi.com');
+    dio.options.headers.addAll({
           "accept": "application/json",
           "accept-charset": "UTF-8",
           "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
@@ -52,9 +49,7 @@ class ComicWifiProvider extends BaseComicProvider {
           "isvpn": "",
           "languagecode": "",
           "accept-encoding": "gzip",
-        },
-      ),
-    );
+        });
     dio.interceptors.add(ComicWifiAuthInterceptor());
     
     _apiClient = ComicWifiApiClient(dio);

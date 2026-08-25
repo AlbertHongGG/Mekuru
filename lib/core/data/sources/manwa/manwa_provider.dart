@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:mekuru/core/network/api_client.dart';
 import 'package:mekuru/core/data/sources/base_comic_provider.dart';
@@ -11,6 +12,7 @@ import 'package:mekuru/core/models/update_check_result.dart';
 import 'package:mekuru/core/data/local/models/comic_metadata_entity.dart';
 import 'manwa_api_client.dart';
 import 'manwa_interceptor.dart';
+import 'manwa_crypto.dart';
 
 class ManwaProvider extends BaseComicProvider {
   late final ManwaApiClient _apiClient;
@@ -39,6 +41,23 @@ class ManwaProvider extends BaseComicProvider {
 
   @override
   String get providerName => 'Manwa';
+
+  @override
+  Future<Uint8List> fetchImageBytes(String url) async {
+    final response = await imageDio.get<List<int>>(
+      url,
+      options: Options(responseType: ResponseType.bytes),
+    );
+    final encryptedBytes = Uint8List.fromList(response.data!);
+    final decryptedBytes = ManwaCrypto.decryptImageBytes(encryptedBytes);
+    
+    if (decryptedBytes != null) {
+      return decryptedBytes;
+    }
+    
+    // Fallback to original bytes in case it's not encrypted (e.g. standard file)
+    return encryptedBytes;
+  }
 
   @override
   Future<Result<ComicDetail, Failure>> getComicDetail(String comicId) async {

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart';
 
@@ -50,5 +51,21 @@ class ManwaCrypto {
     
     // Both failed
     return null;
+  }
+
+  /// Decrypts the encrypted image bytes using AES-128-CBC.
+  static Uint8List? decryptImageBytes(Uint8List encryptedBytes) {
+    try {
+      final key = Key.fromUtf8('my2ecret782ecret');
+      final iv = IV.fromUtf8('my2ecret782ecret');
+      final encrypter =
+          Encrypter(AES(key, mode: AESMode.cbc, padding: 'PKCS7'));
+
+      final encrypted = Encrypted(encryptedBytes);
+      final decrypted = encrypter.decryptBytes(encrypted, iv: iv);
+      return Uint8List.fromList(decrypted);
+    } catch (e) {
+      return null;
+    }
   }
 }

@@ -5,6 +5,7 @@ import 'package:mekuru/core/data/sources/comicwf/comicwf_provider.dart';
 import 'package:mekuru/core/data/sources/webtoon/webtoon_provider.dart';
 import 'package:mekuru/core/data/sources/copymg/copymg_provider.dart';
 import 'package:mekuru/core/data/sources/manwa/manwa_provider.dart';
+import 'package:mekuru/core/data/sources/guazi/guazi_provider.dart';
 
 class ProviderRegistry {
   final Map<String, IComicProvider> _providers = {};
@@ -33,5 +34,6 @@ final providerRegistryProvider = Provider<ProviderRegistry>((ref) {
     ..register(ComicWFProvider(apiClient))
     ..register(WebtoonProvider(apiClient))
     ..register(CopyMGProvider(apiClient))
-    ..register(ManwaProvider(apiClient));
+    ..register(ManwaProvider(apiClient))
+    ..register(GuaziProvider(apiClient));
 });

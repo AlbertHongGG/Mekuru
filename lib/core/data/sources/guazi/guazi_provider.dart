@@ -1,0 +1,193 @@
+import 'package:dio/dio.dart';
+import 'package:mekuru/core/data/sources/base_comic_provider.dart';
+import 'package:mekuru/core/network/api_client.dart';
+import 'package:mekuru/core/error/result.dart';
+import 'package:mekuru/core/data/local/models/comic_metadata_entity.dart';
+import 'package:mekuru/core/models/update_check_result.dart';
+import 'package:mekuru/core/models/comic_models.dart';
+import 'package:mekuru/core/models/chapter.dart';
+import 'package:mekuru/core/models/page.dart';
+import 'package:mekuru/core/models/paginated_result.dart';
+
+import 'guazi_constants.dart';
+import 'guazi_interceptor.dart';
+import 'guazi_api_client.dart';
+
+class GuaziProvider extends BaseComicProvider {
+  static const String _id = 'guazi';
+  static const String _name = 'Guazi';
+
+  late final GuaziApiClient _apiClient;
+  late final Dio _apiDio;
+  late final Dio _imageDio;
+
+  GuaziProvider(ApiClient apiClient) {
+    _apiDio = apiClient.createProviderDio(GuaziConstants.baseUrl);
+    _apiDio.options.headers.addAll({
+      "devicetype": "android",
+      "token": GuaziConstants.token,
+      "user-agent": "okhttp/4.7.2",
+      "accept-encoding": "gzip",
+      "content-type": "application/x-www-form-urlencoded",
+    });
+    _apiDio.interceptors.add(GuaziInterceptor());
+
+    _apiClient = GuaziApiClient(_apiDio);
+
+    _imageDio = apiClient.createProviderDio('');
+    _imageDio.options.headers.addAll({
+      "user-agent": "okhttp/4.7.2",
+      "referer": "https://api.guaziapp.com",
+    });
+  }
+
+  @override
+  Dio get imageDio => _imageDio;
+
+  @override
+  String get providerId => _id;
+
+  @override
+  String get providerName => _name;
+
+  String _convertTimestamp(dynamic ts) {
+    if (ts == null) return '';
+    try {
+      int parsedTs = ts is int ? ts : int.parse(ts.toString());
+      final dt = DateTime.fromMillisecondsSinceEpoch(parsedTs * 1000);
+      return dt.toIso8601String();
+    } catch (e) {
+      return ts.toString();
+    }
+  }
+
+  @override
+  Future<Result<ComicDetail, Failure>> getComicDetail(String comicId) async {
+    return handleApiCall(() async {
+      final detail = await _apiClient.getComicDetail(comicId);
+      return ComicDetail(
+        comicId: detail.id.toString(),
+        providerId: _id,
+        title: detail.name,
+        coverUrl: detail.pic ?? detail.picThumb ?? '',
+        author: detail.author,
+        description: detail.content ?? '',
+        status: detail.serialize ?? '',
+        tags: detail.categoryName != null && detail.categoryName!.isNotEmpty
+            ? [detail.categoryName!]
+            : [],
+      );
+    });
+  }
+
+  @override
+  Future<Result<List<Chapter>, Failure>> getChapterList(String comicId, {bool isDescending = true}) async {
+    return handleApiCall(() async {
+      final rawList = await _apiClient.getChapterList(comicId, sort: 'asc');
+      final List<Chapter> chapters = [];
+      for (final ch in rawList) {
+        chapters.add(Chapter(
+          id: ch.id.toString(),
+          title: ch.name,
+          publishedAt: _convertTimestamp(ch.addtime),
+        ));
+      }
+      
+      if (isDescending) {
+        return chapters.reversed.toList();
+      }
+      return chapters;
+    });
+  }
+
+  @override
+  Future<Result<List<ComicPage>, Failure>> getChapterImages(String comicId, String chapterId) async {
+    return handleApiCall(() async {
+      final rawList = await _apiClient.getChapterImages(chapterId);
+      final List<ComicPage> pages = [];
+      int index = 0;
+      for (final img in rawList.images) {
+        if (img.img != null && img.img!.isNotEmpty) {
+          pages.add(ComicPage(
+            imageUrl: img.img!,
+            index: index,
+          ));
+          index++;
+        }
+      }
+      return pages;
+    });
+  }
+
+  @override
+  Future<Result<PaginatedResult<ComicSearchResult>, Failure>> searchComics(String keyword, int page) async {
+    return handleApiCall(() async {
+      final result = await _apiClient.searchComics(keyword, page);
+      final comics = result.list.map((e) => ComicSearchResult(
+        comicId: e.id.toString(),
+        providerId: _id,
+        title: e.name,
+        coverUrl: e.pic ?? e.picThumb ?? '',
+        tags: e.categoryName != null && e.categoryName!.isNotEmpty ? [e.categoryName!] : [],
+      )).toList();
+      
+      return PaginatedResult<ComicSearchResult>(
+        items: comics,
+        page: page,
+        hasNext: comics.length >= (result.pageSize ?? 20),
+      );
+    });
+  }
+
+  @override
+  Future<Result<PaginatedResult<ComicExploreResult>, Failure>> exploreComics(int page) async {
+    return handleApiCall(() async {
+      final result = await _apiClient.exploreComics(page);
+      final comics = result.list.map((e) => ComicExploreResult(
+        comicId: e.id.toString(),
+        providerId: _id,
+        title: e.name,
+        coverUrl: e.pic ?? e.picThumb ?? '',
+        tags: e.categoryName != null && e.categoryName!.isNotEmpty ? [e.categoryName!] : [],
+      )).toList();
+      
+      return PaginatedResult<ComicExploreResult>(
+        items: comics,
+        page: page,
+        hasNext: comics.length >= (result.pageSize ?? 20),
+      );
+    });
+  }
+
+  @override
+  Future<Result<UpdateCheckResult, Failure>> checkForUpdates(String comicId, ComicMetadataEntity currentMeta) async {
+    return handleApiCall(() async {
+      // We don't have chapter count mapped to the response. Let's just fetch chapter list which might be heavy, 
+      // but the API doesn't support pagination for chapters. So we just fetch all.
+      final rawList = await _apiClient.getChapterList(comicId, sort: 'desc');
+      
+      final int newTotal = rawList.length;
+      final int currentTotal = currentMeta.totalChapters ?? 0;
+      final bool hasNew = newTotal > currentTotal;
+      
+      String? latestTitle;
+      DateTime? latestTime;
+      
+      if (rawList.isNotEmpty) {
+        final ch = rawList.first; // Since we requested desc, first is latest
+        latestTitle = ch.name;
+        final tsStr = _convertTimestamp(ch.addtime);
+        if (tsStr.isNotEmpty) {
+          latestTime = DateTime.tryParse(tsStr);
+        }
+      }
+      
+      return UpdateCheckResult(
+        hasNew: hasNew,
+        newTotal: newTotal > 0 ? newTotal : currentTotal,
+        newSourceUpdatedAt: latestTime,
+        newLatestTitle: latestTitle,
+      );
+    });
+  }
+}

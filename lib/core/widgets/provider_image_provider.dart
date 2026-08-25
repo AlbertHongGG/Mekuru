@@ -39,7 +39,7 @@ class ProviderImageProvider extends ImageProvider<ProviderImageProvider> {
     if (useCache) {
       try {
         final tempDir = await getTemporaryDirectory();
-        final cacheDir = Directory('${tempDir.path}/mekuru_image_cache');
+        final cacheDir = Directory('${tempDir.path}/mekuru_image_cache_v2');
         if (!await cacheDir.exists()) {
           await cacheDir.create(recursive: true);
         }

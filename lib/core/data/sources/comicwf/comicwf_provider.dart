@@ -10,6 +10,7 @@ import 'package:mekuru/core/models/chapter.dart';
 import 'package:mekuru/core/models/page.dart';
 import 'package:mekuru/core/models/paginated_result.dart';
 
+import 'package:dio/dio.dart';
 import 'package:mekuru/core/network/api_client.dart';
 
 class ComicWFProvider extends BaseComicProvider {
@@ -17,9 +18,12 @@ class ComicWFProvider extends BaseComicProvider {
   static const String _name = 'ComicWF';
   
   late final ComicWFApiClient _apiClient;
+  late final Dio _apiDio;
+  late final Dio _imageDio;
+
   ComicWFProvider(ApiClient apiClient) {
-    final dio = apiClient.createProviderDio('https://api.comicwifi.com');
-    dio.options.headers.addAll({
+    _apiDio = apiClient.createProviderDio('https://api.comicwifi.com');
+    _apiDio.options.headers.addAll({
           "accept": "application/json",
           "accept-charset": "UTF-8",
           "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
@@ -51,19 +55,24 @@ class ComicWFProvider extends BaseComicProvider {
           "languagecode": "",
           "accept-encoding": "gzip",
         });
-    dio.interceptors.add(ComicWFAuthInterceptor());
+    _apiDio.interceptors.add(ComicWFAuthInterceptor());
     
-    _apiClient = ComicWFApiClient(dio);
+    _apiClient = ComicWFApiClient(_apiDio);
+
+    _imageDio = apiClient.createProviderDio('');
+    _imageDio.options.headers.addAll({
+      'Referer': 'https://comicwf.com/',
+    });
   }
+
+  @override
+  Dio get imageDio => _imageDio;
 
   @override
   String get providerId => _id;
 
   @override
   String get providerName => _name;
-
-  @override
-  Map<String, String>? get imageHeaders => null;
 
   @override
   Future<Result<ComicDetail, Failure>> getComicDetail(String comicId) async {

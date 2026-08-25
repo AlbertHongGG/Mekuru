@@ -10,6 +10,7 @@ import 'package:mekuru/core/models/chapter.dart';
 import 'package:mekuru/core/models/page.dart';
 import 'package:mekuru/core/models/paginated_result.dart';
 
+import 'package:dio/dio.dart';
 import 'package:mekuru/core/network/api_client.dart';
 
 class WebtoonProvider extends BaseComicProvider {
@@ -17,24 +18,29 @@ class WebtoonProvider extends BaseComicProvider {
   static const String _name = 'Webtoon';
 
   late final WebtoonApiClient _apiClient;
+  late final Dio _apiDio;
+  late final Dio _imageDio;
 
   WebtoonProvider(ApiClient apiClient) {
-    final dio = apiClient.createProviderDio('https://global.apis.naver.com');
-    dio.interceptors.add(WebtoonAuthInterceptor());
-    _apiClient = WebtoonApiClient(dio);
+    _apiDio = apiClient.createProviderDio('https://global.apis.naver.com');
+    _apiDio.interceptors.add(WebtoonAuthInterceptor());
+    _apiClient = WebtoonApiClient(_apiDio);
+
+    _imageDio = apiClient.createProviderDio('');
+    _imageDio.options.headers.addAll({
+      'Referer': 'https://www.webtoons.com/',
+      'User-Agent': 'nApps (Android 9; 22081212C; linewebtoon; 3.9.9)',
+    });
   }
+
+  @override
+  Dio get imageDio => _imageDio;
 
   @override
   String get providerId => _id;
 
   @override
   String get providerName => _name;
-
-  @override
-  Map<String, String>? get imageHeaders => {
-    'Referer': 'https://www.webtoons.com/',
-    'User-Agent': 'nApps (Android 9; 22081212C; linewebtoon; 3.9.9)',
-  };
 
   String _getFullImageUrl(String? uri) {
     if (uri == null || uri.isEmpty) return '';

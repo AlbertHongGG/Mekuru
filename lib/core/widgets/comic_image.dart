@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:mekuru/core/data/sources/provider_registry.dart';
+import 'package:mekuru/core/data/sources/i_comic_provider.dart';
+import 'package:mekuru/core/widgets/provider_image_provider.dart';
 
 class ComicImage extends ConsumerWidget {
   final String imageUrl;
@@ -23,23 +25,34 @@ class ComicImage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    Map<String, String>? headers;
+    IComicProvider? provider;
     
     if (providerId != null) {
       try {
         final registry = ref.watch(providerRegistryProvider);
-        headers = registry.getProvider(providerId!).imageHeaders;
+        provider = registry.getProvider(providerId!);
       } catch (e) {
-        // Fallback to no headers if provider is missing
+        // Fallback
       }
     }
 
+    if (provider != null) {
+      return ExtendedImage(
+        image: ProviderImageProvider(imageUrl, provider),
+        width: width,
+        height: height,
+        fit: fit,
+        clearMemoryCacheIfFailed: true,
+        loadStateChanged: loadStateChanged,
+      );
+    }
+
+    // Fallback if provider is missing
     return ExtendedImage.network(
       imageUrl,
       width: width,
       height: height,
       fit: fit,
-      headers: headers,
       cache: true,
       clearMemoryCacheIfFailed: true,
       loadStateChanged: loadStateChanged,

@@ -3,9 +3,19 @@ import 'package:mekuru/core/error/failures.dart';
 import 'package:mekuru/core/error/result.dart';
 import 'package:mekuru/core/data/sources/i_comic_provider.dart';
 
+import 'dart:typed_data';
+
 abstract class BaseComicProvider implements IComicProvider {
+  Dio get imageDio;
+
   @override
-  Map<String, String>? get imageHeaders => null;
+  Future<Uint8List> fetchImageBytes(String url) async {
+    final response = await imageDio.get<List<int>>(
+      url,
+      options: Options(responseType: ResponseType.bytes),
+    );
+    return Uint8List.fromList(response.data!);
+  }
 
   Future<Result<T, Failure>> handleApiCall<T>(Future<T> Function() apiCall) async {
     try {

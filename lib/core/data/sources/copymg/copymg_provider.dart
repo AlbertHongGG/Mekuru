@@ -11,6 +11,7 @@ import 'package:mekuru/core/models/chapter.dart';
 import 'package:mekuru/core/models/page.dart';
 import 'package:mekuru/core/models/paginated_result.dart';
 
+import 'package:dio/dio.dart';
 import 'package:mekuru/core/network/api_client.dart';
 
 class CopyMGProvider extends BaseComicProvider {
@@ -20,23 +21,28 @@ class CopyMGProvider extends BaseComicProvider {
   late final CopyMGApiClient _apiClient;
   final CopyMGSigner _signer;
 
+  late final Dio _apiDio;
+  late final Dio _imageDio;
+
   CopyMGProvider(ApiClient apiClient) : _signer = CopyMGSigner() {
-    final dio = apiClient.createProviderDio('https://api.copy202601.com/api/v3');
-    dio.interceptors.add(CopyMGAuthInterceptor(_signer));
+    _apiDio = apiClient.createProviderDio('https://api.copy202601.com/api/v3');
+    _apiDio.options.headers['User-Agent'] = 'COPY/3.0.9';
+    _apiDio.interceptors.add(CopyMGAuthInterceptor(_signer));
     
-    _apiClient = CopyMGApiClient(dio);
+    _apiClient = CopyMGApiClient(_apiDio);
+
+    _imageDio = apiClient.createProviderDio('');
+    _imageDio.options.headers['User-Agent'] = 'COPY/3.0.9';
   }
+
+  @override
+  Dio get imageDio => _imageDio;
 
   @override
   String get providerId => _id;
 
   @override
   String get providerName => _name;
-
-  @override
-  Map<String, String>? get imageHeaders => {
-    'User-Agent': 'COPY/3.0.9'
-  };
 
   @override
   Future<Result<ComicDetail, Failure>> getComicDetail(String comicId) async {

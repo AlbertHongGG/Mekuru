@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:mekuru/core/models/comic_models.dart';
 import 'package:mekuru/core/models/paginated_result.dart';
 import 'package:mekuru/core/models/chapter.dart';
@@ -14,8 +16,8 @@ abstract class IComicProvider {
   /// A human-readable name for this provider (e.g., 'ComicWF').
   String get providerName;
 
-  /// Headers required to fetch images from this provider (e.g., Referer).
-  Map<String, String>? get imageHeaders => null;
+  /// Fetch the image bytes for a specific url using the provider's internal client.
+  Future<Uint8List> fetchImageBytes(String url);
 
   /// Fetch basic details and metadata for a specific comic.
   Future<Result<ComicDetail, Failure>> getComicDetail(String comicId);

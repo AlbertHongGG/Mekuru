@@ -73,7 +73,7 @@ class ManwaProvider extends BaseComicProvider {
         author: data.author.join(', '),
         description: data.text ?? '',
         status: data.state ?? '',
-        tags: const [],
+        tags: data.tags.map((t) => t.name).toList(),
       );
     });
   }
@@ -92,7 +92,7 @@ class ManwaProvider extends BaseComicProvider {
         );
       }).toList();
 
-      if (!isDescending) {
+      if (isDescending) {
         return chapters.reversed.toList();
       }
       return chapters;

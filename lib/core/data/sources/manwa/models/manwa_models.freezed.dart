@@ -838,7 +838,7 @@ as String,
 /// @nodoc
 mixin _$MwDetailResult {
 
- dynamic get id; String get name; String? get nickname;@JsonKey(name: 'picx') String? get picx; List<String> get author; String? get state; String? get text;@JsonKey(name: 'chapter_list') List<MwChapterItem> get chapterList;
+ dynamic get id; String get name; String? get nickname;@JsonKey(name: 'picx') String? get picx; List<String> get author; String? get state; String? get text; List<MwTagItem> get tags;@JsonKey(name: 'chapter_list') List<MwChapterItem> get chapterList;
 /// Create a copy of MwDetailResult
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -851,16 +851,16 @@ $MwDetailResultCopyWith<MwDetailResult> get copyWith => _$MwDetailResultCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MwDetailResult&&const DeepCollectionEquality().equals(other.id, id)&&(identical(other.name, name) || other.name == name)&&(identical(other.nickname, nickname) || other.nickname == nickname)&&(identical(other.picx, picx) || other.picx == picx)&&const DeepCollectionEquality().equals(other.author, author)&&(identical(other.state, state) || other.state == state)&&(identical(other.text, text) || other.text == text)&&const DeepCollectionEquality().equals(other.chapterList, chapterList));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MwDetailResult&&const DeepCollectionEquality().equals(other.id, id)&&(identical(other.name, name) || other.name == name)&&(identical(other.nickname, nickname) || other.nickname == nickname)&&(identical(other.picx, picx) || other.picx == picx)&&const DeepCollectionEquality().equals(other.author, author)&&(identical(other.state, state) || other.state == state)&&(identical(other.text, text) || other.text == text)&&const DeepCollectionEquality().equals(other.tags, tags)&&const DeepCollectionEquality().equals(other.chapterList, chapterList));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(id),name,nickname,picx,const DeepCollectionEquality().hash(author),state,text,const DeepCollectionEquality().hash(chapterList));
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(id),name,nickname,picx,const DeepCollectionEquality().hash(author),state,text,const DeepCollectionEquality().hash(tags),const DeepCollectionEquality().hash(chapterList));
 
 @override
 String toString() {
-  return 'MwDetailResult(id: $id, name: $name, nickname: $nickname, picx: $picx, author: $author, state: $state, text: $text, chapterList: $chapterList)';
+  return 'MwDetailResult(id: $id, name: $name, nickname: $nickname, picx: $picx, author: $author, state: $state, text: $text, tags: $tags, chapterList: $chapterList)';
 }
 
 
@@ -871,7 +871,7 @@ abstract mixin class $MwDetailResultCopyWith<$Res>  {
   factory $MwDetailResultCopyWith(MwDetailResult value, $Res Function(MwDetailResult) _then) = _$MwDetailResultCopyWithImpl;
 @useResult
 $Res call({
- dynamic id, String name, String? nickname,@JsonKey(name: 'picx') String? picx, List<String> author, String? state, String? text,@JsonKey(name: 'chapter_list') List<MwChapterItem> chapterList
+ dynamic id, String name, String? nickname,@JsonKey(name: 'picx') String? picx, List<String> author, String? state, String? text, List<MwTagItem> tags,@JsonKey(name: 'chapter_list') List<MwChapterItem> chapterList
 });
 
 
@@ -888,7 +888,7 @@ class _$MwDetailResultCopyWithImpl<$Res>
 
 /// Create a copy of MwDetailResult
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? name = null,Object? nickname = freezed,Object? picx = freezed,Object? author = null,Object? state = freezed,Object? text = freezed,Object? chapterList = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? name = null,Object? nickname = freezed,Object? picx = freezed,Object? author = null,Object? state = freezed,Object? text = freezed,Object? tags = null,Object? chapterList = null,}) {
   return _then(MwDetailResult(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as dynamic,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -897,7 +897,8 @@ as String?,picx: freezed == picx ? _self.picx : picx // ignore: cast_nullable_to
 as String?,author: null == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
 as List<String>,state: freezed == state ? _self.state : state // ignore: cast_nullable_to_non_nullable
 as String?,text: freezed == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
-as String?,chapterList: null == chapterList ? _self.chapterList : chapterList // ignore: cast_nullable_to_non_nullable
+as String?,tags: null == tags ? _self.tags : tags // ignore: cast_nullable_to_non_nullable
+as List<MwTagItem>,chapterList: null == chapterList ? _self.chapterList : chapterList // ignore: cast_nullable_to_non_nullable
 as List<MwChapterItem>,
   ));
 }
@@ -983,10 +984,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( dynamic id,  String name,  String? nickname, @JsonKey(name: 'picx')  String? picx,  List<String> author,  String? state,  String? text, @JsonKey(name: 'chapter_list')  List<MwChapterItem> chapterList)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( dynamic id,  String name,  String? nickname, @JsonKey(name: 'picx')  String? picx,  List<String> author,  String? state,  String? text,  List<MwTagItem> tags, @JsonKey(name: 'chapter_list')  List<MwChapterItem> chapterList)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _MwDetailResult() when $default != null:
-return $default(_that.id,_that.name,_that.nickname,_that.picx,_that.author,_that.state,_that.text,_that.chapterList);case _:
+return $default(_that.id,_that.name,_that.nickname,_that.picx,_that.author,_that.state,_that.text,_that.tags,_that.chapterList);case _:
   return orElse();
 
 }
@@ -1004,10 +1005,10 @@ return $default(_that.id,_that.name,_that.nickname,_that.picx,_that.author,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( dynamic id,  String name,  String? nickname, @JsonKey(name: 'picx')  String? picx,  List<String> author,  String? state,  String? text, @JsonKey(name: 'chapter_list')  List<MwChapterItem> chapterList)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( dynamic id,  String name,  String? nickname, @JsonKey(name: 'picx')  String? picx,  List<String> author,  String? state,  String? text,  List<MwTagItem> tags, @JsonKey(name: 'chapter_list')  List<MwChapterItem> chapterList)  $default,) {final _that = this;
 switch (_that) {
 case _MwDetailResult():
-return $default(_that.id,_that.name,_that.nickname,_that.picx,_that.author,_that.state,_that.text,_that.chapterList);case _:
+return $default(_that.id,_that.name,_that.nickname,_that.picx,_that.author,_that.state,_that.text,_that.tags,_that.chapterList);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -1024,10 +1025,10 @@ return $default(_that.id,_that.name,_that.nickname,_that.picx,_that.author,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( dynamic id,  String name,  String? nickname, @JsonKey(name: 'picx')  String? picx,  List<String> author,  String? state,  String? text, @JsonKey(name: 'chapter_list')  List<MwChapterItem> chapterList)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( dynamic id,  String name,  String? nickname, @JsonKey(name: 'picx')  String? picx,  List<String> author,  String? state,  String? text,  List<MwTagItem> tags, @JsonKey(name: 'chapter_list')  List<MwChapterItem> chapterList)?  $default,) {final _that = this;
 switch (_that) {
 case _MwDetailResult() when $default != null:
-return $default(_that.id,_that.name,_that.nickname,_that.picx,_that.author,_that.state,_that.text,_that.chapterList);case _:
+return $default(_that.id,_that.name,_that.nickname,_that.picx,_that.author,_that.state,_that.text,_that.tags,_that.chapterList);case _:
   return null;
 
 }
@@ -1039,7 +1040,7 @@ return $default(_that.id,_that.name,_that.nickname,_that.picx,_that.author,_that
 @JsonSerializable()
 
 class _MwDetailResult implements MwDetailResult {
-  const _MwDetailResult({required this.id, required this.name, this.nickname, @JsonKey(name: 'picx') this.picx,  List<String> author = const [], this.state, this.text, @JsonKey(name: 'chapter_list')  List<MwChapterItem> chapterList = const []}): _author = author,_chapterList = chapterList;
+  const _MwDetailResult({required this.id, required this.name, this.nickname, @JsonKey(name: 'picx') this.picx,  List<String> author = const [], this.state, this.text,  List<MwTagItem> tags = const [], @JsonKey(name: 'chapter_list')  List<MwChapterItem> chapterList = const []}): _author = author,_tags = tags,_chapterList = chapterList;
   factory _MwDetailResult.fromJson(Map<String, dynamic> json) => _$MwDetailResultFromJson(json);
 
 @override final  dynamic id;
@@ -1055,6 +1056,13 @@ class _MwDetailResult implements MwDetailResult {
 
 @override final  String? state;
 @override final  String? text;
+ final  List<MwTagItem> _tags;
+@override@JsonKey() List<MwTagItem> get tags {
+  if (_tags is EqualUnmodifiableListView) return _tags;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_tags);
+}
+
  final  List<MwChapterItem> _chapterList;
 @override@JsonKey(name: 'chapter_list') List<MwChapterItem> get chapterList {
   if (_chapterList is EqualUnmodifiableListView) return _chapterList;
@@ -1076,16 +1084,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MwDetailResult&&const DeepCollectionEquality().equals(other.id, id)&&(identical(other.name, name) || other.name == name)&&(identical(other.nickname, nickname) || other.nickname == nickname)&&(identical(other.picx, picx) || other.picx == picx)&&const DeepCollectionEquality().equals(other._author, _author)&&(identical(other.state, state) || other.state == state)&&(identical(other.text, text) || other.text == text)&&const DeepCollectionEquality().equals(other._chapterList, _chapterList));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MwDetailResult&&const DeepCollectionEquality().equals(other.id, id)&&(identical(other.name, name) || other.name == name)&&(identical(other.nickname, nickname) || other.nickname == nickname)&&(identical(other.picx, picx) || other.picx == picx)&&const DeepCollectionEquality().equals(other._author, _author)&&(identical(other.state, state) || other.state == state)&&(identical(other.text, text) || other.text == text)&&const DeepCollectionEquality().equals(other._tags, _tags)&&const DeepCollectionEquality().equals(other._chapterList, _chapterList));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(id),name,nickname,picx,const DeepCollectionEquality().hash(_author),state,text,const DeepCollectionEquality().hash(_chapterList));
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(id),name,nickname,picx,const DeepCollectionEquality().hash(_author),state,text,const DeepCollectionEquality().hash(_tags),const DeepCollectionEquality().hash(_chapterList));
 
 @override
 String toString() {
-  return 'MwDetailResult(id: $id, name: $name, nickname: $nickname, picx: $picx, author: $author, state: $state, text: $text, chapterList: $chapterList)';
+  return 'MwDetailResult(id: $id, name: $name, nickname: $nickname, picx: $picx, author: $author, state: $state, text: $text, tags: $tags, chapterList: $chapterList)';
 }
 
 
@@ -1096,7 +1104,7 @@ abstract mixin class _$MwDetailResultCopyWith<$Res> implements $MwDetailResultCo
   factory _$MwDetailResultCopyWith(_MwDetailResult value, $Res Function(_MwDetailResult) _then) = __$MwDetailResultCopyWithImpl;
 @override @useResult
 $Res call({
- dynamic id, String name, String? nickname,@JsonKey(name: 'picx') String? picx, List<String> author, String? state, String? text,@JsonKey(name: 'chapter_list') List<MwChapterItem> chapterList
+ dynamic id, String name, String? nickname,@JsonKey(name: 'picx') String? picx, List<String> author, String? state, String? text, List<MwTagItem> tags,@JsonKey(name: 'chapter_list') List<MwChapterItem> chapterList
 });
 
 
@@ -1113,7 +1121,7 @@ class __$MwDetailResultCopyWithImpl<$Res>
 
 /// Create a copy of MwDetailResult
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? name = null,Object? nickname = freezed,Object? picx = freezed,Object? author = null,Object? state = freezed,Object? text = freezed,Object? chapterList = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? name = null,Object? nickname = freezed,Object? picx = freezed,Object? author = null,Object? state = freezed,Object? text = freezed,Object? tags = null,Object? chapterList = null,}) {
   return _then(_MwDetailResult(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as dynamic,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -1122,7 +1130,8 @@ as String?,picx: freezed == picx ? _self.picx : picx // ignore: cast_nullable_to
 as String?,author: null == author ? _self._author : author // ignore: cast_nullable_to_non_nullable
 as List<String>,state: freezed == state ? _self.state : state // ignore: cast_nullable_to_non_nullable
 as String?,text: freezed == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
-as String?,chapterList: null == chapterList ? _self._chapterList : chapterList // ignore: cast_nullable_to_non_nullable
+as String?,tags: null == tags ? _self._tags : tags // ignore: cast_nullable_to_non_nullable
+as List<MwTagItem>,chapterList: null == chapterList ? _self._chapterList : chapterList // ignore: cast_nullable_to_non_nullable
 as List<MwChapterItem>,
   ));
 }
@@ -1393,6 +1402,269 @@ id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,addtime: freezed == addtime ? _self.addtime : addtime // ignore: cast_nullable_to_non_nullable
 as String?,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$MwTagItem {
+
+ String get name;
+/// Create a copy of MwTagItem
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$MwTagItemCopyWith<MwTagItem> get copyWith => _$MwTagItemCopyWithImpl<MwTagItem>(this as MwTagItem, _$identity);
+
+  /// Serializes this MwTagItem to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MwTagItem&&(identical(other.name, name) || other.name == name));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,name);
+
+@override
+String toString() {
+  return 'MwTagItem(name: $name)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $MwTagItemCopyWith<$Res>  {
+  factory $MwTagItemCopyWith(MwTagItem value, $Res Function(MwTagItem) _then) = _$MwTagItemCopyWithImpl;
+@useResult
+$Res call({
+ String name
+});
+
+
+
+
+}
+/// @nodoc
+class _$MwTagItemCopyWithImpl<$Res>
+    implements $MwTagItemCopyWith<$Res> {
+  _$MwTagItemCopyWithImpl(this._self, this._then);
+
+  final MwTagItem _self;
+  final $Res Function(MwTagItem) _then;
+
+/// Create a copy of MwTagItem
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? name = null,}) {
+  return _then(MwTagItem(
+name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [MwTagItem].
+extension MwTagItemPatterns on MwTagItem {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _MwTagItem value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _MwTagItem() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _MwTagItem value)  $default,){
+final _that = this;
+switch (_that) {
+case _MwTagItem():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _MwTagItem value)?  $default,){
+final _that = this;
+switch (_that) {
+case _MwTagItem() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String name)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _MwTagItem() when $default != null:
+return $default(_that.name);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String name)  $default,) {final _that = this;
+switch (_that) {
+case _MwTagItem():
+return $default(_that.name);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String name)?  $default,) {final _that = this;
+switch (_that) {
+case _MwTagItem() when $default != null:
+return $default(_that.name);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _MwTagItem implements MwTagItem {
+  const _MwTagItem({required this.name});
+  factory _MwTagItem.fromJson(Map<String, dynamic> json) => _$MwTagItemFromJson(json);
+
+@override final  String name;
+
+/// Create a copy of MwTagItem
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$MwTagItemCopyWith<_MwTagItem> get copyWith => __$MwTagItemCopyWithImpl<_MwTagItem>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$MwTagItemToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MwTagItem&&(identical(other.name, name) || other.name == name));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,name);
+
+@override
+String toString() {
+  return 'MwTagItem(name: $name)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$MwTagItemCopyWith<$Res> implements $MwTagItemCopyWith<$Res> {
+  factory _$MwTagItemCopyWith(_MwTagItem value, $Res Function(_MwTagItem) _then) = __$MwTagItemCopyWithImpl;
+@override @useResult
+$Res call({
+ String name
+});
+
+
+
+
+}
+/// @nodoc
+class __$MwTagItemCopyWithImpl<$Res>
+    implements _$MwTagItemCopyWith<$Res> {
+  __$MwTagItemCopyWithImpl(this._self, this._then);
+
+  final _MwTagItem _self;
+  final $Res Function(_MwTagItem) _then;
+
+/// Create a copy of MwTagItem
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? name = null,}) {
+  return _then(_MwTagItem(
+name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,
   ));
 }
 

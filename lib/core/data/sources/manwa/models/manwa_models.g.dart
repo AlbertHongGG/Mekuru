@@ -74,6 +74,11 @@ _MwDetailResult _$MwDetailResultFromJson(Map<String, dynamic> json) =>
           const [],
       state: json['state'] as String?,
       text: json['text'] as String?,
+      tags:
+          (json['tags'] as List<dynamic>?)
+              ?.map((e) => MwTagItem.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
       chapterList:
           (json['chapter_list'] as List<dynamic>?)
               ?.map((e) => MwChapterItem.fromJson(e as Map<String, dynamic>))
@@ -90,6 +95,7 @@ Map<String, dynamic> _$MwDetailResultToJson(_MwDetailResult instance) =>
       'author': instance.author,
       'state': instance.state,
       'text': instance.text,
+      'tags': instance.tags,
       'chapter_list': instance.chapterList,
     };
 
@@ -106,6 +112,12 @@ Map<String, dynamic> _$MwChapterItemToJson(_MwChapterItem instance) =>
       'name': instance.name,
       'addtime': instance.addtime,
     };
+
+_MwTagItem _$MwTagItemFromJson(Map<String, dynamic> json) =>
+    _MwTagItem(name: json['name'] as String);
+
+Map<String, dynamic> _$MwTagItemToJson(_MwTagItem instance) =>
+    <String, dynamic>{'name': instance.name};
 
 _MwChapterImageResult _$MwChapterImageResultFromJson(
   Map<String, dynamic> json,

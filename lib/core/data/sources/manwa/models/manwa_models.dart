@@ -53,6 +53,7 @@ abstract class MwDetailResult with _$MwDetailResult {
     @Default([]) List<String> author,
     String? state,
     String? text,
+    @Default([]) List<MwTagItem> tags,
     @JsonKey(name: 'chapter_list') @Default([]) List<MwChapterItem> chapterList,
   }) = _MwDetailResult;
 
@@ -70,6 +71,16 @@ abstract class MwChapterItem with _$MwChapterItem {
 
   factory MwChapterItem.fromJson(Map<String, dynamic> json) =>
       _$MwChapterItemFromJson(json);
+}
+
+@freezed
+abstract class MwTagItem with _$MwTagItem {
+  const factory MwTagItem({
+    required String name,
+  }) = _MwTagItem;
+
+  factory MwTagItem.fromJson(Map<String, dynamic> json) =>
+      _$MwTagItemFromJson(json);
 }
 
 @freezed

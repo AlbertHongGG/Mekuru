@@ -74,7 +74,7 @@ class GuaziProvider extends BaseComicProvider {
         description: detail.content ?? '',
         status: detail.serialize ?? '',
         tags: detail.categoryName != null && detail.categoryName!.isNotEmpty
-            ? [detail.categoryName!]
+            ? detail.categoryName!.split(RegExp(r'\s+')).where((e) => e.isNotEmpty).toList()
             : [],
       );
     });
@@ -128,7 +128,7 @@ class GuaziProvider extends BaseComicProvider {
         providerId: _id,
         title: e.name,
         coverUrl: e.pic ?? e.picThumb ?? '',
-        tags: e.categoryName != null && e.categoryName!.isNotEmpty ? [e.categoryName!] : [],
+        tags: e.categoryName != null && e.categoryName!.isNotEmpty ? e.categoryName!.split(RegExp(r'\s+')).where((t) => t.isNotEmpty).toList() : [],
       )).toList();
       
       return PaginatedResult<ComicSearchResult>(
@@ -148,7 +148,7 @@ class GuaziProvider extends BaseComicProvider {
         providerId: _id,
         title: e.name,
         coverUrl: e.pic ?? e.picThumb ?? '',
-        tags: e.categoryName != null && e.categoryName!.isNotEmpty ? [e.categoryName!] : [],
+        tags: e.categoryName != null && e.categoryName!.isNotEmpty ? e.categoryName!.split(RegExp(r'\s+')).where((t) => t.isNotEmpty).toList() : [],
       )).toList();
       
       return PaginatedResult<ComicExploreResult>(

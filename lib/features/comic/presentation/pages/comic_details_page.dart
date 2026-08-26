@@ -391,67 +391,96 @@ class ComicDetailsPage extends ConsumerWidget {
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: ClipRRect(
-        borderRadius: BorderRadius.circular(30),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Container(
-            decoration: BoxDecoration(
-              color: isDark ? Colors.black.withValues(alpha: 0.6) : Colors.white.withValues(alpha: 0.8),
-              borderRadius: BorderRadius.circular(30),
-              border: Border.all(
-                color: isDark ? Colors.white12 : Colors.black12,
-                width: 1,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () async {
-                  if (state.chapters.isEmpty) return;
-                  String targetChapterId = state.chapters.first.id;
-                  if (state.isChapterSortDescending) {
-                    targetChapterId = state.chapters.last.id;
-                  }
-                  if (lastReadChapterId != null) {
-                    targetChapterId = lastReadChapterId;
-                  }
-                  await context.push('/viewer/$providerId/$comicId/$targetChapterId');
-                },
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.menu_book_rounded, 
-                        color: isDark ? Colors.white70 : Colors.black54,
-                        size: 22,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        lastReadChapterId != null ? '繼續閱讀' : '開始閱讀',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: isDark ? Colors.white70 : Colors.black54,
-                          letterSpacing: 1.2,
-                        ),
-                      ),
+      floatingActionButton: Stack(
+        clipBehavior: Clip.none,
+        alignment: Alignment.center,
+        children: [
+          // 1. Ultra-Rich Vast Aurora (Faint, highly transparent mesh)
+          Positioned(
+            child: ImageFiltered(
+              imageFilter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
+              child: Container(
+                width: 220,
+                height: 100,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(50),
+                  gradient: SweepGradient(
+                    center: Alignment.center,
+                    colors: [
+                      const Color(0xFF81D4FA).withValues(alpha: 0.2), // Light Blue
+                      const Color(0xFFB39DDB).withValues(alpha: 0.2), // Soft Purple
+                      const Color(0xFFF48FB1).withValues(alpha: 0.2), // Vibrant Pink
+                      const Color(0xFFFFE082).withValues(alpha: 0.2), // Soft Peach/Yellow
+                      const Color(0xFF80CBC4).withValues(alpha: 0.2), // Teal/Cyan
+                      const Color(0xFF81D4FA).withValues(alpha: 0.2), // Back to Light Blue
                     ],
+                    stops: const [0.0, 0.2, 0.4, 0.6, 0.8, 1.0],
                   ),
                 ),
               ),
             ),
           ),
-        ),
+          
+          // 2. Crystal Clear Glass Button
+          ClipRRect(
+            borderRadius: BorderRadius.circular(30),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+              child: Container(
+                decoration: BoxDecoration(
+                  // Extremely low white opacity to allow the aurora to completely dye the glass
+                  color: isDark 
+                      ? Colors.white.withValues(alpha: 0.05) 
+                      : Colors.white.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(30),
+                  border: Border.all(
+                    color: isDark ? Colors.white30 : Colors.white.withValues(alpha: 0.8),
+                    width: 1.5,
+                  ),
+                ),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () async {
+                      if (state.chapters.isEmpty) return;
+                      String targetChapterId = state.chapters.first.id;
+                      if (state.isChapterSortDescending) {
+                        targetChapterId = state.chapters.last.id;
+                      }
+                      if (lastReadChapterId != null) {
+                        targetChapterId = lastReadChapterId;
+                      }
+                      await context.push('/viewer/$providerId/$comicId/$targetChapterId');
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.menu_book_rounded, 
+                            color: isDark ? Colors.white : const Color(0xFF455A64), // Crisp slate color
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            lastReadChapterId != null ? '繼續閱讀' : '開始閱讀',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: isDark ? Colors.white : const Color(0xFF455A64),
+                              letterSpacing: 1.2,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

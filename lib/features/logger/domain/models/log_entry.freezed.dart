@@ -178,10 +178,10 @@ return system(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String id,  DateTime timestamp,  String method,  String url,  Map<String, dynamic> requestHeaders,  dynamic requestBody,  int? statusCode,  Map<String, dynamic>? responseHeaders,  dynamic responseBody,  DateTime? responseTime,  String? error)?  api,TResult Function( String id,  DateTime timestamp,  String eventType,  dynamic data)?  system,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String id,  DateTime timestamp,  String method,  String url,  String? providerId,  String? actionType,  Map<String, dynamic> requestHeaders,  dynamic requestBody,  int? statusCode,  Map<String, dynamic>? responseHeaders,  dynamic responseBody,  DateTime? responseTime,  String? error)?  api,TResult Function( String id,  DateTime timestamp,  String eventType,  dynamic data)?  system,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case ApiLogEntry() when api != null:
-return api(_that.id,_that.timestamp,_that.method,_that.url,_that.requestHeaders,_that.requestBody,_that.statusCode,_that.responseHeaders,_that.responseBody,_that.responseTime,_that.error);case SystemLogEntry() when system != null:
+return api(_that.id,_that.timestamp,_that.method,_that.url,_that.providerId,_that.actionType,_that.requestHeaders,_that.requestBody,_that.statusCode,_that.responseHeaders,_that.responseBody,_that.responseTime,_that.error);case SystemLogEntry() when system != null:
 return system(_that.id,_that.timestamp,_that.eventType,_that.data);case _:
   return orElse();
 
@@ -200,10 +200,10 @@ return system(_that.id,_that.timestamp,_that.eventType,_that.data);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String id,  DateTime timestamp,  String method,  String url,  Map<String, dynamic> requestHeaders,  dynamic requestBody,  int? statusCode,  Map<String, dynamic>? responseHeaders,  dynamic responseBody,  DateTime? responseTime,  String? error)  api,required TResult Function( String id,  DateTime timestamp,  String eventType,  dynamic data)  system,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String id,  DateTime timestamp,  String method,  String url,  String? providerId,  String? actionType,  Map<String, dynamic> requestHeaders,  dynamic requestBody,  int? statusCode,  Map<String, dynamic>? responseHeaders,  dynamic responseBody,  DateTime? responseTime,  String? error)  api,required TResult Function( String id,  DateTime timestamp,  String eventType,  dynamic data)  system,}) {final _that = this;
 switch (_that) {
 case ApiLogEntry():
-return api(_that.id,_that.timestamp,_that.method,_that.url,_that.requestHeaders,_that.requestBody,_that.statusCode,_that.responseHeaders,_that.responseBody,_that.responseTime,_that.error);case SystemLogEntry():
+return api(_that.id,_that.timestamp,_that.method,_that.url,_that.providerId,_that.actionType,_that.requestHeaders,_that.requestBody,_that.statusCode,_that.responseHeaders,_that.responseBody,_that.responseTime,_that.error);case SystemLogEntry():
 return system(_that.id,_that.timestamp,_that.eventType,_that.data);}
 }
 /// A variant of `when` that fallback to returning `null`
@@ -218,10 +218,10 @@ return system(_that.id,_that.timestamp,_that.eventType,_that.data);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String id,  DateTime timestamp,  String method,  String url,  Map<String, dynamic> requestHeaders,  dynamic requestBody,  int? statusCode,  Map<String, dynamic>? responseHeaders,  dynamic responseBody,  DateTime? responseTime,  String? error)?  api,TResult? Function( String id,  DateTime timestamp,  String eventType,  dynamic data)?  system,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String id,  DateTime timestamp,  String method,  String url,  String? providerId,  String? actionType,  Map<String, dynamic> requestHeaders,  dynamic requestBody,  int? statusCode,  Map<String, dynamic>? responseHeaders,  dynamic responseBody,  DateTime? responseTime,  String? error)?  api,TResult? Function( String id,  DateTime timestamp,  String eventType,  dynamic data)?  system,}) {final _that = this;
 switch (_that) {
 case ApiLogEntry() when api != null:
-return api(_that.id,_that.timestamp,_that.method,_that.url,_that.requestHeaders,_that.requestBody,_that.statusCode,_that.responseHeaders,_that.responseBody,_that.responseTime,_that.error);case SystemLogEntry() when system != null:
+return api(_that.id,_that.timestamp,_that.method,_that.url,_that.providerId,_that.actionType,_that.requestHeaders,_that.requestBody,_that.statusCode,_that.responseHeaders,_that.responseBody,_that.responseTime,_that.error);case SystemLogEntry() when system != null:
 return system(_that.id,_that.timestamp,_that.eventType,_that.data);case _:
   return null;
 
@@ -234,13 +234,15 @@ return system(_that.id,_that.timestamp,_that.eventType,_that.data);case _:
 @JsonSerializable()
 
 class ApiLogEntry extends LogEntry {
-  const ApiLogEntry({required this.id, required this.timestamp, required this.method, required this.url,  Map<String, dynamic> requestHeaders = const {}, this.requestBody, this.statusCode,  Map<String, dynamic>? responseHeaders, this.responseBody, this.responseTime, this.error,  String? $type}): _requestHeaders = requestHeaders,_responseHeaders = responseHeaders,$type = $type ?? 'api',super._();
+  const ApiLogEntry({required this.id, required this.timestamp, required this.method, required this.url, this.providerId, this.actionType,  Map<String, dynamic> requestHeaders = const {}, this.requestBody, this.statusCode,  Map<String, dynamic>? responseHeaders, this.responseBody, this.responseTime, this.error,  String? $type}): _requestHeaders = requestHeaders,_responseHeaders = responseHeaders,$type = $type ?? 'api',super._();
   factory ApiLogEntry.fromJson(Map<String, dynamic> json) => _$ApiLogEntryFromJson(json);
 
 @override final  String id;
 @override final  DateTime timestamp;
  final  String method;
  final  String url;
+ final  String? providerId;
+ final  String? actionType;
  final  Map<String, dynamic> _requestHeaders;
 @JsonKey() Map<String, dynamic> get requestHeaders {
   if (_requestHeaders is EqualUnmodifiableMapView) return _requestHeaders;
@@ -280,16 +282,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ApiLogEntry&&(identical(other.id, id) || other.id == id)&&(identical(other.timestamp, timestamp) || other.timestamp == timestamp)&&(identical(other.method, method) || other.method == method)&&(identical(other.url, url) || other.url == url)&&const DeepCollectionEquality().equals(other._requestHeaders, _requestHeaders)&&const DeepCollectionEquality().equals(other.requestBody, requestBody)&&(identical(other.statusCode, statusCode) || other.statusCode == statusCode)&&const DeepCollectionEquality().equals(other._responseHeaders, _responseHeaders)&&const DeepCollectionEquality().equals(other.responseBody, responseBody)&&(identical(other.responseTime, responseTime) || other.responseTime == responseTime)&&(identical(other.error, error) || other.error == error));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ApiLogEntry&&(identical(other.id, id) || other.id == id)&&(identical(other.timestamp, timestamp) || other.timestamp == timestamp)&&(identical(other.method, method) || other.method == method)&&(identical(other.url, url) || other.url == url)&&(identical(other.providerId, providerId) || other.providerId == providerId)&&(identical(other.actionType, actionType) || other.actionType == actionType)&&const DeepCollectionEquality().equals(other._requestHeaders, _requestHeaders)&&const DeepCollectionEquality().equals(other.requestBody, requestBody)&&(identical(other.statusCode, statusCode) || other.statusCode == statusCode)&&const DeepCollectionEquality().equals(other._responseHeaders, _responseHeaders)&&const DeepCollectionEquality().equals(other.responseBody, responseBody)&&(identical(other.responseTime, responseTime) || other.responseTime == responseTime)&&(identical(other.error, error) || other.error == error));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,timestamp,method,url,const DeepCollectionEquality().hash(_requestHeaders),const DeepCollectionEquality().hash(requestBody),statusCode,const DeepCollectionEquality().hash(_responseHeaders),const DeepCollectionEquality().hash(responseBody),responseTime,error);
+int get hashCode => Object.hash(runtimeType,id,timestamp,method,url,providerId,actionType,const DeepCollectionEquality().hash(_requestHeaders),const DeepCollectionEquality().hash(requestBody),statusCode,const DeepCollectionEquality().hash(_responseHeaders),const DeepCollectionEquality().hash(responseBody),responseTime,error);
 
 @override
 String toString() {
-  return 'LogEntry.api(id: $id, timestamp: $timestamp, method: $method, url: $url, requestHeaders: $requestHeaders, requestBody: $requestBody, statusCode: $statusCode, responseHeaders: $responseHeaders, responseBody: $responseBody, responseTime: $responseTime, error: $error)';
+  return 'LogEntry.api(id: $id, timestamp: $timestamp, method: $method, url: $url, providerId: $providerId, actionType: $actionType, requestHeaders: $requestHeaders, requestBody: $requestBody, statusCode: $statusCode, responseHeaders: $responseHeaders, responseBody: $responseBody, responseTime: $responseTime, error: $error)';
 }
 
 
@@ -300,7 +302,7 @@ abstract mixin class $ApiLogEntryCopyWith<$Res> implements $LogEntryCopyWith<$Re
   factory $ApiLogEntryCopyWith(ApiLogEntry value, $Res Function(ApiLogEntry) _then) = _$ApiLogEntryCopyWithImpl;
 @override @useResult
 $Res call({
- String id, DateTime timestamp, String method, String url, Map<String, dynamic> requestHeaders, dynamic requestBody, int? statusCode, Map<String, dynamic>? responseHeaders, dynamic responseBody, DateTime? responseTime, String? error
+ String id, DateTime timestamp, String method, String url, String? providerId, String? actionType, Map<String, dynamic> requestHeaders, dynamic requestBody, int? statusCode, Map<String, dynamic>? responseHeaders, dynamic responseBody, DateTime? responseTime, String? error
 });
 
 
@@ -317,13 +319,15 @@ class _$ApiLogEntryCopyWithImpl<$Res>
 
 /// Create a copy of LogEntry
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? timestamp = null,Object? method = null,Object? url = null,Object? requestHeaders = null,Object? requestBody = freezed,Object? statusCode = freezed,Object? responseHeaders = freezed,Object? responseBody = freezed,Object? responseTime = freezed,Object? error = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? timestamp = null,Object? method = null,Object? url = null,Object? providerId = freezed,Object? actionType = freezed,Object? requestHeaders = null,Object? requestBody = freezed,Object? statusCode = freezed,Object? responseHeaders = freezed,Object? responseBody = freezed,Object? responseTime = freezed,Object? error = freezed,}) {
   return _then(ApiLogEntry(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,timestamp: null == timestamp ? _self.timestamp : timestamp // ignore: cast_nullable_to_non_nullable
 as DateTime,method: null == method ? _self.method : method // ignore: cast_nullable_to_non_nullable
 as String,url: null == url ? _self.url : url // ignore: cast_nullable_to_non_nullable
-as String,requestHeaders: null == requestHeaders ? _self._requestHeaders : requestHeaders // ignore: cast_nullable_to_non_nullable
+as String,providerId: freezed == providerId ? _self.providerId : providerId // ignore: cast_nullable_to_non_nullable
+as String?,actionType: freezed == actionType ? _self.actionType : actionType // ignore: cast_nullable_to_non_nullable
+as String?,requestHeaders: null == requestHeaders ? _self._requestHeaders : requestHeaders // ignore: cast_nullable_to_non_nullable
 as Map<String, dynamic>,requestBody: freezed == requestBody ? _self.requestBody : requestBody // ignore: cast_nullable_to_non_nullable
 as dynamic,statusCode: freezed == statusCode ? _self.statusCode : statusCode // ignore: cast_nullable_to_non_nullable
 as int?,responseHeaders: freezed == responseHeaders ? _self._responseHeaders : responseHeaders // ignore: cast_nullable_to_non_nullable

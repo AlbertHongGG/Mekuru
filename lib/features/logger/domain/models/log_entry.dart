@@ -12,6 +12,8 @@ sealed class LogEntry with _$LogEntry {
     required DateTime timestamp,
     required String method,
     required String url,
+    String? providerId,
+    String? actionType,
     @Default({}) Map<String, dynamic> requestHeaders,
     dynamic requestBody,
     int? statusCode,

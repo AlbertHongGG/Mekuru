@@ -22,7 +22,7 @@ class ComicWFProvider extends BaseComicProvider {
   late final Dio _imageDio;
 
   ComicWFProvider(ApiClient apiClient) {
-    _apiDio = apiClient.createProviderDio('https://api.comicwifi.com');
+    _apiDio = apiClient.createProviderDio('https://api.comicwifi.com', providerId: _id);
     _apiDio.options.headers.addAll({
           "accept": "application/json",
           "accept-charset": "UTF-8",
@@ -59,7 +59,7 @@ class ComicWFProvider extends BaseComicProvider {
     
     _apiClient = ComicWFApiClient(_apiDio);
 
-    _imageDio = apiClient.createProviderDio('');
+    _imageDio = apiClient.createProviderDio('', providerId: _id);
     _imageDio.options.headers.addAll({
       'Referer': 'https://comicwf.com/',
     });

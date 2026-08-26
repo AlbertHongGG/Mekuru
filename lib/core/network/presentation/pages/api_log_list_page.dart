@@ -199,40 +199,57 @@ class ApiLogListPage extends ConsumerStatefulWidget {
 }
 
 class _ApiLogListPageState extends ConsumerState<ApiLogListPage>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-  final List<String?> _tabs = [null, 'GET', 'POST', 'PUT', 'DELETE', 'PATCH'];
-  Map<String?, List<ApiLogEntry>> _cachedFilteredLogs = {};
+    with TickerProviderStateMixin {
+  late TabController _providerController;
+  late TabController _methodController;
+  late TabController _actionController;
+
+  final List<String?> _providers = [null, 'guazi', 'manwa', 'comicwf', 'webtoon', 'copymg'];
+  final List<String?> _methods = [null, 'GET', 'POST', 'PUT', 'DELETE', 'PATCH'];
+  final List<String?> _actions = [null, 'Explore', 'Search', 'Detail', 'Chapters', 'Images', 'Other'];
+
+  List<ApiLogEntry> _filteredLogs = [];
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: _tabs.length, vsync: this);
+    _providerController = TabController(length: _providers.length, vsync: this);
+    _methodController = TabController(length: _methods.length, vsync: this);
+    _actionController = TabController(length: _actions.length, vsync: this);
+
+    _providerController.addListener(_onTabChanged);
+    _methodController.addListener(_onTabChanged);
+    _actionController.addListener(_onTabChanged);
+  }
+
+  void _onTabChanged() {
+    setState(() {}); // Trigger rebuild to recompute filtered logs
   }
 
   @override
   void dispose() {
-    _tabController.dispose();
+    _providerController.dispose();
+    _methodController.dispose();
+    _actionController.dispose();
     super.dispose();
   }
 
   void _computeFilteredLogs(List<ApiLogEntry> allLogs) {
-    final newCachedLogs = <String?, List<ApiLogEntry>>{};
-    for (final tab in _tabs) {
-      if (tab == null) {
-        newCachedLogs[tab] = allLogs;
-      } else {
-        newCachedLogs[tab] = allLogs.where((l) => l.method.toUpperCase() == tab).toList();
-      }
-    }
-    _cachedFilteredLogs = newCachedLogs;
+    final selectedProvider = _providers[_providerController.index];
+    final selectedMethod = _methods[_methodController.index];
+    final selectedAction = _actions[_actionController.index];
+
+    _filteredLogs = allLogs.where((log) {
+      if (selectedProvider != null && log.providerId != selectedProvider) return false;
+      if (selectedMethod != null && log.method.toUpperCase() != selectedMethod) return false;
+      if (selectedAction != null && log.actionType != selectedAction) return false;
+      return true;
+    }).toList();
   }
 
   void _clearLogsInTab() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final currentTab = _tabs[_tabController.index];
-    final titleText = currentTab == null ? 'CLEAR ALL API LOGS' : 'CLEAR $currentTab LOGS';
-
+    
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -262,7 +279,7 @@ class _ApiLogListPageState extends ConsumerState<ApiLogListPage>
             const SizedBox(height: 24),
             Center(
               child: Text(
-                titleText,
+                'CLEAR API LOGS',
                 style: TextStyle(
                   fontFamily: 'Outfit',
                   fontSize: 13,
@@ -279,12 +296,7 @@ class _ApiLogListPageState extends ConsumerState<ApiLogListPage>
               activeColor: Colors.redAccent,
               onConfirmed: () async {
                 Navigator.pop(ctx);
-                if (currentTab == null) {
-                  await ref.read(apiLogsProvider.notifier).clearLogs();
-                } else {
-                  // TO DO: implement clear by method in the future. For now clear all API logs
-                  await ref.read(apiLogsProvider.notifier).clearLogs();
-                }
+                await ref.read(apiLogsProvider.notifier).clearLogs();
               },
             ),
           ],
@@ -319,6 +331,50 @@ class _ApiLogListPageState extends ConsumerState<ApiLogListPage>
     );
   }
 
+  Widget _buildTabBar(TabController controller, List<String?> tabs, bool isDark) {
+    return Container(
+      margin: const EdgeInsets.only(left: 16, right: 16, top: 8, bottom: 0),
+      decoration: BoxDecoration(
+        color: isDark
+            ? Colors.white.withValues(alpha: 0.05)
+            : Colors.black.withValues(alpha: 0.04),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: TabBar(
+        controller: controller,
+        isScrollable: true,
+        dividerColor: Colors.transparent,
+        tabAlignment: TabAlignment.start,
+        indicator: BoxDecoration(
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.15)
+              : Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: isDark
+              ? []
+              : [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.04),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+        ),
+        indicatorSize: TabBarIndicatorSize.tab,
+        indicatorPadding: const EdgeInsets.all(4),
+        labelColor: isDark ? Colors.white : AppColors.primary,
+        unselectedLabelColor: isDark ? Colors.white54 : Colors.black54,
+        labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+        unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+        splashBorderRadius: BorderRadius.circular(12),
+        tabs: tabs.map((tab) => Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Tab(text: tab == null ? 'ALL' : tab.toUpperCase()),
+        )).toList(),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -335,79 +391,18 @@ class _ApiLogListPageState extends ConsumerState<ApiLogListPage>
           SafeArea(
             child: Column(
               children: [
-                // TabBar Only (No Header)
-                Container(
-                  margin: const EdgeInsets.only(
-                    left: 16,
-                    right: 16,
-                    top: 16,
-                    bottom: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    color: isDark
-                        ? Colors.white.withValues(alpha: 0.05)
-                        : Colors.black.withValues(alpha: 0.04),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: TabBar(
-                    controller: _tabController,
-                    isScrollable: true,
-                    dividerColor: Colors.transparent,
-                    tabAlignment: TabAlignment.start,
-                    indicator: BoxDecoration(
-                      color: isDark
-                          ? Colors.white.withValues(alpha: 0.15)
-                          : Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: isDark
-                          ? []
-                          : [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.04),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                    ),
-                    indicatorSize: TabBarIndicatorSize.tab,
-                    indicatorPadding: const EdgeInsets.all(4),
-                    labelColor: isDark ? Colors.white : AppColors.primary,
-                    unselectedLabelColor: isDark ? Colors.white54 : Colors.black54,
-                    labelStyle: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
-                    unselectedLabelStyle: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                    ),
-                    splashBorderRadius: BorderRadius.circular(12),
-                    tabs: _tabs
-                        .map(
-                          (tab) => Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8.0,
-                            ),
-                            child: Tab(text: tab == null ? '全部' : tab),
-                          ),
-                        )
-                        .toList(),
-                  ),
-                ),
+                const SizedBox(height: 8),
+                _buildTabBar(_providerController, _providers, isDark),
+                _buildTabBar(_methodController, _methods, isDark),
+                _buildTabBar(_actionController, _actions, isDark),
+                const SizedBox(height: 8),
 
-                // Native TabBarView with KeepAlive Tabs
+                // Single List (No horizontal swipe pages)
                 Expanded(
-                  child: TabBarView(
-                    controller: _tabController,
-                    children: _tabs.map((tab) {
-                      final filteredLogs = _cachedFilteredLogs[tab] ?? [];
-                      return ApiLogListTab(
-                        key: ValueKey(tab ?? 'all'),
-                        logs: filteredLogs,
-                        isDark: isDark,
-                        onLogTap: _openLogDetail,
-                      );
-                    }).toList(),
+                  child: ApiLogListTab(
+                    logs: _filteredLogs,
+                    isDark: isDark,
+                    onLogTap: _openLogDetail,
                   ),
                 ),
               ],

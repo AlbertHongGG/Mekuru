@@ -25,13 +25,13 @@ class CopyMGProvider extends BaseComicProvider {
   late final Dio _imageDio;
 
   CopyMGProvider(ApiClient apiClient) : _signer = CopyMGSigner() {
-    _apiDio = apiClient.createProviderDio('https://api.copy202601.com/api/v3');
+    _apiDio = apiClient.createProviderDio('https://api.copy202601.com/api/v3', providerId: _id);
     _apiDio.options.headers['User-Agent'] = 'COPY/3.0.9';
     _apiDio.interceptors.add(CopyMGAuthInterceptor(_signer));
     
     _apiClient = CopyMGApiClient(_apiDio);
 
-    _imageDio = apiClient.createProviderDio('');
+    _imageDio = apiClient.createProviderDio('', providerId: _id);
     _imageDio.options.headers['User-Agent'] = 'COPY/3.0.9';
   }
 

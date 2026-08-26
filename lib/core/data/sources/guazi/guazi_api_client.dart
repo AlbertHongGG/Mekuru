@@ -11,6 +11,7 @@ class GuaziApiClient {
     final response = await _dio.get(
       '/index.php/api/v2/mcomic/detail',
       queryParameters: {'id': comicId},
+      options: Options(extra: {'actionType': 'Detail'}),
     );
     return GuaziComicDetail.fromJson(response.data['data']);
   }
@@ -22,6 +23,7 @@ class GuaziApiClient {
         'id': comicId,
         'sort': sort,
       },
+      options: Options(extra: {'actionType': 'Chapters'}),
     );
     
     final data = response.data['data'];
@@ -35,6 +37,7 @@ class GuaziApiClient {
     final response = await _dio.get(
       '/index.php/api/v2/mcomic/pics',
       queryParameters: {'chapter_id': chapterId},
+      options: Options(extra: {'actionType': 'Images'}),
     );
     return GuaziImageList.fromJson(response.data['data']);
   }
@@ -47,6 +50,7 @@ class GuaziApiClient {
         'keyword': encKeyword,
         'page': page,
       },
+      options: Options(extra: {'actionType': 'Search'}),
     );
     return GuaziComicList.fromJson(response.data['data']);
   }
@@ -59,6 +63,7 @@ class GuaziApiClient {
         'page_size': pageSize,
         'sort': 2,
       },
+      options: Options(extra: {'actionType': 'Explore'}),
     );
     return GuaziComicList.fromJson(response.data['data']);
   }

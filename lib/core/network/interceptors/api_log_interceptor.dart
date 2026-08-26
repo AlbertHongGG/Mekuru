@@ -7,8 +7,9 @@ import 'package:uuid/uuid.dart';
 class ApiLogInterceptor extends Interceptor {
   final ProviderListenable<ILoggerRepository> loggerRepositoryProvider;
   final Ref ref;
+  final String? providerId;
 
-  ApiLogInterceptor(this.ref, this.loggerRepositoryProvider);
+  ApiLogInterceptor(this.ref, this.loggerRepositoryProvider, {this.providerId});
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
@@ -16,6 +17,8 @@ class ApiLogInterceptor extends Interceptor {
       id: const Uuid().v4(),
       method: options.method,
       url: options.uri.toString(),
+      providerId: providerId,
+      actionType: options.extra['actionType'] as String? ?? 'Other',
       requestHeaders: options.headers,
       requestBody: options.data,
       timestamp: DateTime.now(),

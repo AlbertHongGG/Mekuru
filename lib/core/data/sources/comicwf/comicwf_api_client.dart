@@ -10,6 +10,7 @@ class ComicWFApiClient {
     final response = await _dio.post(
       '/api/comic/detail_page',
       data: {'comicId': comicId},
+      options: Options(extra: {'actionType': 'Detail'}),
     );
     return CwComicDetail.fromJson(response.data['data']);
   }
@@ -23,6 +24,7 @@ class ComicWFApiClient {
         'page': page,
         'pageSize': pageSize,
       },
+      options: Options(extra: {'actionType': 'Chapters'}),
     );
     return CwChapterList.fromJson(response.data['data']);
   }
@@ -34,6 +36,7 @@ class ComicWFApiClient {
         'comicId': comicId,
         'chapterId': chapterId,
       },
+      options: Options(extra: {'actionType': 'Images'}),
     );
     return CwChapterReadData.fromJson(response.data['data']);
   }
@@ -46,6 +49,7 @@ class ComicWFApiClient {
         'page': page,
         'pageSize': 30,
       },
+      options: Options(extra: {'actionType': 'Search'}),
     );
     final dataList = response.data['data'] as List;
     return dataList.map((e) => CwSearchResultItem.fromJson(e)).toList();
@@ -61,6 +65,7 @@ class ComicWFApiClient {
         'orderType': '',
         'label': '',
       },
+      options: Options(extra: {'actionType': 'Explore'}),
     );
     final dataList = response.data['data'] as List;
     return dataList.map((e) => CwSearchResultItem.fromJson(e)).toList();

@@ -22,7 +22,7 @@ class GuaziProvider extends BaseComicProvider {
   late final Dio _imageDio;
 
   GuaziProvider(ApiClient apiClient) {
-    _apiDio = apiClient.createProviderDio(GuaziConstants.baseUrl);
+    _apiDio = apiClient.createProviderDio(GuaziConstants.baseUrl, providerId: _id);
     _apiDio.options.headers.addAll({
       "devicetype": "android",
       "token": GuaziConstants.token,
@@ -34,7 +34,7 @@ class GuaziProvider extends BaseComicProvider {
 
     _apiClient = GuaziApiClient(_apiDio);
 
-    _imageDio = apiClient.createProviderDio('');
+    _imageDio = apiClient.createProviderDio('', providerId: _id);
     _imageDio.options.headers.addAll({
       "user-agent": "okhttp/4.7.2",
       "referer": "https://api.guaziapp.com",

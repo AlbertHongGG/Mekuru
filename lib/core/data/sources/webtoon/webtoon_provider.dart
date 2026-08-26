@@ -22,11 +22,11 @@ class WebtoonProvider extends BaseComicProvider {
   late final Dio _imageDio;
 
   WebtoonProvider(ApiClient apiClient) {
-    _apiDio = apiClient.createProviderDio('https://global.apis.naver.com');
+    _apiDio = apiClient.createProviderDio('https://global.apis.naver.com', providerId: _id);
     _apiDio.interceptors.add(WebtoonAuthInterceptor());
     _apiClient = WebtoonApiClient(_apiDio);
 
-    _imageDio = apiClient.createProviderDio('');
+    _imageDio = apiClient.createProviderDio('', providerId: _id);
     _imageDio.options.headers.addAll({
       'Referer': 'https://www.webtoons.com/',
       'User-Agent': 'nApps (Android 9; 22081212C; linewebtoon; 3.9.9)',

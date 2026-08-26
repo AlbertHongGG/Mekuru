@@ -29,6 +29,7 @@ class ManwaApiClient {
         'page': page,
         'orderBy': 0,
       },
+      options: Options(extra: {'actionType': 'Explore'}),
     );
     _checkResponse(response.data);
     return MwResponse<MwExploreResult>.fromJson(
@@ -41,6 +42,7 @@ class ManwaApiClient {
     final response = await _dio.get(
       '/api/detail/index',
       queryParameters: {'id': id},
+      options: Options(extra: {'actionType': 'Detail'}),
     );
     _checkResponse(response.data);
     return MwResponse<MwDetailResult>.fromJson(
@@ -53,6 +55,7 @@ class ManwaApiClient {
     final response = await _dio.get(
       '/api/chapters/index',
       queryParameters: {'id': chapterId, 'img_host': 0},
+      options: Options(extra: {'actionType': 'Images'}),
     );
     _checkResponse(response.data);
     return MwResponse<MwChapterImageResult>.fromJson(
@@ -65,6 +68,7 @@ class ManwaApiClient {
     final response = await _dio.get(
       '/api/search/index',
       queryParameters: {'k': keyword, 'page': page},
+      options: Options(extra: {'actionType': 'Search'}),
     );
     _checkResponse(response.data);
     return MwResponse<MwExploreResult>.fromJson(

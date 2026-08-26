@@ -15,17 +15,20 @@ import 'manwa_interceptor.dart';
 import 'manwa_crypto.dart';
 
 class ManwaProvider extends BaseComicProvider {
+  static const String _id = 'manwa';
+  static const String _name = 'Manwa';
+
   late final ManwaApiClient _apiClient;
 
   late final Dio _apiDio;
   late final Dio _imageDio;
 
   ManwaProvider(ApiClient apiClient) {
-    _apiDio = apiClient.createProviderDio('http://mseeowpm.pro');
+    _apiDio = apiClient.createProviderDio('http://mseeowpm.pro', providerId: _id);
     _apiDio.interceptors.add(ManwaInterceptor());
     _apiClient = ManwaApiClient(_apiDio);
 
-    _imageDio = apiClient.createProviderDio('');
+    _imageDio = apiClient.createProviderDio('', providerId: _id);
     _imageDio.options.headers.addAll({
       'Referer': 'http://mseeowpm1.xyz',
       'User-Agent':
@@ -37,10 +40,10 @@ class ManwaProvider extends BaseComicProvider {
   Dio get imageDio => _imageDio;
 
   @override
-  String get providerId => 'manwa';
+  String get providerId => _id;
 
   @override
-  String get providerName => 'Manwa';
+  String get providerName => _name;
 
   @override
   Future<Uint8List> fetchImageBytes(String url) async {

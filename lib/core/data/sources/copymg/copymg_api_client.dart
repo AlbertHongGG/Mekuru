@@ -27,6 +27,7 @@ class CopyMGApiClient {
         'theme': '',
         'top': '',
       },
+      options: Options(extra: {'actionType': 'Explore'}),
     );
     _checkResponse(response.data);
     return CopyMGResponse<CmExploreResult>.fromJson(
@@ -36,7 +37,10 @@ class CopyMGApiClient {
   }
 
   Future<CopyMGResponse<CmDetailResult>> getComicDetail(String pathWord) async {
-    final response = await _dio.get('/comic2/$pathWord');
+    final response = await _dio.get(
+      '/comic2/$pathWord',
+      options: Options(extra: {'actionType': 'Detail'}),
+    );
     _checkResponse(response.data);
     return CopyMGResponse<CmDetailResult>.fromJson(
       response.data,
@@ -55,6 +59,7 @@ class CopyMGApiClient {
         'limit': limit,
         'offset': offset,
       },
+      options: Options(extra: {'actionType': 'Chapters'}),
     );
     _checkResponse(response.data);
     return CopyMGResponse<CmChapterListResult>.fromJson(
@@ -67,7 +72,10 @@ class CopyMGApiClient {
     String pathWord,
     String chapterUuid,
   ) async {
-    final response = await _dio.get('/comic/$pathWord/chapter2/$chapterUuid');
+    final response = await _dio.get(
+      '/comic/$pathWord/chapter2/$chapterUuid',
+      options: Options(extra: {'actionType': 'Images'}),
+    );
     _checkResponse(response.data);
     return CopyMGResponse<CmChapterImageResult>.fromJson(
       response.data,
@@ -88,6 +96,7 @@ class CopyMGApiClient {
         'q_type': '',
         'q': keyword,
       },
+      options: Options(extra: {'actionType': 'Search'}),
     );
     _checkResponse(response.data);
     return CopyMGResponse<CmSearchResult>.fromJson(

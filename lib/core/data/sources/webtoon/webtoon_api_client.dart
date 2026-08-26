@@ -32,7 +32,7 @@ class WebtoonApiClient {
       'startIndex': startIndex,
       'pageSize': pageSize,
       'v': '1',
-    });
+    }, options: Options(extra: {'actionType': 'Search'}));
     return WtSearchResult.fromJson(_extractResult(response));
   }
 
@@ -40,7 +40,7 @@ class WebtoonApiClient {
     final response = await _dio.get('/lineWebtoon/webtoon/trendingChartTitles.json', queryParameters: {
       'size': size,
       'v': '1',
-    });
+    }, options: Options(extra: {'actionType': 'Explore'}));
     return WtTrendingChartResult.fromJson(_extractResult(response));
   }
 
@@ -48,7 +48,7 @@ class WebtoonApiClient {
     final response = await _dio.get('/lineWebtoon/webtoon/titleHomeMainV3', queryParameters: {
       'titleNo': titleNo,
       'v': '1',
-    });
+    }, options: Options(extra: {'actionType': 'Detail'}));
     return WtTitleHomeResult.fromJson(_extractResult(response));
   }
 
@@ -59,7 +59,7 @@ class WebtoonApiClient {
       'pageSize': pageSize,
       'ordering': ordering,
       'v': '1',
-    });
+    }, options: Options(extra: {'actionType': 'Chapters'}));
     return WtEpisodeListResult.fromJson(_extractResult(response));
   }
 
@@ -69,7 +69,7 @@ class WebtoonApiClient {
       'episodeNo': episodeNo,
       'priorityViewingType': 'IMAGE',
       'v': '4',
-    });
+    }, options: Options(extra: {'actionType': 'Images'}));
     return WtEpisodeInfoResult.fromJson(_extractResult(response));
   }
 }

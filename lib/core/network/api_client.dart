@@ -3,12 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mekuru/features/settings/presentation/providers/settings_provider.dart';
 import 'package:mekuru/core/network/interceptors/api_log_interceptor.dart';
 import 'package:mekuru/features/logger/presentation/providers/logger_provider.dart';
+import 'package:mekuru/features/logger/domain/repositories/i_logger_repository.dart';
 
 class ApiClient {
   late final Dio _dio;
-  final Interceptor? _loggerInterceptor;
+  final Ref _ref;
+  final ProviderListenable<ILoggerRepository> _loggerRepositoryProvider;
   
-  ApiClient(String baseUrl, {Dio? dioOverride, Interceptor? loggerInterceptor}) : _loggerInterceptor = loggerInterceptor {
+  ApiClient(String baseUrl, this._ref, this._loggerRepositoryProvider, {Dio? dioOverride}) {
     _dio = dioOverride ?? Dio(
       BaseOptions(
         baseUrl: baseUrl,
@@ -17,14 +19,14 @@ class ApiClient {
       ),
     );
     
-    if (loggerInterceptor != null && dioOverride == null) {
-      _dio.interceptors.add(loggerInterceptor);
+    if (dioOverride == null) {
+      _dio.interceptors.add(ApiLogInterceptor(_ref, _loggerRepositoryProvider));
     }
   }
 
   Dio get dio => _dio;
 
-  Dio createProviderDio(String baseUrl) {
+  Dio createProviderDio(String baseUrl, {String? providerId}) {
     final newDio = Dio(
       BaseOptions(
         baseUrl: baseUrl,
@@ -32,9 +34,7 @@ class ApiClient {
         receiveTimeout: const Duration(seconds: 15),
       ),
     );
-    if (_loggerInterceptor != null) {
-      newDio.interceptors.add(_loggerInterceptor);
-    }
+    newDio.interceptors.add(ApiLogInterceptor(_ref, _loggerRepositoryProvider, providerId: providerId));
     return newDio;
   }
 }
@@ -43,7 +43,8 @@ final apiClientProvider = Provider<ApiClient>((ref) {
   final settings = ref.watch(settingsProvider);
   return ApiClient(
     settings.serverUrl,
-    loggerInterceptor: ApiLogInterceptor(ref, loggerRepositoryProvider),
+    ref,
+    loggerRepositoryProvider,
   );
 });
 

@@ -6,7 +6,6 @@ class ComicCardData {
   final String providerId;
   final String? title;
   final String? coverUrl;
-  final String author;
   final List<String> tags;
   final String? progressLabel;
 
@@ -15,18 +14,15 @@ class ComicCardData {
     required this.providerId,
     this.title,
     this.coverUrl,
-    this.author = '未知作者',
     this.tags = const [],
     this.progressLabel,
   });
 
   factory ComicCardData.fromComic(IComicItem comic, {List<String>? overrideTags, String? progressLabel}) {
-    String author = '未知作者';
     List<String> tags = overrideTags ?? [];
     
     if (overrideTags == null) {
       if (comic is ComicDetail) {
-        author = comic.author;
         tags = comic.tags;
       } else if (comic is ComicExploreResult) {
         tags = comic.tags;
@@ -40,7 +36,6 @@ class ComicCardData {
       providerId: comic.providerId,
       title: comic.title,
       coverUrl: comic.coverUrl,
-      author: author,
       tags: tags,
       progressLabel: progressLabel,
     );

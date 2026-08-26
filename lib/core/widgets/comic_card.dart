@@ -48,24 +48,6 @@ class ComicCard extends StatelessWidget {
             height: 16,
             child: Row(
               children: [
-                if (data.author.isNotEmpty) ...[
-                  const Icon(Icons.person_outline, size: 12, color: Colors.grey),
-                  const SizedBox(width: 2),
-                  Flexible(
-                    flex: 1,
-                    child: Text(
-                      data.author,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(color: Colors.grey, fontSize: 12),
-                    ),
-                  ),
-                ],
-                if (data.author.isNotEmpty && data.tags.isNotEmpty)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 4),
-                    child: Text('•', style: TextStyle(color: Colors.grey, fontSize: 10)),
-                  ),
                 if (data.tags.isNotEmpty)
                   Flexible(
                     flex: 1,

@@ -407,12 +407,12 @@ class ComicDetailsPage extends ConsumerWidget {
                   gradient: SweepGradient(
                     center: Alignment.center,
                     colors: [
-                      const Color(0xFF81D4FA).withValues(alpha: 0.2), // Light Blue
-                      const Color(0xFFB39DDB).withValues(alpha: 0.2), // Soft Purple
-                      const Color(0xFFF48FB1).withValues(alpha: 0.2), // Vibrant Pink
-                      const Color(0xFFFFE082).withValues(alpha: 0.2), // Soft Peach/Yellow
-                      const Color(0xFF80CBC4).withValues(alpha: 0.2), // Teal/Cyan
-                      const Color(0xFF81D4FA).withValues(alpha: 0.2), // Back to Light Blue
+                      const Color(0xFF81D4FA).withValues(alpha: 0.5), // Light Blue
+                      const Color(0xFFB39DDB).withValues(alpha: 0.5), // Soft Purple
+                      const Color(0xFFF48FB1).withValues(alpha: 0.5), // Vibrant Pink
+                      const Color(0xFFFFE082).withValues(alpha: 0.5), // Soft Peach/Yellow
+                      const Color(0xFF80CBC4).withValues(alpha: 0.5), // Teal/Cyan
+                      const Color(0xFF81D4FA).withValues(alpha: 0.5), // Back to Light Blue
                     ],
                     stops: const [0.0, 0.2, 0.4, 0.6, 0.8, 1.0],
                   ),

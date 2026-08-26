@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ComicDetail {
 
-@JsonKey(name: 'id') String get comicId;@JsonKey(name: 'provider_id') String get providerId; String get title;@JsonKey(name: 'cover_url') String get coverUrl; String? get author; String get description; List<String> get tags;@JsonKey(name: 'update_status') String get status;
+@JsonKey(name: 'id') String get comicId;@JsonKey(name: 'provider_id') String get providerId; String get title;@JsonKey(name: 'cover_url') String get coverUrl; String get author; String get description; List<String> get tags;@JsonKey(name: 'update_status') String get status;
 /// Create a copy of ComicDetail
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -49,7 +49,7 @@ abstract mixin class $ComicDetailCopyWith<$Res>  {
   factory $ComicDetailCopyWith(ComicDetail value, $Res Function(ComicDetail) _then) = _$ComicDetailCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(name: 'id') String comicId,@JsonKey(name: 'provider_id') String providerId, String title,@JsonKey(name: 'cover_url') String coverUrl, String? author, String description, List<String> tags,@JsonKey(name: 'update_status') String status
+@JsonKey(name: 'id') String comicId,@JsonKey(name: 'provider_id') String providerId, String title,@JsonKey(name: 'cover_url') String coverUrl, String author, String description, List<String> tags,@JsonKey(name: 'update_status') String status
 });
 
 
@@ -66,14 +66,14 @@ class _$ComicDetailCopyWithImpl<$Res>
 
 /// Create a copy of ComicDetail
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? comicId = null,Object? providerId = null,Object? title = null,Object? coverUrl = null,Object? author = freezed,Object? description = null,Object? tags = null,Object? status = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? comicId = null,Object? providerId = null,Object? title = null,Object? coverUrl = null,Object? author = null,Object? description = null,Object? tags = null,Object? status = null,}) {
   return _then(ComicDetail(
 comicId: null == comicId ? _self.comicId : comicId // ignore: cast_nullable_to_non_nullable
 as String,providerId: null == providerId ? _self.providerId : providerId // ignore: cast_nullable_to_non_nullable
 as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,coverUrl: null == coverUrl ? _self.coverUrl : coverUrl // ignore: cast_nullable_to_non_nullable
-as String,author: freezed == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
-as String?,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
+as String,author: null == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
+as String,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String,tags: null == tags ? _self.tags : tags // ignore: cast_nullable_to_non_nullable
 as List<String>,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as String,
@@ -161,7 +161,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'id')  String comicId, @JsonKey(name: 'provider_id')  String providerId,  String title, @JsonKey(name: 'cover_url')  String coverUrl,  String? author,  String description,  List<String> tags, @JsonKey(name: 'update_status')  String status)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'id')  String comicId, @JsonKey(name: 'provider_id')  String providerId,  String title, @JsonKey(name: 'cover_url')  String coverUrl,  String author,  String description,  List<String> tags, @JsonKey(name: 'update_status')  String status)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ComicDetail() when $default != null:
 return $default(_that.comicId,_that.providerId,_that.title,_that.coverUrl,_that.author,_that.description,_that.tags,_that.status);case _:
@@ -182,7 +182,7 @@ return $default(_that.comicId,_that.providerId,_that.title,_that.coverUrl,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'id')  String comicId, @JsonKey(name: 'provider_id')  String providerId,  String title, @JsonKey(name: 'cover_url')  String coverUrl,  String? author,  String description,  List<String> tags, @JsonKey(name: 'update_status')  String status)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'id')  String comicId, @JsonKey(name: 'provider_id')  String providerId,  String title, @JsonKey(name: 'cover_url')  String coverUrl,  String author,  String description,  List<String> tags, @JsonKey(name: 'update_status')  String status)  $default,) {final _that = this;
 switch (_that) {
 case _ComicDetail():
 return $default(_that.comicId,_that.providerId,_that.title,_that.coverUrl,_that.author,_that.description,_that.tags,_that.status);case _:
@@ -202,7 +202,7 @@ return $default(_that.comicId,_that.providerId,_that.title,_that.coverUrl,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'id')  String comicId, @JsonKey(name: 'provider_id')  String providerId,  String title, @JsonKey(name: 'cover_url')  String coverUrl,  String? author,  String description,  List<String> tags, @JsonKey(name: 'update_status')  String status)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'id')  String comicId, @JsonKey(name: 'provider_id')  String providerId,  String title, @JsonKey(name: 'cover_url')  String coverUrl,  String author,  String description,  List<String> tags, @JsonKey(name: 'update_status')  String status)?  $default,) {final _that = this;
 switch (_that) {
 case _ComicDetail() when $default != null:
 return $default(_that.comicId,_that.providerId,_that.title,_that.coverUrl,_that.author,_that.description,_that.tags,_that.status);case _:
@@ -217,14 +217,14 @@ return $default(_that.comicId,_that.providerId,_that.title,_that.coverUrl,_that.
 @JsonSerializable()
 
 class _ComicDetail implements ComicDetail {
-  const _ComicDetail({@JsonKey(name: 'id') required this.comicId, @JsonKey(name: 'provider_id') required this.providerId, required this.title, @JsonKey(name: 'cover_url') required this.coverUrl, this.author, required this.description,  List<String> tags = const [], @JsonKey(name: 'update_status') this.status = ''}): _tags = tags;
+  const _ComicDetail({@JsonKey(name: 'id') required this.comicId, @JsonKey(name: 'provider_id') required this.providerId, required this.title, @JsonKey(name: 'cover_url') required this.coverUrl, this.author = '未知作者', required this.description,  List<String> tags = const [], @JsonKey(name: 'update_status') this.status = ''}): _tags = tags;
   factory _ComicDetail.fromJson(Map<String, dynamic> json) => _$ComicDetailFromJson(json);
 
 @override@JsonKey(name: 'id') final  String comicId;
 @override@JsonKey(name: 'provider_id') final  String providerId;
 @override final  String title;
 @override@JsonKey(name: 'cover_url') final  String coverUrl;
-@override final  String? author;
+@override@JsonKey() final  String author;
 @override final  String description;
  final  List<String> _tags;
 @override@JsonKey() List<String> get tags {
@@ -268,7 +268,7 @@ abstract mixin class _$ComicDetailCopyWith<$Res> implements $ComicDetailCopyWith
   factory _$ComicDetailCopyWith(_ComicDetail value, $Res Function(_ComicDetail) _then) = __$ComicDetailCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: 'id') String comicId,@JsonKey(name: 'provider_id') String providerId, String title,@JsonKey(name: 'cover_url') String coverUrl, String? author, String description, List<String> tags,@JsonKey(name: 'update_status') String status
+@JsonKey(name: 'id') String comicId,@JsonKey(name: 'provider_id') String providerId, String title,@JsonKey(name: 'cover_url') String coverUrl, String author, String description, List<String> tags,@JsonKey(name: 'update_status') String status
 });
 
 
@@ -285,14 +285,14 @@ class __$ComicDetailCopyWithImpl<$Res>
 
 /// Create a copy of ComicDetail
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? comicId = null,Object? providerId = null,Object? title = null,Object? coverUrl = null,Object? author = freezed,Object? description = null,Object? tags = null,Object? status = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? comicId = null,Object? providerId = null,Object? title = null,Object? coverUrl = null,Object? author = null,Object? description = null,Object? tags = null,Object? status = null,}) {
   return _then(_ComicDetail(
 comicId: null == comicId ? _self.comicId : comicId // ignore: cast_nullable_to_non_nullable
 as String,providerId: null == providerId ? _self.providerId : providerId // ignore: cast_nullable_to_non_nullable
 as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,coverUrl: null == coverUrl ? _self.coverUrl : coverUrl // ignore: cast_nullable_to_non_nullable
-as String,author: freezed == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
-as String?,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
+as String,author: null == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
+as String,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String,tags: null == tags ? _self._tags : tags // ignore: cast_nullable_to_non_nullable
 as List<String>,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as String,

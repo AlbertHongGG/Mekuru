@@ -230,17 +230,15 @@ class ComicDetailsPage extends ConsumerWidget {
                             const SizedBox(height: 12),
                             
                             // Author
-                            if (comic.author != null && comic.author!.isNotEmpty) ...[
-                              Text(
-                                comic.author!,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  color: isDark ? Colors.white60 : Colors.black54,
-                                ),
+                            Text(
+                              comic.author,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: isDark ? Colors.white60 : Colors.black54,
                               ),
-                              const SizedBox(height: 16),
-                            ],
+                            ),
+                            const SizedBox(height: 16),
                             
                             // Status & Date Row
                             Row(

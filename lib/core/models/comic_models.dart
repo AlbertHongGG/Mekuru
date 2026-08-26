@@ -11,7 +11,7 @@ abstract class ComicDetail with _$ComicDetail implements IComicItem {
     @JsonKey(name: 'provider_id') required String providerId,
     required String title,
     @JsonKey(name: 'cover_url') required String coverUrl,
-    String? author,
+    @Default('未知作者') String author,
     required String description,
     @Default([]) List<String> tags,
     @JsonKey(name: 'update_status') @Default('') String status,

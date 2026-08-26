@@ -55,7 +55,7 @@ class CopyMGProvider extends BaseComicProvider {
       final comic = response.results!.comic;
       
       final authors = comic.author.map((a) => a.name).toList();
-      final authorStr = authors.isNotEmpty ? authors.join(', ') : '';
+      final authorStr = authors.isNotEmpty ? authors.join(', ') : '未知作者';
       final tags = comic.theme.map((t) => t.name).toList();
       
       String statusStr = '';

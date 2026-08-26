@@ -70,7 +70,7 @@ class GuaziProvider extends BaseComicProvider {
         providerId: _id,
         title: detail.name,
         coverUrl: detail.pic ?? detail.picThumb ?? '',
-        author: detail.author,
+        author: detail.author != null && detail.author!.isNotEmpty ? detail.author! : '未知作者',
         description: detail.content ?? '',
         status: detail.serialize ?? '',
         tags: detail.categoryName != null && detail.categoryName!.isNotEmpty

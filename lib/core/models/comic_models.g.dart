@@ -11,7 +11,7 @@ _ComicDetail _$ComicDetailFromJson(Map<String, dynamic> json) => _ComicDetail(
   providerId: json['provider_id'] as String,
   title: json['title'] as String,
   coverUrl: json['cover_url'] as String,
-  author: json['author'] as String?,
+  author: json['author'] as String? ?? '未知作者',
   description: json['description'] as String,
   tags:
       (json['tags'] as List<dynamic>?)?.map((e) => e as String).toList() ??

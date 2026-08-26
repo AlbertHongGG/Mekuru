@@ -70,7 +70,7 @@ class ManwaProvider extends BaseComicProvider {
         comicId: comicId,
         title: data.name,
         coverUrl: data.picx ?? '',
-        author: data.author.join(', '),
+        author: data.author.isNotEmpty ? data.author.join(', ') : '未知作者',
         description: data.text ?? '',
         status: data.state ?? '',
         tags: data.tags.map((t) => t.name).toList(),

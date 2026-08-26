@@ -55,7 +55,7 @@ class WebtoonProvider extends BaseComicProvider {
       final dto = await _apiClient.titleHomeMainV3(titleNo);
       
       final authors = dto.title.authorList.map((e) => e.authorName).toList();
-      final authorStr = authors.isNotEmpty ? authors.join(', ') : null;
+      final authorStr = authors.isNotEmpty ? authors.join(', ') : '未知作者';
       
       final List<String> tags = [];
       bool isCompleted = false;

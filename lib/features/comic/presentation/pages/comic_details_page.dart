@@ -114,20 +114,24 @@ class ComicDetailsPage extends ConsumerWidget {
       extendBody: true,
       body: Stack(
         children: [
-          // 1. Fixed Blurred Background (Scaled up to hide blur bleed edges)
+          // 1. Fixed Blurred Background (Scaled up to hide bleed, Clipped to prevent transition ghosting)
           Positioned(
             top: 0,
             left: 0,
             right: 0,
             height: MediaQuery.of(context).size.height * 0.5,
-            child: Transform.scale(
-              scale: 1.15,
-              child: ImageFiltered(
-                imageFilter: ImageFilter.blur(sigmaX: 25, sigmaY: 25, tileMode: TileMode.mirror),
-                child: ComicImage(
-                  imageUrl: comic.coverUrl,
-                  providerId: comic.providerId,
-                  fit: BoxFit.cover,
+            child: ClipRect(
+              child: Transform.scale(
+                scale: 1.15,
+                child: ImageFiltered(
+                  imageFilter: ImageFilter.blur(sigmaX: 25, sigmaY: 25, tileMode: TileMode.mirror),
+                  child: ComicImage(
+                    imageUrl: comic.coverUrl,
+                    providerId: comic.providerId,
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: double.infinity,
+                  ),
                 ),
               ),
             ),

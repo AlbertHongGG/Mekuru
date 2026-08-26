@@ -199,7 +199,7 @@ class ComicDetailsPage extends ConsumerWidget {
               
               // Spacer to expose the blurred background above the card
               const SliverToBoxAdapter(
-                child: SizedBox(height: 20),
+                child: SizedBox(height: 40),
               ),
               
               // The White/Dark Card Wrapper
@@ -210,7 +210,7 @@ class ComicDetailsPage extends ConsumerWidget {
                   children: [
                     // Card Background
                     Container(
-                      margin: const EdgeInsets.only(top: 100), // Push card down to let poster pop out
+                      margin: const EdgeInsets.only(top: 150), // Push card down to let poster pop out
                       constraints: BoxConstraints(
                         minHeight: MediaQuery.of(context).size.height * 0.7,
                       ),
@@ -228,9 +228,9 @@ class ComicDetailsPage extends ConsumerWidget {
                       ),
                       // Card Content
                       child: Padding(
-                        // Poster height = 196. Poster top = 0. Card top = 100.
-                        // Overlap into card = 96. Padding = 96 + 24 = 120.
-                        padding: const EdgeInsets.fromLTRB(24, 120, 24, 40),
+                        // Poster height = 252. Poster top = 0. Card top = 150.
+                        // Overlap into card = 102. Padding = 102 + 24 = 126.
+                        padding: const EdgeInsets.fromLTRB(24, 126, 24, 40),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
@@ -306,14 +306,14 @@ class ComicDetailsPage extends ConsumerWidget {
                                   maxLines: 4,
                                   style: TextStyle(
                                     fontSize: 14,
-                                    height: 1.8, // Slightly taller line height for readability
+                                    height: 1.8,
                                     color: isDark ? Colors.white70 : Colors.black87,
                                   ),
                                 ),
                               ),
                               const SizedBox(height: 16),
                             ],
-
+                            
                             // Tags (Horizontal scroll, below description)
                             if (comic.tags.isNotEmpty)
                               Align(
@@ -349,7 +349,8 @@ class ComicDetailsPage extends ConsumerWidget {
                                 ),
                               ),
                             
-                            const SizedBox(height: 40),
+                            // Bottom padding for FAB space
+                            const SizedBox(height: 80),
                           ],
                         ),
                       ),
@@ -361,8 +362,8 @@ class ComicDetailsPage extends ConsumerWidget {
                       child: Hero(
                         tag: 'cover_${comic.comicId}',
                         child: Container(
-                          width: 140,
-                          height: 196,
+                          width: 180,
+                          height: 252,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: [

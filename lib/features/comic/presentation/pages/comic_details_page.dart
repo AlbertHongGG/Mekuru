@@ -111,24 +111,24 @@ class ComicDetailsPage extends ConsumerWidget {
     }
 
     return Scaffold(
+      extendBody: true,
       body: Stack(
         children: [
           // 1. Fixed Blurred Background
-          if (comic.coverUrl != null)
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              height: MediaQuery.of(context).size.height * 0.5,
-              child: ImageFiltered(
-                imageFilter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
-                child: ComicImage(
-                  imageUrl: comic.coverUrl!,
-                  providerId: comic.providerId,
-                  fit: BoxFit.cover,
-                ),
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: MediaQuery.of(context).size.height * 0.5,
+            child: ImageFiltered(
+              imageFilter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
+              child: ComicImage(
+                imageUrl: comic.coverUrl,
+                providerId: comic.providerId,
+                fit: BoxFit.cover,
               ),
             ),
+          ),
           // Darken overlay to ensure text contrast for app bar icons
           Positioned(
             top: 0,
@@ -161,6 +161,23 @@ class ComicDetailsPage extends ConsumerWidget {
                   ),
                 ),
                 actions: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Material(
+                      color: Colors.black.withValues(alpha: 0.4),
+                      shape: const CircleBorder(),
+                      clipBehavior: Clip.antiAlias,
+                      child: IconButton(
+                        icon: const Icon(
+                          Icons.format_list_bulleted_rounded,
+                          color: Colors.white,
+                          size: 22,
+                        ),
+                        onPressed: () => _showChapterList(context, ref, state, notifier),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Material(
@@ -280,37 +297,12 @@ class ComicDetailsPage extends ConsumerWidget {
                             
                             const SizedBox(height: 28),
                             
-                            // Tags
-                            if (comic.tags != null && comic.tags!.isNotEmpty) ...[
-                              Wrap(
-                                alignment: WrapAlignment.center,
-                                spacing: 8,
-                                runSpacing: 8,
-                                children: comic.tags!.map((tag) {
-                                  return Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                    decoration: BoxDecoration(
-                                      color: isDark 
-                                          ? Colors.white10 
-                                          : Colors.black.withValues(alpha: 0.05),
-                                      borderRadius: BorderRadius.circular(16),
-                                    ),
-                                    child: Text(
-                                      tag,
-                                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
-                                    ),
-                                  );
-                                }).toList(),
-                              ),
-                              const SizedBox(height: 32),
-                            ],
-                            
                             // Description (Left aligned for better readability)
-                            if (comic.description != null && comic.description!.isNotEmpty) ...[
+                            if (comic.description.isNotEmpty) ...[
                               Align(
                                 alignment: Alignment.centerLeft,
                                 child: ExpandableText(
-                                  text: comic.description!,
+                                  text: comic.description,
                                   maxLines: 4,
                                   style: TextStyle(
                                     fontSize: 14,
@@ -319,7 +311,43 @@ class ComicDetailsPage extends ConsumerWidget {
                                   ),
                                 ),
                               ),
+                              const SizedBox(height: 16),
                             ],
+
+                            // Tags (Horizontal scroll, below description)
+                            if (comic.tags.isNotEmpty)
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  physics: const BouncingScrollPhysics(),
+                                  child: Row(
+                                    children: comic.tags.map((tag) {
+                                      return Container(
+                                        margin: const EdgeInsets.only(right: 8),
+                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                        decoration: BoxDecoration(
+                                          color: isDark 
+                                              ? Colors.white.withValues(alpha: 0.08) 
+                                              : Colors.blueGrey.withValues(alpha: 0.08),
+                                          borderRadius: BorderRadius.circular(4),
+                                          border: Border.all(
+                                            color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
+                                          ),
+                                        ),
+                                        child: Text(
+                                          tag,
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w500,
+                                            color: isDark ? Colors.white60 : Colors.blueGrey[700],
+                                          ),
+                                        ),
+                                      );
+                                    }).toList(),
+                                  ),
+                                ),
+                              ),
                             
                             const SizedBox(height: 40),
                           ],
@@ -347,7 +375,7 @@ class ComicDetailsPage extends ConsumerWidget {
                           ),
                           clipBehavior: Clip.antiAlias,
                           child: ComicImage(
-                            imageUrl: comic.coverUrl ?? '',
+                            imageUrl: comic.coverUrl,
                             providerId: comic.providerId,
                             fit: BoxFit.cover,
                           ),
@@ -361,74 +389,66 @@ class ComicDetailsPage extends ConsumerWidget {
           ),
         ],
       ),
-      bottomNavigationBar: SafeArea(
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          decoration: BoxDecoration(
-            color: Theme.of(context).scaffoldBackgroundColor,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 10,
-                offset: const Offset(0, -5),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: ClipRRect(
+        borderRadius: BorderRadius.circular(30),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            decoration: BoxDecoration(
+              color: isDark ? Colors.black.withValues(alpha: 0.6) : Colors.white.withValues(alpha: 0.8),
+              borderRadius: BorderRadius.circular(30),
+              border: Border.all(
+                color: isDark ? Colors.white12 : Colors.black12,
+                width: 1,
               ),
-            ],
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: () async {
-                    if (state.chapters.isEmpty) return;
-                    String targetChapterId = state.chapters.first.id;
-                    if (state.isChapterSortDescending) {
-                      targetChapterId = state.chapters.last.id;
-                    }
-                    
-                    if (lastReadChapterId != null) {
-                      targetChapterId = lastReadChapterId;
-                    }
-                    
-                    await context.push('/viewer/$providerId/$comicId/$targetChapterId');
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: Text(
-                    lastReadChapterId != null ? '繼續閱讀' : '開始閱讀',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1.5,
-                    ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () async {
+                  if (state.chapters.isEmpty) return;
+                  String targetChapterId = state.chapters.first.id;
+                  if (state.isChapterSortDescending) {
+                    targetChapterId = state.chapters.last.id;
+                  }
+                  if (lastReadChapterId != null) {
+                    targetChapterId = lastReadChapterId;
+                  }
+                  await context.push('/viewer/$providerId/$comicId/$targetChapterId');
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.menu_book_rounded, 
+                        color: isDark ? Colors.white70 : Colors.black54,
+                        size: 22,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        lastReadChapterId != null ? '繼續閱讀' : '開始閱讀',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: isDark ? Colors.white70 : Colors.black54,
+                          letterSpacing: 1.2,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
-              Material(
-                color: isDark 
-                    ? Colors.white10 
-                    : Colors.black.withValues(alpha: 0.05),
-                borderRadius: BorderRadius.circular(16),
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(16),
-                  onTap: () => _showChapterList(context, ref, state, notifier),
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    child: Icon(
-                      Icons.format_list_bulleted_rounded,
-                      color: isDark ? Colors.white : Colors.black87,
-                    ),
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),

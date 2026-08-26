@@ -29,34 +29,44 @@ class SplashTitle extends StatelessWidget {
         position: slideAnimation,
         child: FadeTransition(
           opacity: fadeAnimation,
-          child: const Padding(
-            padding: EdgeInsets.only(top: 24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Mekuru',
-                  style: TextStyle(
-                    fontFamily: 'Outfit', // Assuming you have this or will use default
-                    fontSize: 36,
-                    fontWeight: FontWeight.w800,
-                    color: Color(0xFF1D1D1F), // Elegant dark color
-                    letterSpacing: 2.0,
-                  ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 16),
+              // Elegant expanding line
+              AnimatedBuilder(
+                animation: fadeAnimation,
+                builder: (context, child) {
+                  return Container(
+                    width: 120 * fadeAnimation.value, // Line grows from center
+                    height: 1,
+                    color: const Color(0xFF1D1D1F).withOpacity(0.3),
+                  );
+                },
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'M E K U R U',
+                style: TextStyle(
+                  fontFamily: 'Outfit', // Or any elegant serif font if available
+                  fontSize: 22,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF1D1D1F),
+                  letterSpacing: 8.0, // Increased spacing for more elegance
                 ),
-                SizedBox(height: 6),
-                Text(
-                  'SMART READING ASSISTANT',
-                  style: TextStyle(
-                    fontFamily: 'Outfit',
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF86868B), // Subtle secondary color
-                    letterSpacing: 6.0,
-                  ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'COMICS',
+                style: TextStyle(
+                  fontFamily: 'Outfit',
+                  fontSize: 10,
+                  fontWeight: FontWeight.w400,
+                  color: Color(0xFF86868B),
+                  letterSpacing: 4.0,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

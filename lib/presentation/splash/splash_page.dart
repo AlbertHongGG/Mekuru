@@ -28,7 +28,7 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 2000),
+      duration: const Duration(milliseconds: 2400), // Slightly longer for frame
     );
 
     _setupAnimations();
@@ -49,38 +49,38 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
     _logoFade = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: const Interval(0.0, 0.4, curve: Curves.easeOut),
+        curve: const Interval(0.2, 0.6, curve: Curves.easeOut),
       ),
     );
     _logoScale = Tween<double>(begin: 0.9, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: const Interval(0.0, 0.5, curve: Curves.easeOutCubic),
+        curve: const Interval(0.2, 0.7, curve: Curves.easeOutCubic),
       ),
     );
 
     // 2. Title unfolds, slides, and fades
     _titleUnfold = CurvedAnimation(
       parent: _controller,
-      curve: const Interval(0.4, 0.9, curve: Curves.easeOutCubic),
+      curve: const Interval(0.5, 0.9, curve: Curves.easeOutCubic),
     );
     
     _titleSlide = Tween<Offset>(
-      begin: const Offset(0, -0.5),
+      begin: const Offset(0, -0.2),
       end: Offset.zero,
     ).animate(_titleUnfold);
 
     _titleFade = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: const Interval(0.5, 0.9, curve: Curves.easeOut),
+        curve: const Interval(0.6, 1.0, curve: Curves.easeOut),
       ),
     );
   }
 
   void _navigateToHome() async {
     // Wait briefly after animation completes before routing to let user appreciate it
-    await Future.delayed(const Duration(milliseconds: 400));
+    await Future.delayed(const Duration(milliseconds: 500));
 
     if (mounted) {
       // Use go() instead of push() to prevent going back to splash

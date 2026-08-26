@@ -38,11 +38,11 @@ class ManwaApiClient {
     );
   }
 
-  Future<MwResponse<MwDetailResult>> getComicDetail(String id) async {
+  Future<MwResponse<MwDetailResult>> getComicDetail(String id, {String actionType = 'Detail'}) async {
     final response = await _dio.get(
       '/api/detail/index',
       queryParameters: {'id': id},
-      options: Options(extra: {'actionType': 'Detail'}),
+      options: Options(extra: {'actionType': actionType}),
     );
     _checkResponse(response.data);
     return MwResponse<MwDetailResult>.fromJson(

@@ -85,7 +85,7 @@ class ManwaProvider extends BaseComicProvider {
   Future<Result<List<Chapter>, Failure>> getChapterList(String comicId,
       {bool isDescending = true}) async {
     return handleApiCall(() async {
-      final response = await _apiClient.getComicDetail(comicId);
+      final response = await _apiClient.getComicDetail(comicId, actionType: 'Chapters');
       final chapters = response.data.chapterList.map((c) {
         return Chapter(
           id: c.id.toString(),

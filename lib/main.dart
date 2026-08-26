@@ -13,6 +13,7 @@ import 'package:mekuru/features/viewer/presentation/pages/comic_viewer_page.dart
 import 'package:mekuru/core/notifications/presentation/widgets/global_notification_overlay.dart';
 
 
+import 'package:mekuru/presentation/splash/splash_page.dart';
 import 'package:mekuru/core/data/local/database_manager.dart';
 
 void main() async {
@@ -23,8 +24,12 @@ void main() async {
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
-    initialLocation: '/library',
+    initialLocation: '/splash',
     routes: [
+          GoRoute(
+            path: '/splash',
+            builder: (context, state) => const SplashPage(),
+          ),
           GoRoute(
             path: '/details/:providerId/:comicId',
             builder: (context, state) => ComicDetailsPage(

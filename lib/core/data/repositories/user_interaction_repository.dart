@@ -189,6 +189,7 @@ class UserInteractionRepository {
     required String chapterId,
     required String chapterTitle,
     int? pageIndex,
+    int? chapterIndex,
   }) async {
     final id = _genId(dataSourceMode, providerId, comicId);
     
@@ -207,6 +208,7 @@ class UserInteractionRepository {
       lastReadPageIndex: pageIndex ?? existingHistory?.lastReadPageIndex ?? 0,
       updatedAt: DateTime.now(),
       readChapterIds: readChapterIds,
+      lastReadChapterIndex: chapterIndex ?? existingHistory?.lastReadChapterIndex,
     ));
   }
 

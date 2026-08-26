@@ -40,6 +40,37 @@ class ComicViewerState {
 }
 
 class ComicViewerNotifier extends AutoDisposeFamilyNotifier<ComicViewerState, ({String providerId, String comicId, String chapterId})> {
+  UserInteractionRepository? _interactionRepo;
+  DataSourceMode? _mode;
+  dynamic _comic;
+  String? _chapterTitle;
+
+  int? _chronologicalIndex;
+
+  int _calculateChronologicalIndex(List<dynamic> chapters, String targetChapterId) {
+    if (chapters.isEmpty) return 1;
+    final index = chapters.indexWhere((c) => c.id == targetChapterId);
+    if (index == -1) return 1;
+
+    bool isDescending = false;
+    if (chapters.length > 1) {
+      final chaptersWithNumbers = chapters.where((c) => RegExp(r'\d+').hasMatch(c.title)).toList();
+      if (chaptersWithNumbers.length > 1) {
+        final int1 = int.parse(RegExp(r'\d+').firstMatch(chaptersWithNumbers.first.title)!.group(0)!);
+        final int2 = int.parse(RegExp(r'\d+').firstMatch(chaptersWithNumbers.last.title)!.group(0)!);
+        if (int1 > int2) {
+          isDescending = true;
+        }
+      }
+    }
+
+    if (isDescending) {
+      return chapters.length - index;
+    } else {
+      return index + 1;
+    }
+  }
+
   @override
   ComicViewerState build(({String providerId, String comicId, String chapterId}) arg) {
     Future.microtask(() => loadPages());
@@ -60,6 +91,12 @@ class ComicViewerNotifier extends AutoDisposeFamilyNotifier<ComicViewerState, ({
 
       final settings = ref.read(settingsProvider);
       final mode = settings.dataSourceMode;
+      
+      _interactionRepo = interactionRepo;
+      _mode = mode;
+      _comic = comic;
+      _chapterTitle = chapter.title;
+      _chronologicalIndex = _calculateChronologicalIndex(detailsState.chapters, arg.chapterId);
 
       int initAnchorIndex = 0;
       double initAnchorOffset = 0.0;
@@ -93,6 +130,7 @@ class ComicViewerNotifier extends AutoDisposeFamilyNotifier<ComicViewerState, ({
           chapterId: arg.chapterId,
           chapterTitle: chapter.title,
           pageIndex: packed, 
+          chapterIndex: _chronologicalIndex,
         );
       }
       
@@ -104,22 +142,17 @@ class ComicViewerNotifier extends AutoDisposeFamilyNotifier<ComicViewerState, ({
 
   Future<void> updateProgress(int anchorIndex, double anchorOffset) async {
     try {
-      final interactionRepo = ref.read(userInteractionRepositoryProvider);
-      final detailsState = ref.read(comicDetailsProvider((providerId: arg.providerId, comicId: arg.comicId)));
-      final settings = ref.read(settingsProvider);
-      final mode = settings.dataSourceMode;
-      final comic = detailsState.comic;
-      final chapter = detailsState.chapters.firstWhere((c) => c.id == arg.chapterId);
-      if (comic != null) {
+      if (_interactionRepo != null && _comic != null && _mode != null && _chapterTitle != null) {
         int packed = (anchorIndex * 1000000) + anchorOffset.toInt();
-        interactionRepo.markRead(
-          dataSourceMode: mode,
+        _interactionRepo!.markRead(
+          dataSourceMode: _mode!,
           providerId: arg.providerId,
           comicId: arg.comicId,
-          comic: comic,
+          comic: _comic,
           chapterId: arg.chapterId,
-          chapterTitle: chapter.title,
+          chapterTitle: _chapterTitle!,
           pageIndex: packed,
+          chapterIndex: _chronologicalIndex,
         );
       }
     } catch (_) {}

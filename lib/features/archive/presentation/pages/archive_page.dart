@@ -38,6 +38,16 @@ class _ArchivePageState extends ConsumerState<ArchivePage> with RouteAware {
     super.dispose();
   }
 
+  ChapterTask? _getCurrentChapter(ArchiveTask task) {
+    for (final ch in task.chapters.values) {
+      if (ch.status == 'downloading') return ch;
+    }
+    for (final ch in task.chapters.values) {
+      if (ch.status == 'queued') return ch;
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(archiveProvider);
@@ -105,11 +115,7 @@ class _ArchivePageState extends ConsumerState<ArchivePage> with RouteAware {
           final coverUrl = meta != null && meta['cover_url'] != null ? meta['cover_url'] as String : null;
           
           final isDark = Theme.of(context).brightness == Brightness.dark;
-          
-          final totalImages = task.totalImages;
-          final downloadedImages = task.downloadedImages;
-          final hasImageStats = totalImages > 0;
-          final progress = (hasImageStats ? task.imageProgress : task.progress).clamp(0.0, 1.0);
+          final currentChapter = _getCurrentChapter(task);
           
           return Container(
             decoration: BoxDecoration(
@@ -126,8 +132,28 @@ class _ArchivePageState extends ConsumerState<ArchivePage> with RouteAware {
             clipBehavior: Clip.antiAlias,
             child: Column(
               children: [
+                // Header Zone: Status & Provider
                 Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _buildStatusBadge(task.status),
+                      Text(
+                        '來源: ' + task.providerId,
+                        style: TextStyle(
+                          color: isDark ? Colors.white54 : Colors.black45,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                
+                // Body Zone: Cover & Title
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -152,103 +178,50 @@ class _ArchivePageState extends ConsumerState<ArchivePage> with RouteAware {
                       ),
                       const SizedBox(width: 16),
                       Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    title,
-                                    style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16, height: 1.2),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                _buildStatusBadge(task.status),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              '來源: ' + task.providerId,
-                              style: TextStyle(
-                                color: isDark ? Colors.white60 : Colors.black54,
-                                fontSize: 12,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              hasImageStats 
-                                  ? '已下載 ' + downloadedImages.toString() + ' / 總共 ' + totalImages.toString() + ' 頁'
-                                  : '已下載 ' + task.completedChapters.toString() + ' / 總共 ' + task.totalChapters.toString() + ' 章節',
-                              style: TextStyle(
-                                color: isDark ? Colors.white70 : Colors.black87,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  color: isDark ? Colors.white.withOpacity(0.02) : Colors.black.withOpacity(0.02),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: LayoutBuilder(
-                          builder: (context, constraints) {
-                            return Stack(
-                              children: [
-                                Container(
-                                  height: 8,
-                                  decoration: BoxDecoration(
-                                    color: isDark ? Colors.white10 : Colors.black12,
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-                                ),
-                                AnimatedContainer(
-                                  duration: const Duration(milliseconds: 300),
-                                  height: 8,
-                                  width: constraints.maxWidth * progress, 
-                                  decoration: BoxDecoration(
-                                    color: _getStatusColor(task.status),
-                                    borderRadius: BorderRadius.circular(4),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: _getStatusColor(task.status).withOpacity(0.3),
-                                        blurRadius: 6,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            );
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      SizedBox(
-                        width: 48,
                         child: Text(
-                          ((progress * 100).toStringAsFixed(1)) + '%',
-                          style: TextStyle(
-                            fontSize: 13, 
-                            fontWeight: FontWeight.w900,
-                            color: _getStatusColor(task.status),
-                          ),
-                          textAlign: TextAlign.end,
+                          title,
+                          style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16, height: 1.3),
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
                   ),
                 ),
+                
+                const SizedBox(height: 16),
+                
+                // Progress Zone
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  color: isDark ? Colors.white.withOpacity(0.02) : Colors.black.withOpacity(0.02),
+                  child: Column(
+                    children: [
+                      _buildProgressBar(
+                        context: context,
+                        isDark: isDark,
+                        label: '整體進度',
+                        valueText: task.completedChapters.toString() + ' / ' + task.totalChapters.toString() + ' 章',
+                        progress: task.progress.clamp(0.0, 1.0),
+                        color: _getStatusColor(task.status),
+                      ),
+                      if (currentChapter != null) ...[
+                        const SizedBox(height: 12),
+                        _buildProgressBar(
+                          context: context,
+                          isDark: isDark,
+                          label: currentChapter.title,
+                          valueText: currentChapter.downloadedPages.toString() + ' / ' + currentChapter.totalPages.toString() + ' 頁',
+                          progress: currentChapter.totalPages > 0 
+                              ? (currentChapter.downloadedPages / currentChapter.totalPages).clamp(0.0, 1.0) 
+                              : 0.0,
+                          color: Colors.blueAccent,
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                
                 if (task.errorMessage != null && task.errorMessage!.isNotEmpty)
                   Container(
                     width: double.infinity,
@@ -261,6 +234,8 @@ class _ArchivePageState extends ConsumerState<ArchivePage> with RouteAware {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
+                
+                // Action Zone
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   child: Row(
@@ -296,23 +271,112 @@ class _ArchivePageState extends ConsumerState<ArchivePage> with RouteAware {
     );
   }
   
+  Widget _buildProgressBar({
+    required BuildContext context,
+    required bool isDark,
+    required String label,
+    required String valueText,
+    required double progress,
+    required Color color,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: isDark ? Colors.white70 : Colors.black87,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                valueText,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                  color: color,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              return Stack(
+                children: [
+                  Container(
+                    height: 6,
+                    decoration: BoxDecoration(
+                      color: isDark ? Colors.white10 : Colors.black12,
+                      borderRadius: BorderRadius.circular(3),
+                    ),
+                  ),
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    height: 6,
+                    width: constraints.maxWidth * progress, 
+                    decoration: BoxDecoration(
+                      color: color,
+                      borderRadius: BorderRadius.circular(3),
+                      boxShadow: [
+                        BoxShadow(
+                          color: color.withOpacity(0.4),
+                          blurRadius: 4,
+                          offset: const Offset(0, 1),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+  
   Widget _buildStatusBadge(String status) {
     final color = _getStatusColor(status);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(6),
         border: Border.all(color: color.withOpacity(0.3), width: 1),
       ),
-      child: Text(
-        status.toUpperCase(),
-        style: TextStyle(
-          color: color,
-          fontSize: 10,
-          fontWeight: FontWeight.w900,
-          letterSpacing: 0.5,
-        ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 6,
+            height: 6,
+            decoration: BoxDecoration(
+              color: color,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 6),
+          Text(
+            status.toUpperCase(),
+            style: TextStyle(
+              color: color,
+              fontSize: 10,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 0.5,
+            ),
+          ),
+        ],
       ),
     );
   }

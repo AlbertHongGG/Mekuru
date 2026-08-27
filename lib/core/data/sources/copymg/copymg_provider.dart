@@ -45,6 +45,9 @@ class CopyMGProvider extends BaseComicProvider {
   String get providerName => _name;
 
   @override
+  List<String> get aliases => ['copymanga'];
+
+  @override
   Future<Result<ComicDetail, Failure>> getComicDetail(String comicId) async {
     return handleApiCall(() async {
       final response = await _apiClient.getComicDetail(comicId);

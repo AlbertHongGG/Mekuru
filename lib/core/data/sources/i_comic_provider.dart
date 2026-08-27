@@ -13,6 +13,9 @@ abstract class IComicProvider {
   /// A unique identifier for this provider (e.g., 'comicwf', 'webtoon').
   String get providerId;
 
+  /// A list of alternate identifiers that should resolve to this provider.
+  List<String> get aliases;
+
   /// A human-readable name for this provider (e.g., 'ComicWF').
   String get providerName;
 

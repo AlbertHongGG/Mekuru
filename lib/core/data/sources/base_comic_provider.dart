@@ -7,6 +7,9 @@ import 'dart:typed_data';
 
 abstract class BaseComicProvider implements IComicProvider {
   Dio get imageDio;
+  
+  @override
+  List<String> get aliases => [];
 
   @override
   Future<Uint8List> fetchImageBytes(String url) async {

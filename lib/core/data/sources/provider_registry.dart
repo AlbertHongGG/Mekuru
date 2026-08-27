@@ -12,6 +12,9 @@ class ProviderRegistry {
 
   void register(IComicProvider provider) {
     _providers[provider.providerId] = provider;
+    for (final alias in provider.aliases) {
+      _providers[alias] = provider;
+    }
   }
 
   IComicProvider getProvider(String providerId) {

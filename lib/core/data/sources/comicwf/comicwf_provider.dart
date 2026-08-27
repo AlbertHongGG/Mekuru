@@ -75,6 +75,9 @@ class ComicWFProvider extends BaseComicProvider {
   String get providerName => _name;
 
   @override
+  List<String> get aliases => ['comicwifi'];
+
+  @override
   Future<Result<ComicDetail, Failure>> getComicDetail(String comicId) async {
     return handleApiCall(() async {
       final rawDetail = await _apiClient.getComicDetail(comicId);

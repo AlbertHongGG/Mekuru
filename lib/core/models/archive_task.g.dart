@@ -7,55 +7,65 @@ part of 'archive_task.dart';
 // **************************************************************************
 
 _ChapterTask _$ChapterTaskFromJson(Map<String, dynamic> json) => _ChapterTask(
-  chapterId: json['chapter_id'] as String,
+  chapterId: json['chapterId'] as String,
   title: json['title'] as String,
-  status: json['status'] as String? ?? 'queued',
-  totalPages: (json['total_pages'] as num?)?.toInt() ?? 0,
-  downloadedPages: (json['downloaded_pages'] as num?)?.toInt() ?? 0,
-  errorMessage: json['error_message'] as String?,
+  status:
+      $enumDecodeNullable(_$ArchiveTaskStatusEnumMap, json['status']) ??
+      ArchiveTaskStatus.queued,
+  totalPages: (json['totalPages'] as num?)?.toInt() ?? 0,
+  downloadedPages: (json['downloadedPages'] as num?)?.toInt() ?? 0,
+  errorMessage: json['errorMessage'] as String?,
 );
 
 Map<String, dynamic> _$ChapterTaskToJson(_ChapterTask instance) =>
     <String, dynamic>{
-      'chapter_id': instance.chapterId,
+      'chapterId': instance.chapterId,
       'title': instance.title,
-      'status': instance.status,
-      'total_pages': instance.totalPages,
-      'downloaded_pages': instance.downloadedPages,
-      'error_message': instance.errorMessage,
+      'status': _$ArchiveTaskStatusEnumMap[instance.status]!,
+      'totalPages': instance.totalPages,
+      'downloadedPages': instance.downloadedPages,
+      'errorMessage': instance.errorMessage,
     };
 
+const _$ArchiveTaskStatusEnumMap = {
+  ArchiveTaskStatus.queued: 'queued',
+  ArchiveTaskStatus.downloading: 'downloading',
+  ArchiveTaskStatus.paused: 'paused',
+  ArchiveTaskStatus.completed: 'completed',
+  ArchiveTaskStatus.error: 'error',
+};
+
 _ArchiveTask _$ArchiveTaskFromJson(Map<String, dynamic> json) => _ArchiveTask(
-  taskId: json['task_id'] as String,
-  providerId: json['provider_id'] as String,
-  comicId: json['comic_id'] as String,
-  comicTitle: json['comic_title'] as String? ?? '',
-  coverUrl: json['cover_url'] as String? ?? '',
-  status: json['status'] as String? ?? 'queued',
+  providerId: json['providerId'] as String,
+  comicId: json['comicId'] as String,
+  comicTitle: json['comicTitle'] as String? ?? '',
+  coverUrl: json['coverUrl'] as String? ?? '',
+  status:
+      $enumDecodeNullable(_$ArchiveTaskStatusEnumMap, json['status']) ??
+      ArchiveTaskStatus.queued,
   chapters:
       (json['chapters'] as Map<String, dynamic>?)?.map(
         (k, e) => MapEntry(k, ChapterTask.fromJson(e as Map<String, dynamic>)),
       ) ??
       const {},
-  errorMessage: json['error_message'] as String?,
-  createdAt: json['created_at'] == null
+  errorMessage: json['errorMessage'] as String?,
+  createdAt: json['createdAt'] == null
       ? null
-      : DateTime.parse(json['created_at'] as String),
-  updatedAt: json['updated_at'] == null
+      : DateTime.parse(json['createdAt'] as String),
+  updatedAt: json['updatedAt'] == null
       ? null
-      : DateTime.parse(json['updated_at'] as String),
+      : DateTime.parse(json['updatedAt'] as String),
 );
 
 Map<String, dynamic> _$ArchiveTaskToJson(_ArchiveTask instance) =>
     <String, dynamic>{
-      'task_id': instance.taskId,
-      'provider_id': instance.providerId,
-      'comic_id': instance.comicId,
-      'comic_title': instance.comicTitle,
-      'cover_url': instance.coverUrl,
-      'status': instance.status,
+      'providerId': instance.providerId,
+      'comicId': instance.comicId,
+      'comicTitle': instance.comicTitle,
+      'coverUrl': instance.coverUrl,
+      'status': _$ArchiveTaskStatusEnumMap[instance.status]!,
       'chapters': instance.chapters,
-      'error_message': instance.errorMessage,
-      'created_at': instance.createdAt?.toIso8601String(),
-      'updated_at': instance.updatedAt?.toIso8601String(),
+      'errorMessage': instance.errorMessage,
+      'createdAt': instance.createdAt?.toIso8601String(),
+      'updatedAt': instance.updatedAt?.toIso8601String(),
     };

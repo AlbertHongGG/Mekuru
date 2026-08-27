@@ -114,6 +114,9 @@ class SettingsPage extends ConsumerWidget {
         case 'copymg':
           icon = Icons.library_books;
           break;
+        case 'local':
+          icon = Icons.download_done;
+          break;
         default:
           icon = Icons.extension;
       }

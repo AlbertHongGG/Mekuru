@@ -3,15 +3,23 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'archive_task.freezed.dart';
 part 'archive_task.g.dart';
 
+enum ArchiveTaskStatus {
+  @JsonValue('queued') queued,
+  @JsonValue('downloading') downloading,
+  @JsonValue('paused') paused,
+  @JsonValue('completed') completed,
+  @JsonValue('error') error,
+}
+
 @freezed
 abstract class ChapterTask with _$ChapterTask {
   const factory ChapterTask({
-    @JsonKey(name: 'chapter_id') required String chapterId,
+    required String chapterId,
     required String title,
-    @Default('queued') String status,
-    @JsonKey(name: 'total_pages') @Default(0) int totalPages,
-    @JsonKey(name: 'downloaded_pages') @Default(0) int downloadedPages,
-    @JsonKey(name: 'error_message') String? errorMessage,
+    @Default(ArchiveTaskStatus.queued) ArchiveTaskStatus status,
+    @Default(0) int totalPages,
+    @Default(0) int downloadedPages,
+    String? errorMessage,
   }) = _ChapterTask;
 
   factory ChapterTask.fromJson(Map<String, dynamic> json) => _$ChapterTaskFromJson(json);
@@ -22,23 +30,24 @@ abstract class ArchiveTask with _$ArchiveTask {
   const ArchiveTask._();
 
   const factory ArchiveTask({
-    @JsonKey(name: 'task_id') required String taskId,
-    @JsonKey(name: 'provider_id') required String providerId,
-    @JsonKey(name: 'comic_id') required String comicId,
-    @JsonKey(name: 'comic_title') @Default('') String comicTitle,
-    @JsonKey(name: 'cover_url') @Default('') String coverUrl,
-    @Default('queued') String status,
+    required String providerId,
+    required String comicId,
+    @Default('') String comicTitle,
+    @Default('') String coverUrl,
+    @Default(ArchiveTaskStatus.queued) ArchiveTaskStatus status,
     @Default({}) Map<String, ChapterTask> chapters,
-    @JsonKey(name: 'error_message') String? errorMessage,
-    @JsonKey(name: 'created_at') DateTime? createdAt,
-    @JsonKey(name: 'updated_at') DateTime? updatedAt,
+    String? errorMessage,
+    DateTime? createdAt,
+    DateTime? updatedAt,
   }) = _ArchiveTask;
 
   factory ArchiveTask.fromJson(Map<String, dynamic> json) => _$ArchiveTaskFromJson(json);
 
+  String get taskId => '${providerId}_$comicId';
+
   int get totalChapters => chapters.length;
 
-  int get completedChapters => chapters.values.where((ch) => ch.status == 'completed').length;
+  int get completedChapters => chapters.values.where((ch) => ch.status == ArchiveTaskStatus.completed).length;
   
   double get progress {
     if (totalChapters == 0) return 0.0;

@@ -14,6 +14,8 @@ class DatabaseManager {
   static const String boxReadingHistory = 'box_reading_history';
   static const String boxSystemLogs = 'box_system_logs';
   static const String boxApiLogs = 'box_api_logs';
+  static const String boxArchiveTasks = 'box_archive_tasks';
+  static const String boxArchiveComics = 'box_archive_comics';
 
   static Future<void> init() async {
     await Hive.initFlutter();
@@ -29,6 +31,8 @@ class DatabaseManager {
     await _safeOpenBox<HistoryEntity>(boxReadingHistory);
     await _safeOpenBox<LogEntry>(boxSystemLogs);
     await _safeOpenBox<LogEntry>(boxApiLogs);
+    await _safeOpenBox<dynamic>(boxArchiveTasks);
+    await _safeOpenBox<dynamic>(boxArchiveComics);
   }
 
   static Future<void> _safeOpenBox<T>(String boxName) async {
@@ -51,5 +55,7 @@ class DatabaseManager {
     await Hive.deleteBoxFromDisk(boxReadingHistory);
     await Hive.deleteBoxFromDisk(boxSystemLogs);
     await Hive.deleteBoxFromDisk(boxApiLogs);
+    await Hive.deleteBoxFromDisk(boxArchiveTasks);
+    await Hive.deleteBoxFromDisk(boxArchiveComics);
   }
 }

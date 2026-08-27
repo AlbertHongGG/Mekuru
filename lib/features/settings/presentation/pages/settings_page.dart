@@ -40,37 +40,41 @@ class SettingsPage extends ConsumerWidget {
             title: '偏好設定',
             subtitle: 'SYSTEM CONFIGURATION',
           ),
-            SettingsSection(
-              title: '系統',
-              children: [
-                SettingsTile(
-                  icon: Icons.source,
-                  iconColor: AppColors.primary,
-                  title: '資料來源模式',
-                  subtitle: settingsState.dataSourceMode.label,
-                  onTap: () => _showModeBottomSheet(context, ref, settingsState.dataSourceMode),
-                ),
-                if (settingsState.dataSourceMode == DataSourceMode.source)
-                  SettingsTile(
-                    icon: Icons.api_rounded,
-                    iconColor: AppColors.primary,
-                    title: '來源選擇',
-                    subtitle: _getProviderName(ref, settingsState.currentSourceId),
-                    onTap: () => _showSourceProviderBottomSheet(context, ref, settingsState.currentSourceId),
-                  ),
-                if (settingsState.dataSourceMode == DataSourceMode.db)
-                  SettingsTile(
-                    icon: Icons.link,
-                    iconColor: AppColors.primary,
-                    title: '伺服器網址',
-                    subtitle: settingsState.serverUrl,
-                    onTap: () => _showUrlBottomSheet(context, ref, settingsState.serverUrl),
-                  ),
-                SettingsTile(
-                  icon: Icons.dark_mode_rounded,
-                  iconColor: AppColors.primary,
-                  title: '深色模式',
-                  trailing: AppSwitch(
+          SettingsSection(
+            title: '資料來源',
+            children: [
+              SettingsTile(
+                icon: Icons.source,
+                iconColor: AppColors.primary,
+                title: '資料來源模式',
+                subtitle: settingsState.dataSourceMode.label,
+                onTap: () => _showModeBottomSheet(context, ref, settingsState.dataSourceMode),
+              ),
+              SettingsTile(
+                icon: Icons.api_rounded,
+                iconColor: AppColors.primary,
+                title: '來源選擇',
+                subtitle: _getProviderName(ref, settingsState.currentSourceId),
+                onTap: () => _showSourceProviderBottomSheet(context, ref, settingsState.currentSourceId),
+              ),
+              SettingsTile(
+                icon: Icons.link,
+                iconColor: AppColors.primary,
+                title: '伺服器網址',
+                subtitle: settingsState.serverUrl,
+                onTap: () => _showUrlBottomSheet(context, ref, settingsState.serverUrl),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          SettingsSection(
+            title: '系統',
+            children: [
+              SettingsTile(
+                icon: Icons.dark_mode_rounded,
+                iconColor: AppColors.primary,
+                title: '深色模式',
+                trailing: AppSwitch(
                   value: settingsState.themeMode == ThemeMode.dark,
                   onChanged: (val) {
                     notifier.updateTheme(val ? ThemeMode.dark : ThemeMode.light);

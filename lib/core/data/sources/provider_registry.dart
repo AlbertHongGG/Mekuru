@@ -26,7 +26,7 @@ class ProviderRegistry {
   }
 
   List<IComicProvider> getAllProviders() {
-    return _providers.values.toList();
+    return _providers.values.toSet().toList();
   }
 }
 

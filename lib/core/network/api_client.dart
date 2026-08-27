@@ -42,7 +42,7 @@ class ApiClient {
 final apiClientProvider = Provider<ApiClient>((ref) {
   final settings = ref.watch(settingsProvider);
   return ApiClient(
-    settings.serverUrl,
+    '' /* Legacy serverUrl removed */,
     ref,
     loggerRepositoryProvider,
   );

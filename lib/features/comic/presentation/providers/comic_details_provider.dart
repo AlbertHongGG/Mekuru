@@ -99,8 +99,7 @@ class ComicDetailsNotifier extends AutoDisposeFamilyNotifier<ComicDetailsState, 
 
   Future<void> toggleFavorite() async {
     final interactionRepo = ref.read(userInteractionRepositoryProvider);
-    final settings = ref.read(settingsProvider);
-    final mode = settings.dataSourceMode;
+    
     final isFavorite = state.interaction?.isFavorite ?? false;
     final newFavoriteStatus = !isFavorite;
     final comic = state.comic;

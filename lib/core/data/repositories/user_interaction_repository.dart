@@ -60,7 +60,7 @@ class UserInteractionRepository {
   }
 
   Future<List<ComicRecord>> getFavoritesByProvider(String providerId) async {
-    final records = await getAllFavorites(dataSourceMode);
+    final records = await getAllFavorites();
     return records.where((r) => r.providerId == providerId).toList();
   }
   
@@ -77,7 +77,7 @@ class UserInteractionRepository {
   }
 
   Future<List<ComicRecord>> getHistoryByProvider(String providerId) async {
-    final records = await getAllHistory(dataSourceMode);
+    final records = await getAllHistory();
     return records.where((r) => r.providerId == providerId).toList();
   }
 

@@ -8,6 +8,7 @@ import 'package:mekuru/core/data/local/models/favorite_entity.dart';
 import 'package:mekuru/core/data/local/models/history_entity.dart';
 
 import 'package:mekuru/features/logger/domain/models/log_entry.dart';
+import 'package:mekuru/core/data/local/archive_storage.dart';
 
 final settingsBoxProvider = Provider<ILocalStorage<dynamic>>((ref) {
   return HiveLocalStorage<dynamic>(Hive.box<dynamic>(DatabaseManager.boxSettings));
@@ -37,7 +38,7 @@ final apiLogsBoxProvider = Provider<ILocalStorage<LogEntry>>((ref) {
   return HiveLocalStorage<LogEntry>(Hive.box<LogEntry>(DatabaseManager.boxApiLogs));
 });
 
-import 'package:mekuru/core/data/local/archive_storage.dart';
+
 
 final localLibraryStorageProvider = Provider<ILocalLibraryStorage>((ref) {
   return HiveLocalLibraryStorage(Hive.box<dynamic>(DatabaseManager.boxArchiveComics));

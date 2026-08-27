@@ -57,15 +57,14 @@ class LibraryUpdateNotifier extends Notifier<LibraryUpdateState> {
         try {
           final provider = providerRegistry.getProvider(record.providerId);
           if (provider != null) {
-            final meta = await interactionRepo.getMetadata(record.dataSourceMode, record.providerId, record.comicId);
+            final meta = await interactionRepo.getMetadata(record.providerId, record.comicId);
             if (meta != null) {
               final result = await provider.checkForUpdates(record.comicId, meta);
               if (result.isSuccess) {
                 final newData = result.getOrThrow();
                 if (newData.hasNew) {
                   await interactionRepo.updateMetadataFields(
-                    record.dataSourceMode,
-                    record.providerId,
+                                        record.providerId,
                     record.comicId,
                     totalChapters: newData.newTotal,
                     sourceUpdatedAt: newData.newSourceUpdatedAt,

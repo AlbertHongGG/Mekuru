@@ -104,6 +104,8 @@ class LibraryNotifier extends Notifier<LibraryState> {
         availableProviders: availableProviders,
       );
       _updateDisplayItems();
+      
+
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
     }

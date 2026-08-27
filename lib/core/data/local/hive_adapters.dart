@@ -24,7 +24,7 @@ class ComicMetadataEntityAdapter extends TypeAdapter<ComicMetadataEntity> {
   @override
   ComicMetadataEntity read(BinaryReader reader) {
     final id = reader.readString();
-        final providerId = reader.readString();
+    final providerId = reader.readString();
     final comicId = reader.readString();
     final title = reader.readString();
     final coverUrl = reader.readString();
@@ -51,7 +51,7 @@ class ComicMetadataEntityAdapter extends TypeAdapter<ComicMetadataEntity> {
 
     return ComicMetadataEntity(
       id: id,
-            providerId: providerId,
+      providerId: providerId,
       comicId: comicId,
       title: title,
       coverUrl: coverUrl,

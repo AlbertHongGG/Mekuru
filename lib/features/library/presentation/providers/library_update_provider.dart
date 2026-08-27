@@ -64,7 +64,7 @@ class LibraryUpdateNotifier extends Notifier<LibraryUpdateState> {
                 final newData = result.getOrThrow();
                 if (newData.hasNew) {
                   await interactionRepo.updateMetadataFields(
-                                        record.providerId,
+                    record.providerId,
                     record.comicId,
                     totalChapters: newData.newTotal,
                     sourceUpdatedAt: newData.newSourceUpdatedAt,

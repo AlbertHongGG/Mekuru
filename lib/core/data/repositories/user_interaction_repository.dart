@@ -23,12 +23,13 @@ class UserInteractionRepository {
   ComicRecord? _buildRecord(String id) {
     final metadata = _metadataBox.get(id);
     if (metadata == null) return null;
+    
     final favorite = _favoritesBox.get(id);
     final history = _historyBox.get(id);
 
     return ComicRecord(
       id: id,
-            providerId: metadata.providerId,
+      providerId: metadata.providerId,
       comicId: metadata.comicId,
       title: metadata.title,
       coverUrl: metadata.coverUrl,

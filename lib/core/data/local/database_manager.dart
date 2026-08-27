@@ -33,7 +33,10 @@ class DatabaseManager {
     await _safeOpenBox<LogEntry>(boxApiLogs);
     await _safeOpenBox<dynamic>(boxArchiveTasks);
     await _safeOpenBox<dynamic>(boxArchiveComics);
+    
   }
+
+
 
   static Future<void> _safeOpenBox<T>(String boxName) async {
     try {

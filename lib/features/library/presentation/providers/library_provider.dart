@@ -24,7 +24,7 @@ class LibraryState {
     this.availableProviders = const [],
     this.activeProviderFilter,
     this.searchQuery = '',
-    this.sortMode = LibrarySortMode.added,
+    required this.sortMode,
     this.error,
   });
 
@@ -55,6 +55,7 @@ class LibraryState {
 class LibraryNotifier extends Notifier<LibraryState> {
   @override
   LibraryState build() {
+    final sortMode = ref.watch(settingsProvider.select((s) => s.librarySortMode));
     ref.watch(settingsProvider.select((s) => s.dataSourceMode));
     
     // Subscribe to DB changes so Library auto-updates when progress is saved or favorites are toggled
@@ -67,7 +68,7 @@ class LibraryNotifier extends Notifier<LibraryState> {
     });
     
     Future.microtask(() => loadLibrary());
-    return LibraryState();
+    return LibraryState(sortMode: sortMode);
   }
 
   void setProviderFilter(String? providerId) {
@@ -85,6 +86,7 @@ class LibraryNotifier extends Notifier<LibraryState> {
 
   void setSortMode(LibrarySortMode sortMode) {
     state = state.copyWith(sortMode: sortMode);
+    ref.read(settingsProvider.notifier).updateLibrarySortMode(sortMode);
     _updateDisplayItems();
   }
 

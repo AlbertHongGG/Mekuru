@@ -118,6 +118,7 @@ class _ArchivePageState extends ConsumerState<ArchivePage> with RouteAware {
           final currentChapter = _getCurrentChapter(task);
           
           return Container(
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
               borderRadius: BorderRadius.circular(20),
@@ -131,137 +132,141 @@ class _ArchivePageState extends ConsumerState<ArchivePage> with RouteAware {
             ),
             clipBehavior: Clip.antiAlias,
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header Zone: Status & Provider
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _buildStatusBadge(task.status),
-                      Text(
-                        '來源: ' + task.providerId,
-                        style: TextStyle(
-                          color: isDark ? Colors.white54 : Colors.black45,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                
-                // Body Zone: Cover & Title
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: 72,
-                        height: 96,
-                        decoration: BoxDecoration(
-                          color: isDark ? Colors.grey[800] : Colors.grey[200],
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
+                // Top Row: Badge & Actions
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _buildStatusBadge(task.status),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (task.status == 'downloading' || task.status == 'queued')
+                          InkWell(
+                            onTap: () => ref.read(archiveProvider.notifier).pauseTask(task.providerId, task.comicId),
+                            borderRadius: BorderRadius.circular(20),
+                            child: const Padding(
+                              padding: EdgeInsets.all(4.0),
+                              child: Icon(Icons.pause_rounded, size: 22, color: AppColors.primary),
                             ),
-                          ],
-                        ),
-                        clipBehavior: Clip.antiAlias,
-                        child: coverUrl != null 
-                            ? ComicImage(imageUrl: coverUrl, fit: BoxFit.cover, providerId: task.providerId)
-                            : const Center(child: Icon(Icons.image_not_supported_rounded, color: Colors.grey)),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Text(
-                          title,
-                          style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16, height: 1.3),
-                          maxLines: 3,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                
-                const SizedBox(height: 16),
-                
-                // Progress Zone
-                Container(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  color: isDark ? Colors.white.withOpacity(0.02) : Colors.black.withOpacity(0.02),
-                  child: Column(
-                    children: [
-                      _buildProgressBar(
-                        context: context,
-                        isDark: isDark,
-                        label: '整體進度',
-                        valueText: task.completedChapters.toString() + ' / ' + task.totalChapters.toString() + ' 章',
-                        progress: task.progress.clamp(0.0, 1.0),
-                        color: _getStatusColor(task.status),
-                      ),
-                      if (currentChapter != null) ...[
-                        const SizedBox(height: 12),
-                        _buildProgressBar(
-                          context: context,
-                          isDark: isDark,
-                          label: currentChapter.title,
-                          valueText: currentChapter.downloadedPages.toString() + ' / ' + currentChapter.totalPages.toString() + ' 頁',
-                          progress: currentChapter.totalPages > 0 
-                              ? (currentChapter.downloadedPages / currentChapter.totalPages).clamp(0.0, 1.0) 
-                              : 0.0,
-                          color: Colors.blueAccent,
+                          )
+                        else if (task.status == 'paused' || task.status == 'failed')
+                          InkWell(
+                            onTap: () => ref.read(archiveProvider.notifier).resumeTask(task.providerId, task.comicId),
+                            borderRadius: BorderRadius.circular(20),
+                            child: const Padding(
+                              padding: EdgeInsets.all(4.0),
+                              child: Icon(Icons.play_arrow_rounded, size: 22, color: AppColors.primary),
+                            ),
+                          ),
+                        const SizedBox(width: 16),
+                        InkWell(
+                          onTap: () => _confirmDelete(context, ref, task),
+                          borderRadius: BorderRadius.circular(20),
+                          child: const Padding(
+                            padding: EdgeInsets.all(4.0),
+                            child: Icon(Icons.delete_outline_rounded, size: 22, color: Colors.redAccent),
+                          ),
                         ),
                       ],
-                    ],
-                  ),
-                ),
-                
-                if (task.errorMessage != null && task.errorMessage!.isNotEmpty)
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    color: Colors.redAccent.withOpacity(0.1),
-                    child: Text(
-                      '錯誤: ' + task.errorMessage!,
-                      style: const TextStyle(color: Colors.redAccent, fontSize: 12, fontWeight: FontWeight.w500),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
+                  ],
+                ),
+                const SizedBox(height: 12),
                 
-                // Action Zone
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      if (task.status == 'downloading' || task.status == 'queued')
-                        TextButton.icon(
-                          icon: const Icon(Icons.pause_rounded, size: 20),
-                          label: const Text('暫停', style: TextStyle(fontWeight: FontWeight.w600)),
-                          onPressed: () => ref.read(archiveProvider.notifier).pauseTask(task.providerId, task.comicId),
-                        )
-                      else if (task.status == 'paused' || task.status == 'failed')
-                        TextButton.icon(
-                          icon: const Icon(Icons.play_arrow_rounded, size: 20),
-                          label: const Text('繼續', style: TextStyle(fontWeight: FontWeight.w600)),
-                          onPressed: () => ref.read(archiveProvider.notifier).resumeTask(task.providerId, task.comicId),
-                        ),
-                      const SizedBox(width: 8),
-                      TextButton.icon(
-                        icon: const Icon(Icons.delete_outline_rounded, size: 20, color: Colors.redAccent),
-                        label: const Text('刪除', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.w600)),
-                        style: TextButton.styleFrom(foregroundColor: Colors.redAccent),
-                        onPressed: () => _confirmDelete(context, ref, task),
+                // Body: Image + Content
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Cover Image
+                    Container(
+                      width: 84,
+                      height: 112,
+                      decoration: BoxDecoration(
+                        color: isDark ? Colors.grey[800] : Colors.grey[200],
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                      clipBehavior: Clip.antiAlias,
+                      child: coverUrl != null 
+                          ? ComicImage(imageUrl: coverUrl, fit: BoxFit.cover, providerId: task.providerId)
+                          : const Center(child: Icon(Icons.image_not_supported_rounded, color: Colors.grey)),
+                    ),
+                    const SizedBox(width: 16),
+                    // Content
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Title
+                          Text(
+                            title,
+                            style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16, height: 1.3),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 4),
+                          // Subtitle (Provider)
+                          Text(
+                            '來源: ' + task.providerId,
+                            style: TextStyle(
+                              color: isDark ? Colors.white54 : Colors.black45,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          
+                          // Progress Bars (no gray background)
+                          _buildProgressBar(
+                            context: context,
+                            isDark: isDark,
+                            label: '整體進度',
+                            valueText: task.completedChapters.toString() + ' / ' + task.totalChapters.toString() + ' 章',
+                            progress: task.progress.clamp(0.0, 1.0),
+                            color: _getStatusColor(task.status),
+                          ),
+                          if (currentChapter != null) ...[
+                            const SizedBox(height: 10),
+                            _buildProgressBar(
+                              context: context,
+                              isDark: isDark,
+                              label: currentChapter.title,
+                              valueText: currentChapter.downloadedPages.toString() + ' / ' + currentChapter.totalPages.toString() + ' 頁',
+                              progress: currentChapter.totalPages > 0 
+                                  ? (currentChapter.downloadedPages / currentChapter.totalPages).clamp(0.0, 1.0) 
+                                  : 0.0,
+                              color: Colors.blueAccent,
+                            ),
+                          ],
+                          
+                          if (task.errorMessage != null && task.errorMessage!.isNotEmpty) ...[
+                            const SizedBox(height: 12),
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.redAccent.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                '錯誤: ' + task.errorMessage!,
+                                style: const TextStyle(color: Colors.redAccent, fontSize: 12, fontWeight: FontWeight.w500),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -279,70 +284,67 @@ class _ArchivePageState extends ConsumerState<ArchivePage> with RouteAware {
     required double progress,
     required Color color,
   }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: isDark ? Colors.white70 : Colors.black87,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Text(
-                valueText,
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Text(
+                label,
                 style: TextStyle(
                   fontSize: 12,
-                  fontWeight: FontWeight.w800,
-                  color: color,
+                  fontWeight: FontWeight.w600,
+                  color: isDark ? Colors.white70 : Colors.black87,
                 ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              return Stack(
-                children: [
-                  Container(
-                    height: 6,
-                    decoration: BoxDecoration(
-                      color: isDark ? Colors.white10 : Colors.black12,
-                      borderRadius: BorderRadius.circular(3),
-                    ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              valueText,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w800,
+                color: color,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 6),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            return Stack(
+              children: [
+                Container(
+                  height: 6,
+                  decoration: BoxDecoration(
+                    color: isDark ? Colors.white10 : Colors.black12,
+                    borderRadius: BorderRadius.circular(3),
                   ),
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    height: 6,
-                    width: constraints.maxWidth * progress, 
-                    decoration: BoxDecoration(
-                      color: color,
-                      borderRadius: BorderRadius.circular(3),
-                      boxShadow: [
-                        BoxShadow(
-                          color: color.withOpacity(0.4),
-                          blurRadius: 4,
-                          offset: const Offset(0, 1),
-                        ),
-                      ],
-                    ),
+                ),
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  height: 6,
+                  width: constraints.maxWidth * progress, 
+                  decoration: BoxDecoration(
+                    color: color,
+                    borderRadius: BorderRadius.circular(3),
+                    boxShadow: [
+                      BoxShadow(
+                        color: color.withOpacity(0.4),
+                        blurRadius: 4,
+                        offset: const Offset(0, 1),
+                      ),
+                    ],
                   ),
-                ],
-              );
-            },
-          ),
-        ],
-      ),
+                ),
+              ],
+            );
+          },
+        ),
+      ],
     );
   }
   

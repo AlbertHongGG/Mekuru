@@ -26,7 +26,7 @@ class LocalProvider implements IComicProvider {
   List<String> get aliases => [];
 
   @override
-  String get providerName => '已下載漫畫';
+  String get providerName => 'local';
 
   @override
   Future<Uint8List> fetchImageBytes(String url) async {

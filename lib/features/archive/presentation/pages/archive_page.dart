@@ -245,11 +245,11 @@ class _ArchivePageState extends ConsumerState<ArchivePage> with RouteAware {
                               context: context,
                               isDark: isDark,
                               label: currentChapter.title,
-                              valueText: currentChapter.downloadedPages.toString() + ' / ' + currentChapter.totalPages.toString() + ' 頁',
+                              valueText: '${currentChapter.downloadedPages} / ${currentChapter.totalPages} 頁',
                               progress: currentChapter.totalPages > 0 
                                   ? (currentChapter.downloadedPages / currentChapter.totalPages).clamp(0.0, 1.0) 
                                   : 0.0,
-                              color: Colors.blueAccent,
+                              color: _getStatusColor(currentChapter.status),
                             ),
                           ],
                           

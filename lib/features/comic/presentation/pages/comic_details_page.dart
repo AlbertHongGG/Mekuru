@@ -171,46 +171,13 @@ class ComicDetailsPage extends ConsumerWidget {
                 ),
                 actions: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: Material(
-                      color: Colors.black.withValues(alpha: 0.4),
-                      shape: const CircleBorder(),
-                      clipBehavior: Clip.antiAlias,
-                      child: IconButton(
-                        icon: const Icon(
-                          Icons.format_list_bulleted_rounded,
-                          color: Colors.white,
-                          size: 22,
-                        ),
-                        onPressed: () => _showChapterList(context, ref, state, notifier),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Material(
-                      color: Colors.black.withValues(alpha: 0.4),
-                      shape: const CircleBorder(),
-                      clipBehavior: Clip.antiAlias,
-                      child: IconButton(
-                        icon: Icon(
-                          isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                          color: isFavorite ? Colors.redAccent : Colors.white,
-                          size: 22,
-                        ),
-                        onPressed: () => notifier.toggleFavorite(),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
                     child: Material(
                       color: Colors.black.withValues(alpha: 0.4),
                       shape: const CircleBorder(),
                       clipBehavior: Clip.antiAlias,
                       child: Consumer(
                         builder: (context, ref, _) {
-                          // Check if comic is already in tasks
                           final archiveState = ref.watch(archiveProvider);
                           final isQueued = archiveState.tasks.any((t) => t.comicId == comicId && t.providerId == providerId);
                           
@@ -235,6 +202,38 @@ class ComicDetailsPage extends ConsumerWidget {
                             },
                           );
                         },
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
+                    child: Material(
+                      color: Colors.black.withValues(alpha: 0.4),
+                      shape: const CircleBorder(),
+                      clipBehavior: Clip.antiAlias,
+                      child: IconButton(
+                        icon: Icon(
+                          isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                          color: isFavorite ? Colors.redAccent : Colors.white,
+                          size: 22,
+                        ),
+                        onPressed: () => notifier.toggleFavorite(),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 4.0, right: 12.0, top: 8.0, bottom: 8.0),
+                    child: Material(
+                      color: Colors.black.withValues(alpha: 0.4),
+                      shape: const CircleBorder(),
+                      clipBehavior: Clip.antiAlias,
+                      child: IconButton(
+                        icon: const Icon(
+                          Icons.format_list_bulleted_rounded,
+                          color: Colors.white,
+                          size: 22,
+                        ),
+                        onPressed: () => _showChapterList(context, ref, state, notifier),
                       ),
                     ),
                   ),

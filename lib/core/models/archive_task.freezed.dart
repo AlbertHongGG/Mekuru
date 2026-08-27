@@ -493,8 +493,8 @@ return $default(_that.providerId,_that.comicId,_that.comicTitle,_that.coverUrl,_
 }
 
 /// @nodoc
-@JsonSerializable()
 
+@JsonSerializable(explicitToJson: true)
 class _ArchiveTask extends ArchiveTask {
   const _ArchiveTask({required this.providerId, required this.comicId, this.comicTitle = '', this.coverUrl = '', this.status = ArchiveTaskStatus.queued,  Map<String, ChapterTask> chapters = const {}, this.errorMessage, this.createdAt, this.updatedAt}): _chapters = chapters,super._();
   factory _ArchiveTask.fromJson(Map<String, dynamic> json) => _$ArchiveTaskFromJson(json);

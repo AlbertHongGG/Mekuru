@@ -165,7 +165,8 @@ class ArchiveTaskManager extends Notifier<List<ArchiveTask>> implements IArchive
         final detailResult = await provider.getComicDetail(task.comicId);
         final comicDetail = detailResult.getOrThrow();
         
-        final chaptersResult = await provider.getChapterList(task.comicId);
+        // Explicitly request ascending order (chronological) from the provider
+        final chaptersResult = await provider.getChapterList(task.comicId, isDescending: false);
         final chapters = chaptersResult.getOrThrow();
         
         // Prepare local entity representation
@@ -211,13 +212,13 @@ class ArchiveTaskManager extends Notifier<List<ArchiveTask>> implements IArchive
         final chTask = task.chapters[chId]!;
         if (chTask.status == ArchiveTaskStatus.completed) continue;
         
-        task = _updateChapterTask(task, chTask.copyWith(status: ArchiveTaskStatus.downloading));
+        task = _updateChapterTask(task.taskId, chTask.copyWith(status: ArchiveTaskStatus.downloading));
         
         try {
           final pagesResult = await provider.getChapterImages(task.comicId, chId);
           final pages = pagesResult.getOrThrow();
           
-          task = _updateChapterTask(task, task.chapters[chId]!.copyWith(totalPages: pages.length));
+          task = _updateChapterTask(task.taskId, task.chapters[chId]!.copyWith(totalPages: pages.length));
           
           int downloaded = task.chapters[chId]!.downloadedPages;
           for (int i = downloaded; i < pages.length; i++) {
@@ -234,13 +235,13 @@ class ArchiveTaskManager extends Notifier<List<ArchiveTask>> implements IArchive
              await _mediaStorage.saveImage(task.providerId, task.comicId, chId, i, bytes, ext);
              
              downloaded++;
-             task = _updateChapterTask(task, task.chapters[chId]!.copyWith(downloadedPages: downloaded));
+             task = _updateChapterTask(task.taskId, task.chapters[chId]!.copyWith(downloadedPages: downloaded));
           }
           
-          task = _updateChapterTask(task, task.chapters[chId]!.copyWith(status: ArchiveTaskStatus.completed));
+          task = _updateChapterTask(task.taskId, task.chapters[chId]!.copyWith(status: ArchiveTaskStatus.completed));
           
         } catch (e) {
-          task = _updateChapterTask(task, task.chapters[chId]!.copyWith(status: ArchiveTaskStatus.error, errorMessage: e.toString()));
+          task = _updateChapterTask(task.taskId, task.chapters[chId]!.copyWith(status: ArchiveTaskStatus.error, errorMessage: e.toString()));
           rethrow;
         }
       }
@@ -266,10 +267,16 @@ class ArchiveTaskManager extends Notifier<List<ArchiveTask>> implements IArchive
     }
   }
   
-  ArchiveTask _updateChapterTask(ArchiveTask task, ChapterTask chTask) {
-    final newChapters = Map<String, ChapterTask>.from(task.chapters);
+  ArchiveTask _updateChapterTask(String taskId, ChapterTask chTask) {
+    final idx = state.indexWhere((t) => t.taskId == taskId);
+    if (idx == -1) {
+      // If task was cancelled while updating, just return a dummy
+      return ArchiveTask(providerId: '', comicId: ''); 
+    }
+    final currentTask = state[idx];
+    final newChapters = Map<String, ChapterTask>.from(currentTask.chapters);
     newChapters[chTask.chapterId] = chTask;
-    final newTask = task.copyWith(chapters: newChapters, updatedAt: DateTime.now());
+    final newTask = currentTask.copyWith(chapters: newChapters, updatedAt: DateTime.now());
     _updateTask(newTask);
     return newTask;
   }

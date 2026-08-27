@@ -210,7 +210,7 @@ class ArchivePage extends ConsumerWidget {
                             progress: currentChapter.totalPages > 0 
                                 ? (currentChapter.downloadedPages / currentChapter.totalPages).clamp(0.0, 1.0) 
                                 : 0.0,
-                            color: _getStatusColor(currentChapter.status.name),
+                            color: _getStatusColor(task.status.name),
                           ),
                         ],
                         

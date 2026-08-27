@@ -26,6 +26,7 @@ abstract class ChapterTask with _$ChapterTask {
 }
 
 @freezed
+@JsonSerializable(explicitToJson: true)
 abstract class ArchiveTask with _$ArchiveTask {
   const ArchiveTask._();
 

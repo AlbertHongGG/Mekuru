@@ -48,18 +48,12 @@ class ArchiveNotifier extends Notifier<ArchiveState> {
     
     try {
       final repo = ref.read(archiveRepositoryProvider);
-      final results = await Future.wait([
-        repo.getActiveTasks(),
-        repo.getArchivedComics(),
-      ]);
-      
-      final tasks = results[0] as List<ArchiveTask>;
-      final metadata = results[1] as Map<String, dynamic>;
+      final tasks = await repo.getActiveTasks();
       
       state = state.copyWith(
         isLoading: false,
         tasks: tasks,
-        metadata: metadata,
+        metadata: {},
       );
     } catch (e) {
       if (!silent) {

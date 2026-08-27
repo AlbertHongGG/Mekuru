@@ -43,7 +43,7 @@ class ComicImage extends ConsumerWidget {
         height: height,
         fit: fit,
         clearMemoryCacheIfFailed: true,
-        loadStateChanged: loadStateChanged,
+        loadStateChanged: loadStateChanged ?? _defaultLoadStateChanged,
       );
     }
 
@@ -55,7 +55,23 @@ class ComicImage extends ConsumerWidget {
       fit: fit,
       cache: true,
       clearMemoryCacheIfFailed: true,
-      loadStateChanged: loadStateChanged,
+      loadStateChanged: loadStateChanged ?? _defaultLoadStateChanged,
     );
+  }
+
+  Widget? _defaultLoadStateChanged(ExtendedImageState state) {
+    switch (state.extendedImageLoadState) {
+      case LoadState.loading:
+        return const Center(
+          child: CircularProgressIndicator(strokeWidth: 2),
+        );
+      case LoadState.completed:
+        return null; // Return null to display the image as usual
+      case LoadState.failed:
+        debugPrint('ComicImage Failed to load: $imageUrl');
+        return const Center(
+          child: Icon(Icons.broken_image_rounded, color: Colors.grey, size: 32),
+        );
+    }
   }
 }

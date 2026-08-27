@@ -25,6 +25,8 @@ abstract class ArchiveTask with _$ArchiveTask {
     @JsonKey(name: 'task_id') required String taskId,
     @JsonKey(name: 'provider_id') required String providerId,
     @JsonKey(name: 'comic_id') required String comicId,
+    @JsonKey(name: 'comic_title') @Default('') String comicTitle,
+    @JsonKey(name: 'cover_url') @Default('') String coverUrl,
     @Default('queued') String status,
     @Default({}) Map<String, ChapterTask> chapters,
     @JsonKey(name: 'error_message') String? errorMessage,

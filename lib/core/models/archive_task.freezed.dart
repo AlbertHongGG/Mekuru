@@ -294,7 +294,7 @@ as String?,
 /// @nodoc
 mixin _$ArchiveTask {
 
-@JsonKey(name: 'task_id') String get taskId;@JsonKey(name: 'provider_id') String get providerId;@JsonKey(name: 'comic_id') String get comicId; String get status; Map<String, ChapterTask> get chapters;@JsonKey(name: 'error_message') String? get errorMessage;@JsonKey(name: 'created_at') DateTime? get createdAt;@JsonKey(name: 'updated_at') DateTime? get updatedAt;
+@JsonKey(name: 'task_id') String get taskId;@JsonKey(name: 'provider_id') String get providerId;@JsonKey(name: 'comic_id') String get comicId;@JsonKey(name: 'comic_title') String get comicTitle;@JsonKey(name: 'cover_url') String get coverUrl; String get status; Map<String, ChapterTask> get chapters;@JsonKey(name: 'error_message') String? get errorMessage;@JsonKey(name: 'created_at') DateTime? get createdAt;@JsonKey(name: 'updated_at') DateTime? get updatedAt;
 /// Create a copy of ArchiveTask
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -307,16 +307,16 @@ $ArchiveTaskCopyWith<ArchiveTask> get copyWith => _$ArchiveTaskCopyWithImpl<Arch
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ArchiveTask&&(identical(other.taskId, taskId) || other.taskId == taskId)&&(identical(other.providerId, providerId) || other.providerId == providerId)&&(identical(other.comicId, comicId) || other.comicId == comicId)&&(identical(other.status, status) || other.status == status)&&const DeepCollectionEquality().equals(other.chapters, chapters)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ArchiveTask&&(identical(other.taskId, taskId) || other.taskId == taskId)&&(identical(other.providerId, providerId) || other.providerId == providerId)&&(identical(other.comicId, comicId) || other.comicId == comicId)&&(identical(other.comicTitle, comicTitle) || other.comicTitle == comicTitle)&&(identical(other.coverUrl, coverUrl) || other.coverUrl == coverUrl)&&(identical(other.status, status) || other.status == status)&&const DeepCollectionEquality().equals(other.chapters, chapters)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,taskId,providerId,comicId,status,const DeepCollectionEquality().hash(chapters),errorMessage,createdAt,updatedAt);
+int get hashCode => Object.hash(runtimeType,taskId,providerId,comicId,comicTitle,coverUrl,status,const DeepCollectionEquality().hash(chapters),errorMessage,createdAt,updatedAt);
 
 @override
 String toString() {
-  return 'ArchiveTask(taskId: $taskId, providerId: $providerId, comicId: $comicId, status: $status, chapters: $chapters, errorMessage: $errorMessage, createdAt: $createdAt, updatedAt: $updatedAt)';
+  return 'ArchiveTask(taskId: $taskId, providerId: $providerId, comicId: $comicId, comicTitle: $comicTitle, coverUrl: $coverUrl, status: $status, chapters: $chapters, errorMessage: $errorMessage, createdAt: $createdAt, updatedAt: $updatedAt)';
 }
 
 
@@ -327,7 +327,7 @@ abstract mixin class $ArchiveTaskCopyWith<$Res>  {
   factory $ArchiveTaskCopyWith(ArchiveTask value, $Res Function(ArchiveTask) _then) = _$ArchiveTaskCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(name: 'task_id') String taskId,@JsonKey(name: 'provider_id') String providerId,@JsonKey(name: 'comic_id') String comicId, String status, Map<String, ChapterTask> chapters,@JsonKey(name: 'error_message') String? errorMessage,@JsonKey(name: 'created_at') DateTime? createdAt,@JsonKey(name: 'updated_at') DateTime? updatedAt
+@JsonKey(name: 'task_id') String taskId,@JsonKey(name: 'provider_id') String providerId,@JsonKey(name: 'comic_id') String comicId,@JsonKey(name: 'comic_title') String comicTitle,@JsonKey(name: 'cover_url') String coverUrl, String status, Map<String, ChapterTask> chapters,@JsonKey(name: 'error_message') String? errorMessage,@JsonKey(name: 'created_at') DateTime? createdAt,@JsonKey(name: 'updated_at') DateTime? updatedAt
 });
 
 
@@ -344,11 +344,13 @@ class _$ArchiveTaskCopyWithImpl<$Res>
 
 /// Create a copy of ArchiveTask
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? taskId = null,Object? providerId = null,Object? comicId = null,Object? status = null,Object? chapters = null,Object? errorMessage = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? taskId = null,Object? providerId = null,Object? comicId = null,Object? comicTitle = null,Object? coverUrl = null,Object? status = null,Object? chapters = null,Object? errorMessage = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
   return _then(ArchiveTask(
 taskId: null == taskId ? _self.taskId : taskId // ignore: cast_nullable_to_non_nullable
 as String,providerId: null == providerId ? _self.providerId : providerId // ignore: cast_nullable_to_non_nullable
 as String,comicId: null == comicId ? _self.comicId : comicId // ignore: cast_nullable_to_non_nullable
+as String,comicTitle: null == comicTitle ? _self.comicTitle : comicTitle // ignore: cast_nullable_to_non_nullable
+as String,coverUrl: null == coverUrl ? _self.coverUrl : coverUrl // ignore: cast_nullable_to_non_nullable
 as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as String,chapters: null == chapters ? _self.chapters : chapters // ignore: cast_nullable_to_non_nullable
 as Map<String, ChapterTask>,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
@@ -439,10 +441,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'task_id')  String taskId, @JsonKey(name: 'provider_id')  String providerId, @JsonKey(name: 'comic_id')  String comicId,  String status,  Map<String, ChapterTask> chapters, @JsonKey(name: 'error_message')  String? errorMessage, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'updated_at')  DateTime? updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'task_id')  String taskId, @JsonKey(name: 'provider_id')  String providerId, @JsonKey(name: 'comic_id')  String comicId, @JsonKey(name: 'comic_title')  String comicTitle, @JsonKey(name: 'cover_url')  String coverUrl,  String status,  Map<String, ChapterTask> chapters, @JsonKey(name: 'error_message')  String? errorMessage, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'updated_at')  DateTime? updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ArchiveTask() when $default != null:
-return $default(_that.taskId,_that.providerId,_that.comicId,_that.status,_that.chapters,_that.errorMessage,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.taskId,_that.providerId,_that.comicId,_that.comicTitle,_that.coverUrl,_that.status,_that.chapters,_that.errorMessage,_that.createdAt,_that.updatedAt);case _:
   return orElse();
 
 }
@@ -460,10 +462,10 @@ return $default(_that.taskId,_that.providerId,_that.comicId,_that.status,_that.c
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'task_id')  String taskId, @JsonKey(name: 'provider_id')  String providerId, @JsonKey(name: 'comic_id')  String comicId,  String status,  Map<String, ChapterTask> chapters, @JsonKey(name: 'error_message')  String? errorMessage, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'updated_at')  DateTime? updatedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'task_id')  String taskId, @JsonKey(name: 'provider_id')  String providerId, @JsonKey(name: 'comic_id')  String comicId, @JsonKey(name: 'comic_title')  String comicTitle, @JsonKey(name: 'cover_url')  String coverUrl,  String status,  Map<String, ChapterTask> chapters, @JsonKey(name: 'error_message')  String? errorMessage, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'updated_at')  DateTime? updatedAt)  $default,) {final _that = this;
 switch (_that) {
 case _ArchiveTask():
-return $default(_that.taskId,_that.providerId,_that.comicId,_that.status,_that.chapters,_that.errorMessage,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.taskId,_that.providerId,_that.comicId,_that.comicTitle,_that.coverUrl,_that.status,_that.chapters,_that.errorMessage,_that.createdAt,_that.updatedAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -480,10 +482,10 @@ return $default(_that.taskId,_that.providerId,_that.comicId,_that.status,_that.c
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'task_id')  String taskId, @JsonKey(name: 'provider_id')  String providerId, @JsonKey(name: 'comic_id')  String comicId,  String status,  Map<String, ChapterTask> chapters, @JsonKey(name: 'error_message')  String? errorMessage, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'updated_at')  DateTime? updatedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'task_id')  String taskId, @JsonKey(name: 'provider_id')  String providerId, @JsonKey(name: 'comic_id')  String comicId, @JsonKey(name: 'comic_title')  String comicTitle, @JsonKey(name: 'cover_url')  String coverUrl,  String status,  Map<String, ChapterTask> chapters, @JsonKey(name: 'error_message')  String? errorMessage, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'updated_at')  DateTime? updatedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _ArchiveTask() when $default != null:
-return $default(_that.taskId,_that.providerId,_that.comicId,_that.status,_that.chapters,_that.errorMessage,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.taskId,_that.providerId,_that.comicId,_that.comicTitle,_that.coverUrl,_that.status,_that.chapters,_that.errorMessage,_that.createdAt,_that.updatedAt);case _:
   return null;
 
 }
@@ -495,12 +497,14 @@ return $default(_that.taskId,_that.providerId,_that.comicId,_that.status,_that.c
 @JsonSerializable()
 
 class _ArchiveTask extends ArchiveTask {
-  const _ArchiveTask({@JsonKey(name: 'task_id') required this.taskId, @JsonKey(name: 'provider_id') required this.providerId, @JsonKey(name: 'comic_id') required this.comicId, this.status = 'queued',  Map<String, ChapterTask> chapters = const {}, @JsonKey(name: 'error_message') this.errorMessage, @JsonKey(name: 'created_at') this.createdAt, @JsonKey(name: 'updated_at') this.updatedAt}): _chapters = chapters,super._();
+  const _ArchiveTask({@JsonKey(name: 'task_id') required this.taskId, @JsonKey(name: 'provider_id') required this.providerId, @JsonKey(name: 'comic_id') required this.comicId, @JsonKey(name: 'comic_title') this.comicTitle = '', @JsonKey(name: 'cover_url') this.coverUrl = '', this.status = 'queued',  Map<String, ChapterTask> chapters = const {}, @JsonKey(name: 'error_message') this.errorMessage, @JsonKey(name: 'created_at') this.createdAt, @JsonKey(name: 'updated_at') this.updatedAt}): _chapters = chapters,super._();
   factory _ArchiveTask.fromJson(Map<String, dynamic> json) => _$ArchiveTaskFromJson(json);
 
 @override@JsonKey(name: 'task_id') final  String taskId;
 @override@JsonKey(name: 'provider_id') final  String providerId;
 @override@JsonKey(name: 'comic_id') final  String comicId;
+@override@JsonKey(name: 'comic_title') final  String comicTitle;
+@override@JsonKey(name: 'cover_url') final  String coverUrl;
 @override@JsonKey() final  String status;
  final  Map<String, ChapterTask> _chapters;
 @override@JsonKey() Map<String, ChapterTask> get chapters {
@@ -526,16 +530,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ArchiveTask&&(identical(other.taskId, taskId) || other.taskId == taskId)&&(identical(other.providerId, providerId) || other.providerId == providerId)&&(identical(other.comicId, comicId) || other.comicId == comicId)&&(identical(other.status, status) || other.status == status)&&const DeepCollectionEquality().equals(other._chapters, _chapters)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ArchiveTask&&(identical(other.taskId, taskId) || other.taskId == taskId)&&(identical(other.providerId, providerId) || other.providerId == providerId)&&(identical(other.comicId, comicId) || other.comicId == comicId)&&(identical(other.comicTitle, comicTitle) || other.comicTitle == comicTitle)&&(identical(other.coverUrl, coverUrl) || other.coverUrl == coverUrl)&&(identical(other.status, status) || other.status == status)&&const DeepCollectionEquality().equals(other._chapters, _chapters)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,taskId,providerId,comicId,status,const DeepCollectionEquality().hash(_chapters),errorMessage,createdAt,updatedAt);
+int get hashCode => Object.hash(runtimeType,taskId,providerId,comicId,comicTitle,coverUrl,status,const DeepCollectionEquality().hash(_chapters),errorMessage,createdAt,updatedAt);
 
 @override
 String toString() {
-  return 'ArchiveTask(taskId: $taskId, providerId: $providerId, comicId: $comicId, status: $status, chapters: $chapters, errorMessage: $errorMessage, createdAt: $createdAt, updatedAt: $updatedAt)';
+  return 'ArchiveTask(taskId: $taskId, providerId: $providerId, comicId: $comicId, comicTitle: $comicTitle, coverUrl: $coverUrl, status: $status, chapters: $chapters, errorMessage: $errorMessage, createdAt: $createdAt, updatedAt: $updatedAt)';
 }
 
 
@@ -546,7 +550,7 @@ abstract mixin class _$ArchiveTaskCopyWith<$Res> implements $ArchiveTaskCopyWith
   factory _$ArchiveTaskCopyWith(_ArchiveTask value, $Res Function(_ArchiveTask) _then) = __$ArchiveTaskCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: 'task_id') String taskId,@JsonKey(name: 'provider_id') String providerId,@JsonKey(name: 'comic_id') String comicId, String status, Map<String, ChapterTask> chapters,@JsonKey(name: 'error_message') String? errorMessage,@JsonKey(name: 'created_at') DateTime? createdAt,@JsonKey(name: 'updated_at') DateTime? updatedAt
+@JsonKey(name: 'task_id') String taskId,@JsonKey(name: 'provider_id') String providerId,@JsonKey(name: 'comic_id') String comicId,@JsonKey(name: 'comic_title') String comicTitle,@JsonKey(name: 'cover_url') String coverUrl, String status, Map<String, ChapterTask> chapters,@JsonKey(name: 'error_message') String? errorMessage,@JsonKey(name: 'created_at') DateTime? createdAt,@JsonKey(name: 'updated_at') DateTime? updatedAt
 });
 
 
@@ -563,11 +567,13 @@ class __$ArchiveTaskCopyWithImpl<$Res>
 
 /// Create a copy of ArchiveTask
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? taskId = null,Object? providerId = null,Object? comicId = null,Object? status = null,Object? chapters = null,Object? errorMessage = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? taskId = null,Object? providerId = null,Object? comicId = null,Object? comicTitle = null,Object? coverUrl = null,Object? status = null,Object? chapters = null,Object? errorMessage = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
   return _then(_ArchiveTask(
 taskId: null == taskId ? _self.taskId : taskId // ignore: cast_nullable_to_non_nullable
 as String,providerId: null == providerId ? _self.providerId : providerId // ignore: cast_nullable_to_non_nullable
 as String,comicId: null == comicId ? _self.comicId : comicId // ignore: cast_nullable_to_non_nullable
+as String,comicTitle: null == comicTitle ? _self.comicTitle : comicTitle // ignore: cast_nullable_to_non_nullable
+as String,coverUrl: null == coverUrl ? _self.coverUrl : coverUrl // ignore: cast_nullable_to_non_nullable
 as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as String,chapters: null == chapters ? _self._chapters : chapters // ignore: cast_nullable_to_non_nullable
 as Map<String, ChapterTask>,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable

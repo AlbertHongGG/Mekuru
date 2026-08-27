@@ -34,35 +34,55 @@ class ProviderImageProvider extends ImageProvider<ProviderImageProvider> {
   Future<ui.Codec> _loadAsync(ProviderImageProvider key, ImageDecoderCallback decode) async {
     assert(key == this);
 
+    File? cacheFile;
     Uint8List? bytes;
 
     if (useCache) {
       try {
         final tempDir = await getTemporaryDirectory();
-        final cacheDir = Directory('${tempDir.path}/mekuru_image_cache_v2');
+        final cacheDir = Directory('${tempDir.path}/mekuru_image_cache_v3');
         if (!await cacheDir.exists()) {
           await cacheDir.create(recursive: true);
         }
 
         final hash = md5.convert(utf8.encode(key.url)).toString();
-        final file = File('${cacheDir.path}/$hash');
+        cacheFile = File('${cacheDir.path}/$hash');
 
-        if (await file.exists()) {
-          bytes = await file.readAsBytes();
-        } else {
+        if (await cacheFile.exists()) {
+          bytes = await cacheFile.readAsBytes();
+          // Extremely basic check for corrupt/empty files
+          if (bytes.length < 100) {
+            bytes = null;
+          }
+        }
+        
+        if (bytes == null) {
           bytes = await key.provider.fetchImageBytes(key.url);
-          await file.writeAsBytes(bytes);
+          await cacheFile.writeAsBytes(bytes);
         }
       } catch (e) {
-        // Fallback to direct network fetch if cache logic fails
+        // Cache read/write failed, fetch directly
         bytes = await key.provider.fetchImageBytes(key.url);
       }
     } else {
       bytes = await key.provider.fetchImageBytes(key.url);
     }
 
-    final buffer = await ui.ImmutableBuffer.fromUint8List(bytes);
-    return decode(buffer);
+    try {
+      final buffer = await ui.ImmutableBuffer.fromUint8List(bytes);
+      return await decode(buffer);
+    } catch (e) {
+      // If decoding fails, the cache is corrupted. Delete it.
+      if (cacheFile != null && await cacheFile.exists()) {
+        try {
+          await cacheFile.delete();
+        } catch (_) {}
+      }
+      // Re-fetch once from network as fallback
+      bytes = await key.provider.fetchImageBytes(key.url);
+      final buffer = await ui.ImmutableBuffer.fromUint8List(bytes);
+      return await decode(buffer);
+    }
   }
 
   @override

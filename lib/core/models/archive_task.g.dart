@@ -29,6 +29,8 @@ _ArchiveTask _$ArchiveTaskFromJson(Map<String, dynamic> json) => _ArchiveTask(
   taskId: json['task_id'] as String,
   providerId: json['provider_id'] as String,
   comicId: json['comic_id'] as String,
+  comicTitle: json['comic_title'] as String? ?? '',
+  coverUrl: json['cover_url'] as String? ?? '',
   status: json['status'] as String? ?? 'queued',
   chapters:
       (json['chapters'] as Map<String, dynamic>?)?.map(
@@ -49,6 +51,8 @@ Map<String, dynamic> _$ArchiveTaskToJson(_ArchiveTask instance) =>
       'task_id': instance.taskId,
       'provider_id': instance.providerId,
       'comic_id': instance.comicId,
+      'comic_title': instance.comicTitle,
+      'cover_url': instance.coverUrl,
       'status': instance.status,
       'chapters': instance.chapters,
       'error_message': instance.errorMessage,

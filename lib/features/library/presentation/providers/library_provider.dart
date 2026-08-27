@@ -55,7 +55,7 @@ class LibraryState {
 class LibraryNotifier extends Notifier<LibraryState> {
   @override
   LibraryState build() {
-    final sortMode = ref.watch(settingsProvider.select((s) => s.librarySortMode));
+    final sortMode = ref.read(settingsProvider).librarySortMode;
     ref.watch(settingsProvider.select((s) => s.dataSourceMode));
     
     // Subscribe to DB changes so Library auto-updates when progress is saved or favorites are toggled

@@ -1,9 +1,10 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mekuru/core/theme/app_colors.dart';
 import 'package:mekuru/core/notifications/presentation/controllers/notification_controller.dart';
 import 'package:mekuru/features/archive/presentation/providers/archive_provider.dart';
+import 'package:mekuru/features/settings/presentation/providers/settings_provider.dart';
 import 'package:mekuru/core/models/archive_task.dart';
 import 'package:mekuru/core/widgets/comic_image.dart';
 
@@ -110,9 +111,8 @@ class _ArchivePageState extends ConsumerState<ArchivePage> with RouteAware {
         separatorBuilder: (_, __) => const SizedBox(height: 16),
         itemBuilder: (context, index) {
           final task = state.tasks[index];
-          final meta = state.metadata[task.comicId];
-          final title = meta != null && meta['title'] != null ? meta['title'] as String : task.comicId;
-          final coverUrl = meta != null && meta['cover_url'] != null ? meta['cover_url'] as String : null;
+          final title = task.comicTitle.isNotEmpty ? task.comicTitle : task.comicId;
+          final coverUrl = task.coverUrl.isNotEmpty ? task.coverUrl : null;
           
           final isDark = Theme.of(context).brightness == Brightness.dark;
           final currentChapter = _getCurrentChapter(task);
@@ -195,9 +195,15 @@ class _ArchivePageState extends ConsumerState<ArchivePage> with RouteAware {
                         ],
                       ),
                       clipBehavior: Clip.antiAlias,
-                      child: coverUrl != null 
-                          ? ComicImage(imageUrl: coverUrl, fit: BoxFit.cover, providerId: task.providerId)
-                          : const Center(child: Icon(Icons.image_not_supported_rounded, color: Colors.grey)),
+                      child: Builder(
+                        builder: (context) {
+                          if (coverUrl == null) {
+                            return const Center(child: Icon(Icons.image_not_supported_rounded, color: Colors.grey));
+                          }
+                          
+                          return ComicImage(imageUrl: coverUrl, fit: BoxFit.cover, providerId: task.providerId);
+                        },
+                      ),
                     ),
                     const SizedBox(width: 16),
                     // Content
@@ -426,7 +432,7 @@ class _ArchivePageState extends ConsumerState<ArchivePage> with RouteAware {
     );
     
     if (result == true) {
-      final success = await ref.read(archiveProvider.notifier).cancelTask(task.providerId, task.comicId);
+      final success = await ref.read(archiveProvider.notifier).deleteComic(task.providerId, task.comicId);
       final notificationCtrl = ref.read(notificationProvider.notifier);
       if (success) {
         notificationCtrl.showSuccess('已刪除任務');

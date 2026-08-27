@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ComicMetadataEntity {
 
- String get id; DataSourceMode get dataSourceMode; String get providerId; String get comicId; String get title; String get coverUrl; DateTime get updatedAt; DateTime? get sourceUpdatedAt; int? get totalChapters; String? get latestChapterTitle;
+ String get id; String get providerId; String get comicId; String get title; String get coverUrl; DateTime get updatedAt; DateTime? get sourceUpdatedAt; int? get totalChapters; String? get latestChapterTitle;
 /// Create a copy of ComicMetadataEntity
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -29,16 +29,16 @@ $ComicMetadataEntityCopyWith<ComicMetadataEntity> get copyWith => _$ComicMetadat
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ComicMetadataEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.dataSourceMode, dataSourceMode) || other.dataSourceMode == dataSourceMode)&&(identical(other.providerId, providerId) || other.providerId == providerId)&&(identical(other.comicId, comicId) || other.comicId == comicId)&&(identical(other.title, title) || other.title == title)&&(identical(other.coverUrl, coverUrl) || other.coverUrl == coverUrl)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.sourceUpdatedAt, sourceUpdatedAt) || other.sourceUpdatedAt == sourceUpdatedAt)&&(identical(other.totalChapters, totalChapters) || other.totalChapters == totalChapters)&&(identical(other.latestChapterTitle, latestChapterTitle) || other.latestChapterTitle == latestChapterTitle));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ComicMetadataEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.providerId, providerId) || other.providerId == providerId)&&(identical(other.comicId, comicId) || other.comicId == comicId)&&(identical(other.title, title) || other.title == title)&&(identical(other.coverUrl, coverUrl) || other.coverUrl == coverUrl)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.sourceUpdatedAt, sourceUpdatedAt) || other.sourceUpdatedAt == sourceUpdatedAt)&&(identical(other.totalChapters, totalChapters) || other.totalChapters == totalChapters)&&(identical(other.latestChapterTitle, latestChapterTitle) || other.latestChapterTitle == latestChapterTitle));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,dataSourceMode,providerId,comicId,title,coverUrl,updatedAt,sourceUpdatedAt,totalChapters,latestChapterTitle);
+int get hashCode => Object.hash(runtimeType,id,providerId,comicId,title,coverUrl,updatedAt,sourceUpdatedAt,totalChapters,latestChapterTitle);
 
 @override
 String toString() {
-  return 'ComicMetadataEntity(id: $id, dataSourceMode: $dataSourceMode, providerId: $providerId, comicId: $comicId, title: $title, coverUrl: $coverUrl, updatedAt: $updatedAt, sourceUpdatedAt: $sourceUpdatedAt, totalChapters: $totalChapters, latestChapterTitle: $latestChapterTitle)';
+  return 'ComicMetadataEntity(id: $id, providerId: $providerId, comicId: $comicId, title: $title, coverUrl: $coverUrl, updatedAt: $updatedAt, sourceUpdatedAt: $sourceUpdatedAt, totalChapters: $totalChapters, latestChapterTitle: $latestChapterTitle)';
 }
 
 
@@ -49,7 +49,7 @@ abstract mixin class $ComicMetadataEntityCopyWith<$Res>  {
   factory $ComicMetadataEntityCopyWith(ComicMetadataEntity value, $Res Function(ComicMetadataEntity) _then) = _$ComicMetadataEntityCopyWithImpl;
 @useResult
 $Res call({
- String id, DataSourceMode dataSourceMode, String providerId, String comicId, String title, String coverUrl, DateTime updatedAt, DateTime? sourceUpdatedAt, int? totalChapters, String? latestChapterTitle
+ String id, String providerId, String comicId, String title, String coverUrl, DateTime updatedAt, DateTime? sourceUpdatedAt, int? totalChapters, String? latestChapterTitle
 });
 
 
@@ -66,11 +66,10 @@ class _$ComicMetadataEntityCopyWithImpl<$Res>
 
 /// Create a copy of ComicMetadataEntity
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? dataSourceMode = null,Object? providerId = null,Object? comicId = null,Object? title = null,Object? coverUrl = null,Object? updatedAt = null,Object? sourceUpdatedAt = freezed,Object? totalChapters = freezed,Object? latestChapterTitle = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? providerId = null,Object? comicId = null,Object? title = null,Object? coverUrl = null,Object? updatedAt = null,Object? sourceUpdatedAt = freezed,Object? totalChapters = freezed,Object? latestChapterTitle = freezed,}) {
   return _then(ComicMetadataEntity(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,dataSourceMode: null == dataSourceMode ? _self.dataSourceMode : dataSourceMode // ignore: cast_nullable_to_non_nullable
-as DataSourceMode,providerId: null == providerId ? _self.providerId : providerId // ignore: cast_nullable_to_non_nullable
+as String,providerId: null == providerId ? _self.providerId : providerId // ignore: cast_nullable_to_non_nullable
 as String,comicId: null == comicId ? _self.comicId : comicId // ignore: cast_nullable_to_non_nullable
 as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,coverUrl: null == coverUrl ? _self.coverUrl : coverUrl // ignore: cast_nullable_to_non_nullable
@@ -163,10 +162,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  DataSourceMode dataSourceMode,  String providerId,  String comicId,  String title,  String coverUrl,  DateTime updatedAt,  DateTime? sourceUpdatedAt,  int? totalChapters,  String? latestChapterTitle)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String providerId,  String comicId,  String title,  String coverUrl,  DateTime updatedAt,  DateTime? sourceUpdatedAt,  int? totalChapters,  String? latestChapterTitle)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ComicMetadataEntity() when $default != null:
-return $default(_that.id,_that.dataSourceMode,_that.providerId,_that.comicId,_that.title,_that.coverUrl,_that.updatedAt,_that.sourceUpdatedAt,_that.totalChapters,_that.latestChapterTitle);case _:
+return $default(_that.id,_that.providerId,_that.comicId,_that.title,_that.coverUrl,_that.updatedAt,_that.sourceUpdatedAt,_that.totalChapters,_that.latestChapterTitle);case _:
   return orElse();
 
 }
@@ -184,10 +183,10 @@ return $default(_that.id,_that.dataSourceMode,_that.providerId,_that.comicId,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  DataSourceMode dataSourceMode,  String providerId,  String comicId,  String title,  String coverUrl,  DateTime updatedAt,  DateTime? sourceUpdatedAt,  int? totalChapters,  String? latestChapterTitle)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String providerId,  String comicId,  String title,  String coverUrl,  DateTime updatedAt,  DateTime? sourceUpdatedAt,  int? totalChapters,  String? latestChapterTitle)  $default,) {final _that = this;
 switch (_that) {
 case _ComicMetadataEntity():
-return $default(_that.id,_that.dataSourceMode,_that.providerId,_that.comicId,_that.title,_that.coverUrl,_that.updatedAt,_that.sourceUpdatedAt,_that.totalChapters,_that.latestChapterTitle);case _:
+return $default(_that.id,_that.providerId,_that.comicId,_that.title,_that.coverUrl,_that.updatedAt,_that.sourceUpdatedAt,_that.totalChapters,_that.latestChapterTitle);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -204,10 +203,10 @@ return $default(_that.id,_that.dataSourceMode,_that.providerId,_that.comicId,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  DataSourceMode dataSourceMode,  String providerId,  String comicId,  String title,  String coverUrl,  DateTime updatedAt,  DateTime? sourceUpdatedAt,  int? totalChapters,  String? latestChapterTitle)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String providerId,  String comicId,  String title,  String coverUrl,  DateTime updatedAt,  DateTime? sourceUpdatedAt,  int? totalChapters,  String? latestChapterTitle)?  $default,) {final _that = this;
 switch (_that) {
 case _ComicMetadataEntity() when $default != null:
-return $default(_that.id,_that.dataSourceMode,_that.providerId,_that.comicId,_that.title,_that.coverUrl,_that.updatedAt,_that.sourceUpdatedAt,_that.totalChapters,_that.latestChapterTitle);case _:
+return $default(_that.id,_that.providerId,_that.comicId,_that.title,_that.coverUrl,_that.updatedAt,_that.sourceUpdatedAt,_that.totalChapters,_that.latestChapterTitle);case _:
   return null;
 
 }
@@ -219,11 +218,10 @@ return $default(_that.id,_that.dataSourceMode,_that.providerId,_that.comicId,_th
 @JsonSerializable()
 
 class _ComicMetadataEntity implements ComicMetadataEntity {
-  const _ComicMetadataEntity({required this.id, required this.dataSourceMode, required this.providerId, required this.comicId, required this.title, required this.coverUrl, required this.updatedAt, this.sourceUpdatedAt, this.totalChapters, this.latestChapterTitle});
+  const _ComicMetadataEntity({required this.id, required this.providerId, required this.comicId, required this.title, required this.coverUrl, required this.updatedAt, this.sourceUpdatedAt, this.totalChapters, this.latestChapterTitle});
   factory _ComicMetadataEntity.fromJson(Map<String, dynamic> json) => _$ComicMetadataEntityFromJson(json);
 
 @override final  String id;
-@override final  DataSourceMode dataSourceMode;
 @override final  String providerId;
 @override final  String comicId;
 @override final  String title;
@@ -246,16 +244,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ComicMetadataEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.dataSourceMode, dataSourceMode) || other.dataSourceMode == dataSourceMode)&&(identical(other.providerId, providerId) || other.providerId == providerId)&&(identical(other.comicId, comicId) || other.comicId == comicId)&&(identical(other.title, title) || other.title == title)&&(identical(other.coverUrl, coverUrl) || other.coverUrl == coverUrl)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.sourceUpdatedAt, sourceUpdatedAt) || other.sourceUpdatedAt == sourceUpdatedAt)&&(identical(other.totalChapters, totalChapters) || other.totalChapters == totalChapters)&&(identical(other.latestChapterTitle, latestChapterTitle) || other.latestChapterTitle == latestChapterTitle));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ComicMetadataEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.providerId, providerId) || other.providerId == providerId)&&(identical(other.comicId, comicId) || other.comicId == comicId)&&(identical(other.title, title) || other.title == title)&&(identical(other.coverUrl, coverUrl) || other.coverUrl == coverUrl)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.sourceUpdatedAt, sourceUpdatedAt) || other.sourceUpdatedAt == sourceUpdatedAt)&&(identical(other.totalChapters, totalChapters) || other.totalChapters == totalChapters)&&(identical(other.latestChapterTitle, latestChapterTitle) || other.latestChapterTitle == latestChapterTitle));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,dataSourceMode,providerId,comicId,title,coverUrl,updatedAt,sourceUpdatedAt,totalChapters,latestChapterTitle);
+int get hashCode => Object.hash(runtimeType,id,providerId,comicId,title,coverUrl,updatedAt,sourceUpdatedAt,totalChapters,latestChapterTitle);
 
 @override
 String toString() {
-  return 'ComicMetadataEntity(id: $id, dataSourceMode: $dataSourceMode, providerId: $providerId, comicId: $comicId, title: $title, coverUrl: $coverUrl, updatedAt: $updatedAt, sourceUpdatedAt: $sourceUpdatedAt, totalChapters: $totalChapters, latestChapterTitle: $latestChapterTitle)';
+  return 'ComicMetadataEntity(id: $id, providerId: $providerId, comicId: $comicId, title: $title, coverUrl: $coverUrl, updatedAt: $updatedAt, sourceUpdatedAt: $sourceUpdatedAt, totalChapters: $totalChapters, latestChapterTitle: $latestChapterTitle)';
 }
 
 
@@ -266,7 +264,7 @@ abstract mixin class _$ComicMetadataEntityCopyWith<$Res> implements $ComicMetada
   factory _$ComicMetadataEntityCopyWith(_ComicMetadataEntity value, $Res Function(_ComicMetadataEntity) _then) = __$ComicMetadataEntityCopyWithImpl;
 @override @useResult
 $Res call({
- String id, DataSourceMode dataSourceMode, String providerId, String comicId, String title, String coverUrl, DateTime updatedAt, DateTime? sourceUpdatedAt, int? totalChapters, String? latestChapterTitle
+ String id, String providerId, String comicId, String title, String coverUrl, DateTime updatedAt, DateTime? sourceUpdatedAt, int? totalChapters, String? latestChapterTitle
 });
 
 
@@ -283,11 +281,10 @@ class __$ComicMetadataEntityCopyWithImpl<$Res>
 
 /// Create a copy of ComicMetadataEntity
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? dataSourceMode = null,Object? providerId = null,Object? comicId = null,Object? title = null,Object? coverUrl = null,Object? updatedAt = null,Object? sourceUpdatedAt = freezed,Object? totalChapters = freezed,Object? latestChapterTitle = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? providerId = null,Object? comicId = null,Object? title = null,Object? coverUrl = null,Object? updatedAt = null,Object? sourceUpdatedAt = freezed,Object? totalChapters = freezed,Object? latestChapterTitle = freezed,}) {
   return _then(_ComicMetadataEntity(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,dataSourceMode: null == dataSourceMode ? _self.dataSourceMode : dataSourceMode // ignore: cast_nullable_to_non_nullable
-as DataSourceMode,providerId: null == providerId ? _self.providerId : providerId // ignore: cast_nullable_to_non_nullable
+as String,providerId: null == providerId ? _self.providerId : providerId // ignore: cast_nullable_to_non_nullable
 as String,comicId: null == comicId ? _self.comicId : comicId // ignore: cast_nullable_to_non_nullable
 as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,coverUrl: null == coverUrl ? _self.coverUrl : coverUrl // ignore: cast_nullable_to_non_nullable

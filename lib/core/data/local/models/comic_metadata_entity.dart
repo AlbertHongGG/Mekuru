@@ -1,5 +1,4 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:mekuru/core/models/enums/data_source_mode.dart';
 
 part 'comic_metadata_entity.freezed.dart';
 part 'comic_metadata_entity.g.dart';
@@ -8,7 +7,6 @@ part 'comic_metadata_entity.g.dart';
 abstract class ComicMetadataEntity with _$ComicMetadataEntity {
   const factory ComicMetadataEntity({
     required String id, // 唯一識別碼
-    required DataSourceMode dataSourceMode,
     required String providerId,
     required String comicId,
     required String title,

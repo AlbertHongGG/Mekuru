@@ -1,4 +1,3 @@
-import 'package:mekuru/core/models/enums/data_source_mode.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mekuru/core/data/providers/repository_providers.dart';
 import 'package:mekuru/core/data/repositories/user_interaction_repository.dart';
@@ -67,14 +66,12 @@ class ComicDetailsNotifier extends AutoDisposeFamilyNotifier<ComicDetailsState, 
       final chapters = chapterResult.getOrThrow();
 
       final settings = ref.read(settingsProvider);
-      final mode = settings.dataSourceMode;
 
       // Update metadata with chapter list information
-      await interactionRepo.updateMetadata(mode, arg.providerId, comic, chapters: chapters, isChaptersDescending: state.isChapterSortDescending);
+      await interactionRepo.updateMetadata(arg.providerId, comic, chapters: chapters, isChaptersDescending: state.isChapterSortDescending);
 
       // Start watching the interaction stream
       final sub = interactionRepo.watchInteraction(
-        dataSourceMode: mode, 
         providerId: arg.providerId, 
         comicId: arg.comicId
       ).listen((record) {
@@ -111,7 +108,6 @@ class ComicDetailsNotifier extends AutoDisposeFamilyNotifier<ComicDetailsState, 
 
     try {
       await interactionRepo.toggleFavorite(
-        dataSourceMode: mode,
         providerId: arg.providerId, 
         comicId: arg.comicId,
         comic: comic, 
@@ -119,7 +115,6 @@ class ComicDetailsNotifier extends AutoDisposeFamilyNotifier<ComicDetailsState, 
       );
       // Re-fetch interaction
       final interaction = await interactionRepo.getInteraction(
-        dataSourceMode: mode,
         providerId: arg.providerId, 
         comicId: arg.comicId
       );

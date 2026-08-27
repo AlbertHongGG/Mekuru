@@ -9,10 +9,6 @@ part of 'comic_metadata_entity.dart';
 _ComicMetadataEntity _$ComicMetadataEntityFromJson(Map<String, dynamic> json) =>
     _ComicMetadataEntity(
       id: json['id'] as String,
-      dataSourceMode: $enumDecode(
-        _$DataSourceModeEnumMap,
-        json['dataSourceMode'],
-      ),
       providerId: json['providerId'] as String,
       comicId: json['comicId'] as String,
       title: json['title'] as String,
@@ -29,7 +25,6 @@ Map<String, dynamic> _$ComicMetadataEntityToJson(
   _ComicMetadataEntity instance,
 ) => <String, dynamic>{
   'id': instance.id,
-  'dataSourceMode': _$DataSourceModeEnumMap[instance.dataSourceMode]!,
   'providerId': instance.providerId,
   'comicId': instance.comicId,
   'title': instance.title,
@@ -38,9 +33,4 @@ Map<String, dynamic> _$ComicMetadataEntityToJson(
   'sourceUpdatedAt': instance.sourceUpdatedAt?.toIso8601String(),
   'totalChapters': instance.totalChapters,
   'latestChapterTitle': instance.latestChapterTitle,
-};
-
-const _$DataSourceModeEnumMap = {
-  DataSourceMode.source: 'source',
-  DataSourceMode.db: 'db',
 };

@@ -1,4 +1,3 @@
-import 'package:mekuru/core/models/enums/data_source_mode.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mekuru/core/data/providers/repository_providers.dart';
 import 'package:mekuru/core/data/repositories/user_interaction_repository.dart';
@@ -41,7 +40,6 @@ class ComicViewerState {
 
 class ComicViewerNotifier extends AutoDisposeFamilyNotifier<ComicViewerState, ({String providerId, String comicId, String chapterId})> {
   UserInteractionRepository? _interactionRepo;
-  DataSourceMode? _mode;
   dynamic _comic;
   String? _chapterTitle;
 
@@ -90,10 +88,8 @@ class ComicViewerNotifier extends AutoDisposeFamilyNotifier<ComicViewerState, ({
       final chapter = detailsState.chapters.firstWhere((c) => c.id == arg.chapterId);
 
       final settings = ref.read(settingsProvider);
-      final mode = settings.dataSourceMode;
       
       _interactionRepo = interactionRepo;
-      _mode = mode;
       _comic = comic;
       _chapterTitle = chapter.title;
       _chronologicalIndex = _calculateChronologicalIndex(detailsState.chapters, arg.chapterId);
@@ -102,7 +98,6 @@ class ComicViewerNotifier extends AutoDisposeFamilyNotifier<ComicViewerState, ({
       double initAnchorOffset = 0.0;
       try {
         final interaction = await interactionRepo.getInteraction(
-          dataSourceMode: mode,
           providerId: arg.providerId, 
           comicId: arg.comicId
         );
@@ -123,7 +118,6 @@ class ComicViewerNotifier extends AutoDisposeFamilyNotifier<ComicViewerState, ({
       if (comic != null) {
         int packed = (initAnchorIndex * 1000000) + initAnchorOffset.toInt();
         interactionRepo.markRead(
-          dataSourceMode: mode,
           providerId: arg.providerId,
           comicId: arg.comicId,
           comic: comic,
@@ -142,10 +136,9 @@ class ComicViewerNotifier extends AutoDisposeFamilyNotifier<ComicViewerState, ({
 
   Future<void> updateProgress(int anchorIndex, double anchorOffset) async {
     try {
-      if (_interactionRepo != null && _comic != null && _mode != null && _chapterTitle != null) {
+      if (_interactionRepo != null && _comic != null && _chapterTitle != null) {
         int packed = (anchorIndex * 1000000) + anchorOffset.toInt();
         _interactionRepo!.markRead(
-          dataSourceMode: _mode!,
           providerId: arg.providerId,
           comicId: arg.comicId,
           comic: _comic,

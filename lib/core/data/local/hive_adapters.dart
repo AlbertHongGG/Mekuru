@@ -3,12 +3,10 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:mekuru/core/data/local/models/comic_metadata_entity.dart';
 import 'package:mekuru/core/data/local/models/favorite_entity.dart';
 import 'package:mekuru/core/data/local/models/history_entity.dart';
-import 'package:mekuru/core/models/enums/data_source_mode.dart';
 import 'package:mekuru/features/logger/domain/models/log_entry.dart';
 
 class HiveAdapters {
   static void registerAll() {
-    Hive.registerAdapter(DataSourceModeAdapter());
     Hive.registerAdapter(ComicMetadataEntityAdapter());
     Hive.registerAdapter(FavoriteEntityAdapter());
     Hive.registerAdapter(HistoryEntityAdapter());
@@ -17,20 +15,7 @@ class HiveAdapters {
   }
 }
 
-class DataSourceModeAdapter extends TypeAdapter<DataSourceMode> {
-  @override
-  final int typeId = 1;
 
-  @override
-  DataSourceMode read(BinaryReader reader) {
-    return DataSourceModeExtension.fromString(reader.readString());
-  }
-
-  @override
-  void write(BinaryWriter writer, DataSourceMode obj) {
-    writer.writeString(obj.name);
-  }
-}
 
 class ComicMetadataEntityAdapter extends TypeAdapter<ComicMetadataEntity> {
   @override
@@ -39,8 +24,7 @@ class ComicMetadataEntityAdapter extends TypeAdapter<ComicMetadataEntity> {
   @override
   ComicMetadataEntity read(BinaryReader reader) {
     final id = reader.readString();
-    final dataSourceMode = DataSourceModeExtension.fromString(reader.readString());
-    final providerId = reader.readString();
+        final providerId = reader.readString();
     final comicId = reader.readString();
     final title = reader.readString();
     final coverUrl = reader.readString();
@@ -67,8 +51,7 @@ class ComicMetadataEntityAdapter extends TypeAdapter<ComicMetadataEntity> {
 
     return ComicMetadataEntity(
       id: id,
-      dataSourceMode: dataSourceMode,
-      providerId: providerId,
+            providerId: providerId,
       comicId: comicId,
       title: title,
       coverUrl: coverUrl,
@@ -83,8 +66,7 @@ class ComicMetadataEntityAdapter extends TypeAdapter<ComicMetadataEntity> {
   void write(BinaryWriter writer, ComicMetadataEntity obj) {
     writer
       ..writeString(obj.id)
-      ..writeString(obj.dataSourceMode.name)
-      ..writeString(obj.providerId)
+            ..writeString(obj.providerId)
       ..writeString(obj.comicId)
       ..writeString(obj.title)
       ..writeString(obj.coverUrl)

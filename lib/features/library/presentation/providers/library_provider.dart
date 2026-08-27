@@ -1,5 +1,4 @@
 import 'package:mekuru/core/models/enums/library_sort_mode.dart';
-import 'package:mekuru/core/models/enums/data_source_mode.dart';
 import 'package:mekuru/core/models/comic_record.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mekuru/core/data/repositories/user_interaction_repository.dart';
@@ -56,8 +55,7 @@ class LibraryNotifier extends Notifier<LibraryState> {
   @override
   LibraryState build() {
     final sortMode = ref.read(settingsProvider).librarySortMode;
-    ref.watch(settingsProvider.select((s) => s.dataSourceMode));
-    
+        
     // Subscribe to DB changes so Library auto-updates when progress is saved or favorites are toggled
     final subscription = ref.watch(userInteractionRepositoryProvider).watchGlobalChanges().listen((_) {
       loadLibrary();
@@ -96,7 +94,7 @@ class LibraryNotifier extends Notifier<LibraryState> {
       final interactionRepo = ref.read(userInteractionRepositoryProvider);
       final settings = ref.read(settingsProvider);
       
-      final records = await interactionRepo.getAllFavorites(settings.dataSourceMode);
+      final records = await interactionRepo.getAllFavorites();
 
       final availableProviders = records.map((r) => r.providerId).toSet().toList();
 

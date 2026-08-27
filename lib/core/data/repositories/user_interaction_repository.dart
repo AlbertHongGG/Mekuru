@@ -1,5 +1,4 @@
 import 'package:async/async.dart';
-import 'package:mekuru/core/models/enums/data_source_mode.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mekuru/core/data/local/i_local_storage.dart';
 import 'package:mekuru/core/models/comic_record.dart';
@@ -17,8 +16,8 @@ class UserInteractionRepository {
 
   UserInteractionRepository(this._metadataBox, this._favoritesBox, this._historyBox);
 
-  String _genId(DataSourceMode dataSourceMode, String providerId, String comicId) {
-    return '${dataSourceMode}_${providerId}_$comicId';
+  String _genId(String providerId, String comicId) {
+    return '${providerId}_$comicId';
   }
 
   ComicRecord? _buildRecord(String id) {
@@ -29,8 +28,7 @@ class UserInteractionRepository {
 
     return ComicRecord(
       id: id,
-      dataSourceMode: metadata.dataSourceMode,
-      providerId: metadata.providerId,
+            providerId: metadata.providerId,
       comicId: metadata.comicId,
       title: metadata.title,
       coverUrl: metadata.coverUrl,
@@ -49,11 +47,11 @@ class UserInteractionRepository {
     );
   }
 
-  Future<List<ComicRecord>> getAllFavorites(DataSourceMode dataSourceMode) async {
+  Future<List<ComicRecord>> getAllFavorites() async {
     final records = <ComicRecord>[];
     for (final id in _favoritesBox.keys) {
       final record = _buildRecord(id);
-      if (record != null && record.dataSourceMode == dataSourceMode) {
+      if (record != null) {
         records.add(record);
       }
     }
@@ -61,16 +59,16 @@ class UserInteractionRepository {
     return records;
   }
 
-  Future<List<ComicRecord>> getFavoritesByProvider(DataSourceMode dataSourceMode, String providerId) async {
+  Future<List<ComicRecord>> getFavoritesByProvider(String providerId) async {
     final records = await getAllFavorites(dataSourceMode);
     return records.where((r) => r.providerId == providerId).toList();
   }
   
-  Future<List<ComicRecord>> getAllHistory(DataSourceMode dataSourceMode) async {
+  Future<List<ComicRecord>> getAllHistory() async {
     final records = <ComicRecord>[];
     for (final id in _historyBox.keys) {
       final record = _buildRecord(id);
-      if (record != null && record.dataSourceMode == dataSourceMode) {
+      if (record != null) {
         records.add(record);
       }
     }
@@ -78,26 +76,25 @@ class UserInteractionRepository {
     return records;
   }
 
-  Future<List<ComicRecord>> getHistoryByProvider(DataSourceMode dataSourceMode, String providerId) async {
+  Future<List<ComicRecord>> getHistoryByProvider(String providerId) async {
     final records = await getAllHistory(dataSourceMode);
     return records.where((r) => r.providerId == providerId).toList();
   }
 
 
-  Future<ComicMetadataEntity?> getMetadata(DataSourceMode dataSourceMode, String providerId, String comicId) async {
-    final id = _genId(dataSourceMode, providerId, comicId);
+  Future<ComicMetadataEntity?> getMetadata(String providerId, String comicId) async {
+    final id = _genId(providerId, comicId);
     return _metadataBox.get(id);
   }
 
   Future<void> updateMetadataFields(
-    DataSourceMode dataSourceMode,
     String providerId,
     String comicId, {
     int? totalChapters,
     DateTime? sourceUpdatedAt,
     String? latestChapterTitle,
   }) async {
-    final id = _genId(dataSourceMode, providerId, comicId);
+    final id = _genId(providerId, comicId);
     final existing = _metadataBox.get(id);
     if (existing != null) {
       final updated = existing.copyWith(
@@ -109,8 +106,8 @@ class UserInteractionRepository {
     }
   }
 
-  Future<void> updateMetadata(DataSourceMode dataSourceMode, String providerId, IComicItem comic, {List<Chapter>? chapters, bool isChaptersDescending = false}) async {
-    final id = _genId(dataSourceMode, providerId, comic.comicId);
+  Future<void> updateMetadata(String providerId, IComicItem comic, {List<Chapter>? chapters, bool isChaptersDescending = false}) async {
+    final id = _genId(providerId, comic.comicId);
     final now = DateTime.now();
     final existing = _metadataBox.get(id);
     
@@ -150,7 +147,6 @@ class UserInteractionRepository {
     if (existing == null || existing.coverUrl != comic.coverUrl || existing.title != comic.title || chaptersUpdated) {
       await _metadataBox.put(id, ComicMetadataEntity(
         id: id,
-        dataSourceMode: dataSourceMode,
         providerId: providerId,
         comicId: comic.comicId,
         title: comic.title ?? existing?.title ?? '',
@@ -182,7 +178,6 @@ class UserInteractionRepository {
   }
 
   Future<void> markRead({
-    required DataSourceMode dataSourceMode,
     required String providerId,
     required String comicId,
     required IComicItem comic,
@@ -191,9 +186,9 @@ class UserInteractionRepository {
     int? pageIndex,
     int? chapterIndex,
   }) async {
-    final id = _genId(dataSourceMode, providerId, comicId);
+    final id = _genId(providerId, comicId);
     
-    await updateMetadata(dataSourceMode, providerId, comic);
+    await updateMetadata(providerId, comic);
     
     final existingHistory = _historyBox.get(id);
     final readChapterIds = existingHistory?.readChapterIds.toList() ?? [];
@@ -213,20 +208,18 @@ class UserInteractionRepository {
   }
 
   Future<ComicRecord?> getInteraction({
-    required DataSourceMode dataSourceMode,
     required String providerId,
     required String comicId,
   }) async {
-    final id = _genId(dataSourceMode, providerId, comicId);
+    final id = _genId(providerId, comicId);
     return _buildRecord(id);
   }
 
   Stream<ComicRecord?> watchInteraction({
-    required DataSourceMode dataSourceMode,
     required String providerId,
     required String comicId,
   }) async* {
-    final id = _genId(dataSourceMode, providerId, comicId);
+    final id = _genId(providerId, comicId);
     yield _buildRecord(id);
     
     yield* StreamGroup.merge([
@@ -245,15 +238,14 @@ class UserInteractionRepository {
   }
 
   Future<void> toggleFavorite({
-    required DataSourceMode dataSourceMode,
     required String providerId,
     required String comicId,
     required IComicItem comic,
     required bool isFavorite,
   }) async {
-    final id = _genId(dataSourceMode, providerId, comicId);
+    final id = _genId(providerId, comicId);
     
-    await updateMetadata(dataSourceMode, providerId, comic);
+    await updateMetadata(providerId, comic);
     
     if (isFavorite) {
       await _favoritesBox.put(id, FavoriteEntity(

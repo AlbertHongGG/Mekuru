@@ -1,64 +1,65 @@
-import 'package:mekuru/core/models/enums/data_source_mode.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mekuru/core/data/repositories/archive_repository.dart';
 import 'package:mekuru/core/models/archive_task.dart';
 import 'dart:async';
+import 'package:dio/dio.dart';
 
 class ArchiveState {
   final bool isLoading;
   final List<ArchiveTask> tasks;
+  final Map<String, dynamic> metadata;
   final String? error;
 
   ArchiveState({
     this.isLoading = false,
     this.tasks = const [],
+    this.metadata = const {},
     this.error,
   });
 
   ArchiveState copyWith({
     bool? isLoading,
     List<ArchiveTask>? tasks,
+    Map<String, dynamic>? metadata,
     String? error,
+    bool clearError = false,
   }) {
     return ArchiveState(
       isLoading: isLoading ?? this.isLoading,
       tasks: tasks ?? this.tasks,
-      error: error,
+      metadata: metadata ?? this.metadata,
+      error: clearError ? null : (error ?? this.error),
     );
   }
 }
 
 class ArchiveNotifier extends Notifier<ArchiveState> {
-  Timer? _timer;
-
   @override
   ArchiveState build() {
-    Future.microtask(() {
-      loadTasks();
-      _timer = Timer.periodic(const Duration(seconds: 5), (_) {
-        loadTasks(silent: true);
-      });
-    });
-    
-    ref.onDispose(() {
-      _timer?.cancel();
-    });
-    
+    // Initial load
+    Future.microtask(() => loadTasks());
     return ArchiveState();
   }
 
   Future<void> loadTasks({bool silent = false}) async {
     if (!silent) {
-      state = state.copyWith(isLoading: true, error: null);
+      state = state.copyWith(isLoading: true, clearError: true);
     }
     
     try {
       final repo = ref.read(archiveRepositoryProvider);
-      final tasks = await repo.getActiveTasks();
+      final results = await Future.wait([
+        repo.getActiveTasks(),
+        repo.getArchivedComics(),
+      ]);
+      
+      final tasks = results[0] as List<ArchiveTask>;
+      final metadata = results[1] as Map<String, dynamic>;
       
       state = state.copyWith(
         isLoading: false,
         tasks: tasks,
+        metadata: metadata,
       );
     } catch (e) {
       if (!silent) {
@@ -66,8 +67,49 @@ class ArchiveNotifier extends Notifier<ArchiveState> {
       }
     }
   }
+
+  Future<bool> pauseTask(String providerId, String comicId) async {
+    final success = await ref.read(archiveRepositoryProvider).pauseTask(providerId, comicId);
+    if (success) await loadTasks(silent: true);
+    return success;
+  }
+
+  Future<bool> resumeTask(String providerId, String comicId) async {
+    final success = await ref.read(archiveRepositoryProvider).resumeTask(providerId, comicId);
+    if (success) await loadTasks(silent: true);
+    return success;
+  }
+
+  Future<bool> cancelTask(String providerId, String comicId) async {
+    final success = await ref.read(archiveRepositoryProvider).cancelTask(providerId, comicId);
+    if (success) await loadTasks(silent: true);
+    return success;
+  }
+
+  Future<bool> deleteComic(String providerId, String comicId) async {
+    final success = await ref.read(archiveRepositoryProvider).deleteComic(providerId, comicId);
+    if (success) await loadTasks(silent: true);
+    return success;
+  }
+
+  Future<String?> startDownload(String providerId, String comicId) async {
+    try {
+      await ref.read(archiveRepositoryProvider).startSync(providerId, comicId);
+      await loadTasks(silent: true);
+      return null;
+    } catch (e) {
+      if (e is DioException && e.response?.data != null) {
+        final data = e.response!.data;
+        if (data is Map<String, dynamic> && data['detail'] != null) {
+          return data['detail'].toString();
+        }
+      }
+      return e.toString();
+    }
+  }
 }
 
 final archiveProvider = NotifierProvider<ArchiveNotifier, ArchiveState>(() {
   return ArchiveNotifier();
 });
+

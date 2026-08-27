@@ -4,7 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:mekuru/core/theme/app_colors.dart';
+import 'package:mekuru/core/notifications/presentation/controllers/notification_controller.dart';
 import 'package:mekuru/features/comic/presentation/providers/comic_details_provider.dart';
+import 'package:mekuru/features/archive/presentation/providers/archive_provider.dart';
 import 'package:mekuru/features/comic/presentation/widgets/chapter_list_bottom_sheet.dart';
 import 'package:mekuru/core/widgets/comic_image.dart';
 import 'package:mekuru/core/widgets/expandable_text.dart';
@@ -184,7 +186,6 @@ class ComicDetailsPage extends ConsumerWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 4),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Material(
@@ -198,6 +199,42 @@ class ComicDetailsPage extends ConsumerWidget {
                           size: 22,
                         ),
                         onPressed: () => notifier.toggleFavorite(),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Material(
+                      color: Colors.black.withValues(alpha: 0.4),
+                      shape: const CircleBorder(),
+                      clipBehavior: Clip.antiAlias,
+                      child: Consumer(
+                        builder: (context, ref, _) {
+                          // Check if comic is already in tasks
+                          final archiveState = ref.watch(archiveProvider);
+                          final isQueued = archiveState.tasks.any((t) => t.comicId == comicId && t.providerId == providerId);
+                          
+                          return IconButton(
+                            icon: Icon(
+                              isQueued ? Icons.cloud_done_rounded : Icons.download_rounded,
+                              color: isQueued ? Colors.greenAccent : Colors.white,
+                              size: 22,
+                            ),
+                            onPressed: () async {
+                              final notificationCtrl = ref.read(notificationProvider.notifier);
+                              if (isQueued) {
+                                notificationCtrl.showInfo('已在下載佇列中');
+                                return;
+                              }
+                              final error = await ref.read(archiveProvider.notifier).startDownload(providerId, comicId);
+                              if (error == null) {
+                                notificationCtrl.showSuccess('已加入下載任務');
+                              } else {
+                                notificationCtrl.showError('加入失敗: $error');
+                              }
+                            },
+                          );
+                        },
                       ),
                     ),
                   ),

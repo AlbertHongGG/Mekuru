@@ -141,7 +141,15 @@ class LibraryNotifier extends Notifier<LibraryState> {
         progressLabel = '$readLabel/${r.totalChapters}';
       }
       
-      return ComicCardData.fromComic(r, overrideTags: [providerName], progressLabel: progressLabel);
+      final tags = [providerName];
+      if (r.sourceUpdatedAt != null) {
+        final d = r.sourceUpdatedAt!;
+        tags.add('${d.month}/${d.day} ${d.hour}:${d.minute.toString().padLeft(2, '0')}');
+      } else {
+        tags.add('No Date');
+      }
+      
+      return ComicCardData.fromComic(r, overrideTags: tags, progressLabel: progressLabel);
     }).toList();
 
     state = state.copyWith(displayItems: displayItems);

@@ -7,8 +7,6 @@ import 'package:mekuru/core/models/chapter.dart';
 import 'package:mekuru/core/models/page.dart';
 import 'package:mekuru/core/error/result.dart';
 import 'package:mekuru/core/error/failures.dart';
-import 'package:mekuru/core/models/update_check_result.dart';
-import 'package:mekuru/core/data/local/models/comic_metadata_entity.dart';
 import 'package:mekuru/core/data/local/archive_storage.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:mekuru/features/archive/domain/managers/i_local_library_manager.dart';
@@ -127,8 +125,4 @@ class LocalProvider implements IComicProvider {
     }
   }
 
-  @override
-  Future<Result<UpdateCheckResult, Failure>> checkForUpdates(String comicId, ComicMetadataEntity currentMeta) async {
-    return Success(UpdateCheckResult(hasNew: false, newTotal: currentMeta.totalChapters ?? 0));
-  }
 }

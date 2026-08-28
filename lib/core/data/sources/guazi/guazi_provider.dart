@@ -2,8 +2,6 @@ import 'package:dio/dio.dart';
 import 'package:mekuru/core/data/sources/base_comic_provider.dart';
 import 'package:mekuru/core/network/api_client.dart';
 import 'package:mekuru/core/error/result.dart';
-import 'package:mekuru/core/data/local/models/comic_metadata_entity.dart';
-import 'package:mekuru/core/models/update_check_result.dart';
 import 'package:mekuru/core/models/comic_models.dart';
 import 'package:mekuru/core/models/chapter.dart';
 import 'package:mekuru/core/models/page.dart';
@@ -159,35 +157,4 @@ class GuaziProvider extends BaseComicProvider {
     });
   }
 
-  @override
-  Future<Result<UpdateCheckResult, Failure>> checkForUpdates(String comicId, ComicMetadataEntity currentMeta) async {
-    return handleApiCall(() async {
-      // We don't have chapter count mapped to the response. Let's just fetch chapter list which might be heavy, 
-      // but the API doesn't support pagination for chapters. So we just fetch all.
-      final rawList = await _apiClient.getChapterList(comicId, sort: 'desc');
-      
-      final int newTotal = rawList.length;
-      final int currentTotal = currentMeta.totalChapters ?? 0;
-      final bool hasNew = newTotal > currentTotal;
-      
-      String? latestTitle;
-      DateTime? latestTime;
-      
-      if (rawList.isNotEmpty) {
-        final ch = rawList.first; // Since we requested desc, first is latest
-        latestTitle = ch.name;
-        final tsStr = _convertTimestamp(ch.addtime);
-        if (tsStr.isNotEmpty) {
-          latestTime = DateTime.tryParse(tsStr);
-        }
-      }
-      
-      return UpdateCheckResult(
-        hasNew: hasNew,
-        newTotal: newTotal > 0 ? newTotal : currentTotal,
-        newSourceUpdatedAt: latestTime,
-        newLatestTitle: latestTitle,
-      );
-    });
-  }
 }

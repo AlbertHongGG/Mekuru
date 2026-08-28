@@ -5,8 +5,6 @@ import 'package:mekuru/core/models/paginated_result.dart';
 import 'package:mekuru/core/models/chapter.dart';
 import 'package:mekuru/core/models/page.dart';
 import 'package:mekuru/core/error/result.dart';
-import 'package:mekuru/core/models/update_check_result.dart';
-import 'package:mekuru/core/data/local/models/comic_metadata_entity.dart';
 
 /// The standard contract that ALL comic providers must implement.
 abstract class IComicProvider {
@@ -36,8 +34,4 @@ abstract class IComicProvider {
 
   /// Explore/discover comics from the provider.
   Future<Result<PaginatedResult<ComicExploreResult>, Failure>> exploreComics(int page);
-
-  /// Check for updates efficiently.
-  /// Implementations should make the minimal API requests needed (e.g. only fetching the first/last page).
-  Future<Result<UpdateCheckResult, Failure>> checkForUpdates(String comicId, ComicMetadataEntity currentMeta);
 }

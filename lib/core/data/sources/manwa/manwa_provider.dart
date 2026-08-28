@@ -2,14 +2,11 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:mekuru/core/network/api_client.dart';
 import 'package:mekuru/core/data/sources/base_comic_provider.dart';
-import 'package:mekuru/core/error/failures.dart';
 import 'package:mekuru/core/error/result.dart';
 import 'package:mekuru/core/models/chapter.dart';
 import 'package:mekuru/core/models/comic_models.dart';
 import 'package:mekuru/core/models/page.dart';
 import 'package:mekuru/core/models/paginated_result.dart';
-import 'package:mekuru/core/models/update_check_result.dart';
-import 'package:mekuru/core/data/local/models/comic_metadata_entity.dart';
 import 'manwa_api_client.dart';
 import 'manwa_interceptor.dart';
 import 'manwa_crypto.dart';
@@ -162,36 +159,4 @@ class ManwaProvider extends BaseComicProvider {
     });
   }
 
-  @override
-  Future<Result<UpdateCheckResult, Failure>> checkForUpdates(
-      String comicId, ComicMetadataEntity currentMeta) async {
-    return handleApiCall(() async {
-      final response = await _apiClient.getComicDetail(comicId);
-      final chapterList = response.data.chapterList;
-      final currentTotal = currentMeta.totalChapters ?? 0;
-      
-      if (chapterList.isEmpty) {
-        return UpdateCheckResult(
-          hasNew: false,
-          newTotal: currentTotal,
-        );
-      }
-
-      final newTotal = chapterList.length;
-      final hasNew = newTotal > currentTotal;
-
-      DateTime? latestTime;
-      final ch = chapterList.first;
-      if (ch.addtime != null && ch.addtime!.isNotEmpty) {
-        latestTime = DateTime.tryParse(ch.addtime!);
-      }
-
-      return UpdateCheckResult(
-        hasNew: hasNew,
-        newTotal: newTotal > 0 ? newTotal : currentTotal,
-        newSourceUpdatedAt: latestTime,
-        newLatestTitle: ch.name,
-      );
-    });
-  }
 }

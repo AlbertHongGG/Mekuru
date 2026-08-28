@@ -107,18 +107,18 @@ class UserInteractionRepository {
     }
   }
 
-  Future<void> updateMetadata(String providerId, IComicItem comic, {List<Chapter>? chapters, bool isChaptersDescending = false}) async {
-    final id = _genId(providerId, comic.comicId);
-    final now = DateTime.now();
+  
+  Future<void> updateChaptersOnly(String providerId, String comicId, List<Chapter> chapters, {bool isChaptersDescending = false}) async {
+    final id = _genId(providerId, comicId);
     final existing = _metadataBox.get(id);
-    
-    DateTime? sourceUpdatedAt = existing?.sourceUpdatedAt;
-    int? totalChapters = existing?.totalChapters;
-    String? latestChapterTitle = existing?.latestChapterTitle;
+    if (existing == null) return;
+
+    DateTime? sourceUpdatedAt = existing.sourceUpdatedAt;
+    int? totalChapters = existing.totalChapters;
+    String? latestChapterTitle = existing.latestChapterTitle;
     bool chaptersUpdated = false;
 
-    if (chapters != null && chapters.isNotEmpty) {
-      // Find the newest publish time
+    if (chapters.isNotEmpty) {
       DateTime? newestTime;
       Chapter? latestChap = chapters.first;
       for (final chap in chapters) {
@@ -144,22 +144,17 @@ class UserInteractionRepository {
         chaptersUpdated = true;
       }
     }
-    
-    if (existing == null || existing.coverUrl != comic.coverUrl || existing.title != comic.title || chaptersUpdated) {
-      await _metadataBox.put(id, ComicMetadataEntity(
-        id: id,
-        providerId: providerId,
-        comicId: comic.comicId,
-        title: comic.title ?? existing?.title ?? '',
-        coverUrl: comic.coverUrl ?? existing?.coverUrl ?? '',
-        updatedAt: now,
+
+    if (chaptersUpdated) {
+      await _metadataBox.put(id, existing.copyWith(
         sourceUpdatedAt: sourceUpdatedAt,
         totalChapters: totalChapters,
         latestChapterTitle: latestChapterTitle,
+        updatedAt: DateTime.now(),
       ));
     }
 
-    if (chapters != null && chapters.isNotEmpty) {
+    if (chapters.isNotEmpty) {
       final existingHistory = _historyBox.get(id);
       if (existingHistory != null && existingHistory.lastReadChapterId.isNotEmpty) {
         final indexInList = chapters.indexWhere((c) => c.id == existingHistory.lastReadChapterId);
@@ -178,6 +173,29 @@ class UserInteractionRepository {
     }
   }
 
+  Future<void> updateMetadata(String providerId, IComicItem comic, {List<Chapter>? chapters, bool isChaptersDescending = false}) async {
+    final id = _genId(providerId, comic.comicId);
+    final now = DateTime.now();
+    final existing = _metadataBox.get(id);
+    
+    if (existing == null || existing.coverUrl != comic.coverUrl || existing.title != comic.title) {
+      await _metadataBox.put(id, ComicMetadataEntity(
+        id: id,
+        providerId: providerId,
+        comicId: comic.comicId,
+        title: comic.title ?? existing?.title ?? '',
+        coverUrl: comic.coverUrl ?? existing?.coverUrl ?? '',
+        updatedAt: now,
+        sourceUpdatedAt: existing?.sourceUpdatedAt,
+        totalChapters: existing?.totalChapters,
+        latestChapterTitle: existing?.latestChapterTitle,
+      ));
+    }
+
+    if (chapters != null && chapters.isNotEmpty) {
+      await updateChaptersOnly(providerId, comic.comicId, chapters, isChaptersDescending: isChaptersDescending);
+    }
+  }
   Future<void> markRead({
     required String providerId,
     required String comicId,

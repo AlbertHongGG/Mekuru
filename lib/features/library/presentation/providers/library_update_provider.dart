@@ -59,23 +59,25 @@ class LibraryUpdateNotifier extends Notifier<LibraryUpdateState> {
           if (provider != null) {
             final meta = await interactionRepo.getMetadata(record.providerId, record.comicId);
             if (meta != null) {
-              final result = await provider.checkForUpdates(record.comicId, meta);
+              final result = await provider.getChapterList(record.comicId, isDescending: false);
               if (result.isSuccess) {
-                final newData = result.getOrThrow();
-                if (newData.hasNew) {
-                  await interactionRepo.updateMetadataFields(
+                final chapters = result.getOrThrow();
+                if (chapters.isNotEmpty) {
+                  await interactionRepo.updateChaptersOnly(
                     record.providerId,
                     record.comicId,
-                    totalChapters: newData.newTotal,
-                    sourceUpdatedAt: newData.newSourceUpdatedAt,
-                    latestChapterTitle: newData.newLatestTitle,
+                    chapters,
                   );
                 }
+              } else {
+                String errorMsg = 'Unknown error';
+                result.fold((_) {}, (f) => errorMsg = f.message);
+                print('Library update failed for ${record.comicId}: $errorMsg');
               }
             }
           }
-        } catch (_) {
-          // Ignore failures
+        } catch (e) {
+          print('Exception during library update for ${record.comicId}: $e');
         }
         
         state = state.copyWith(completedTasks: state.completedTasks + 1);

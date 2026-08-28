@@ -1,4 +1,3 @@
-import 'package:mekuru/core/models/archive_task.dart';
 
 abstract class IArchiveTaskManager {
   Future<void> enqueueTask(String providerId, String comicId);

@@ -15,7 +15,7 @@ class DatabaseManager {
   static const String boxUserFavorites = 'box_user_favorites';
   static const String boxReadingHistory = 'box_reading_history';
   static const String boxSystemLogs = 'box_system_logs';
-  static const String boxApiLogs = 'box_api_logs';
+  static const String boxApiLogs = 'box_api_logs_v2';
   static const String boxArchiveTasks = 'box_archive_tasks_v3';
   static const String boxArchiveComics = 'box_archive_comics_v3';
 

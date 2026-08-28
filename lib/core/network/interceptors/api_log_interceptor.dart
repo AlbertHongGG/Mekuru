@@ -13,6 +13,11 @@ class ApiLogInterceptor extends Interceptor {
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    dynamic reqBody = options.data;
+    if (reqBody is List<int> || options.contentType?.contains('multipart/form-data') == true) {
+      reqBody = '[Binary Data / Stream]';
+    }
+
     final entry = LogEntry.api(
       id: const Uuid().v4(),
       method: options.method,
@@ -20,7 +25,7 @@ class ApiLogInterceptor extends Interceptor {
       providerId: providerId,
       actionType: options.extra['actionType'] as String? ?? 'Other',
       requestHeaders: options.headers,
-      requestBody: options.data,
+      requestBody: reqBody,
       timestamp: DateTime.now(),
     );
 
@@ -48,10 +53,17 @@ class ApiLogInterceptor extends Interceptor {
     final existingLog = options.extra['api_log_entry'] as LogEntry?;
     if (existingLog == null || existingLog is! ApiLogEntry) return;
 
+    dynamic resBody = response?.data;
+    if (options.responseType == ResponseType.bytes || options.responseType == ResponseType.stream) {
+      resBody = '[Binary Data / Stream]';
+    } else if (resBody is List<int>) {
+      resBody = '[Binary Data]';
+    }
+
     final updatedLog = existingLog.copyWith(
       statusCode: response?.statusCode,
       responseHeaders: response?.headers.map,
-      responseBody: response?.data,
+      responseBody: resBody,
       responseTime: DateTime.now(),
       error: error,
     );

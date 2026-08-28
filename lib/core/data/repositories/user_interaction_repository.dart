@@ -123,7 +123,20 @@ class UserInteractionRepository {
       Chapter? latestChap = chapters.first;
       for (final chap in chapters) {
         if (chap.publishedAt != null) {
-          final time = DateTime.tryParse(chap.publishedAt!);
+          String dateStr = chap.publishedAt!.replaceAll('.', '-').replaceAll('/', '-');
+          final spaceParts = dateStr.split(' ');
+          final dateParts = spaceParts[0].split('-');
+          if (dateParts.length == 3) {
+            final y = dateParts[0];
+            final m = dateParts[1].padLeft(2, '0');
+            final d = dateParts[2].padLeft(2, '0');
+            String cleanDate = '$y-$m-$d';
+            if (spaceParts.length > 1) {
+              cleanDate += ' ' + spaceParts[1];
+            }
+            dateStr = cleanDate;
+          }
+          final time = DateTime.tryParse(dateStr);
           if (time != null) {
             if (newestTime == null || time.isAfter(newestTime)) {
               newestTime = time;

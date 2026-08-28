@@ -144,7 +144,7 @@ class LibraryNotifier extends Notifier<LibraryState> {
       final tags = [providerName];
       if (r.sourceUpdatedAt != null) {
         final d = r.sourceUpdatedAt!;
-        tags.add('${d.month}/${d.day} ${d.hour}:${d.minute.toString().padLeft(2, '0')}');
+        tags.add('${d.month}/${d.day}');
       } else {
         tags.add('No Date');
       }

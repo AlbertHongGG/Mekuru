@@ -25,25 +25,23 @@ abstract class IMediaStorage {
 }
 
 class HiveLocalLibraryStorage implements ILocalLibraryStorage {
-  final Box<dynamic> _box;
+  final Box<LocalComicEntity> _box;
 
   HiveLocalLibraryStorage(this._box);
 
   @override
   Future<void> saveComic(LocalComicEntity comic) async {
-    await _box.put(comic.comicId, comic.toJson());
+    await _box.put(comic.comicId, comic);
   }
 
   @override
   Future<List<LocalComicEntity>> getAllComics() async {
-    return _box.values.map((e) => LocalComicEntity.fromJson(Map<String, dynamic>.from(e))).toList();
+    return _box.values.toList();
   }
 
   @override
   Future<LocalComicEntity?> getComic(String comicId) async {
-    final data = _box.get(comicId);
-    if (data == null) return null;
-    return LocalComicEntity.fromJson(Map<String, dynamic>.from(data));
+    return _box.get(comicId);
   }
 
   @override
@@ -53,18 +51,18 @@ class HiveLocalLibraryStorage implements ILocalLibraryStorage {
 }
 
 class HiveArchiveTaskStorage implements IArchiveTaskStorage {
-  final Box<dynamic> _box;
+  final Box<ArchiveTask> _box;
 
   HiveArchiveTaskStorage(this._box);
 
   @override
   Future<void> saveTask(ArchiveTask task) async {
-    await _box.put(task.taskId, task.toJson());
+    await _box.put(task.taskId, task);
   }
 
   @override
   Future<List<ArchiveTask>> getActiveTasks() async {
-    return _box.values.map((e) => ArchiveTask.fromJson(Map<String, dynamic>.from(e))).toList();
+    return _box.values.toList();
   }
 
   @override

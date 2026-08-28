@@ -6,6 +6,8 @@ import 'package:mekuru/core/data/local/hive_local_storage.dart';
 import 'package:mekuru/core/data/local/models/comic_metadata_entity.dart';
 import 'package:mekuru/core/data/local/models/favorite_entity.dart';
 import 'package:mekuru/core/data/local/models/history_entity.dart';
+import 'package:mekuru/core/models/archive_task.dart';
+import 'package:mekuru/core/data/local/models/local_comic_entity.dart';
 
 import 'package:mekuru/features/logger/domain/models/log_entry.dart';
 import 'package:mekuru/core/data/local/archive_storage.dart';
@@ -38,16 +40,15 @@ final apiLogsBoxProvider = Provider<ILocalStorage<LogEntry>>((ref) {
   return HiveLocalStorage<LogEntry>(Hive.box<LogEntry>(DatabaseManager.boxApiLogs));
 });
 
-
-
 final localLibraryStorageProvider = Provider<ILocalLibraryStorage>((ref) {
-  return HiveLocalLibraryStorage(Hive.box<dynamic>(DatabaseManager.boxArchiveComics));
+  return HiveLocalLibraryStorage(Hive.box<LocalComicEntity>(DatabaseManager.boxArchiveComics));
 });
 
 final archiveTaskStorageProvider = Provider<IArchiveTaskStorage>((ref) {
-  return HiveArchiveTaskStorage(Hive.box<dynamic>(DatabaseManager.boxArchiveTasks));
+  return HiveArchiveTaskStorage(Hive.box<ArchiveTask>(DatabaseManager.boxArchiveTasks));
 });
 
 final mediaStorageProvider = Provider<IMediaStorage>((ref) {
   return FileSystemMediaStorage();
 });
+

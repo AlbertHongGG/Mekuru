@@ -1,41 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mekuru/core/theme/app_colors.dart';
+import 'package:mekuru/core/routes/app_routes.dart';
 
 class MainPage extends StatelessWidget {
   final Widget child;
 
   const MainPage({super.key, required this.child});
 
+  int _calculateSelectedIndex(BuildContext context) {
+    final location = GoRouterState.of(context).uri.path;
+    if (location.startsWith(AppRoutes.library)) return 0;
+    if (location.startsWith(AppRoutes.explore)) return 1;
+    if (location.startsWith(AppRoutes.archive)) return 2;
+    if (location.startsWith(AppRoutes.settings)) return 3;
+    return 0;
+  }
+
+  void _onItemTapped(int index, BuildContext context) {
+    switch (index) {
+      case 0:
+        context.go(AppRoutes.library);
+        break;
+      case 1:
+        context.go(AppRoutes.explore);
+        break;
+      case 2:
+        context.go(AppRoutes.archive);
+        break;
+      case 3:
+        context.go(AppRoutes.settings);
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Determine current index based on route
-    final String location = GoRouterState.of(context).uri.path;
-    int currentIndex = 0;
-    if (location.startsWith('/explore')) currentIndex = 1;
-    if (location.startsWith('/archive')) currentIndex = 2;
-    if (location.startsWith('/settings')) currentIndex = 3;
-
     return Scaffold(
       body: child,
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: currentIndex,
-        onTap: (index) {
-          switch (index) {
-            case 0:
-              context.go('/library');
-              break;
-            case 1:
-              context.go('/explore');
-              break;
-            case 2:
-              context.go('/archive');
-              break;
-            case 3:
-              context.go('/settings');
-              break;
-          }
-        },
+        currentIndex: _calculateSelectedIndex(context),
+        onTap: (index) => _onItemTapped(index, context),
         type: BottomNavigationBarType.fixed,
         selectedItemColor: AppColors.primary,
         unselectedItemColor: Colors.grey,

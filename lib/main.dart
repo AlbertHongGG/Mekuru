@@ -14,6 +14,8 @@ import 'package:mekuru/core/notifications/presentation/widgets/global_notificati
 
 import 'package:mekuru/presentation/splash/splash_page.dart';
 
+import 'package:mekuru/core/routes/app_routes.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(const ProviderScope(child: MekuruBootstrap()));
@@ -21,17 +23,17 @@ void main() async {
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
-    initialLocation: '/library',
+    initialLocation: AppRoutes.library,
     routes: [
           GoRoute(
-            path: '/details/:providerId/:comicId',
+            path: AppRoutes.detailsPath,
             builder: (context, state) => ComicDetailsPage(
               providerId: state.pathParameters['providerId']!,
               comicId: state.pathParameters['comicId']!,
             ),
           ),
           GoRoute(
-            path: '/viewer/:providerId/:comicId/:chapterId',
+            path: AppRoutes.viewerPath,
             builder: (context, state) => ComicViewerPage(
               providerId: state.pathParameters['providerId']!,
               comicId: state.pathParameters['comicId']!,
@@ -46,19 +48,19 @@ final routerProvider = Provider<GoRouter>((ref) {
         routes: [
 
           GoRoute(
-            path: '/library',
+            path: AppRoutes.library,
             builder: (context, state) => const LibraryPage(),
           ),
           GoRoute(
-            path: '/explore',
+            path: AppRoutes.explore,
             builder: (context, state) => const ExplorePage(),
           ),
           GoRoute(
-            path: '/archive',
+            path: AppRoutes.archive,
             builder: (context, state) => const ArchivePage(),
           ),
           GoRoute(
-            path: '/settings',
+            path: AppRoutes.settings,
             builder: (context, state) => const SettingsPage(),
           ),
         ],

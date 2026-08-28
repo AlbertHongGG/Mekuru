@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mekuru/core/widgets/app_action_button.dart';
+import 'package:mekuru/core/routes/app_routes.dart';
 
 class ViewerTopBar extends StatelessWidget {
   final bool isVisible;
@@ -76,10 +77,10 @@ class ViewerTopBar extends StatelessWidget {
                     const SizedBox(width: 2),
                     AppActionButton(
                       icon: Icons.home_rounded,
-                      tooltip: '回到書庫',
+                      tooltip: '回到首頁',
                       padding: 6,
                       onPressed: () {
-                        context.go('/');
+                        context.go(AppRoutes.library);
                       },
                     ),
                     const SizedBox(width: 2),

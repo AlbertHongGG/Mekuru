@@ -36,11 +36,11 @@ class SettingsPage extends ConsumerWidget {
         padding: const EdgeInsets.only(bottom: 100),
         children: [
           const PremiumConfigHeader(
-            title: '偏好設定',
+            title: '進階設定',
             subtitle: 'SYSTEM CONFIGURATION',
           ),
           SettingsSection(
-            title: '資料來源',
+            title: '系統',
             children: [
               SettingsTile(
                 icon: Icons.api_rounded,
@@ -49,16 +49,10 @@ class SettingsPage extends ConsumerWidget {
                 subtitle: _getProviderName(ref, settingsState.currentSourceId),
                 onTap: () => _showSourceProviderBottomSheet(context, ref, settingsState.currentSourceId),
               ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          SettingsSection(
-            title: '系統',
-            children: [
               SettingsTile(
                 icon: Icons.dark_mode_rounded,
                 iconColor: AppColors.primary,
-                title: '深色模式',
+                title: '深色主題',
                 trailing: AppSwitch(
                   value: settingsState.themeMode == ThemeMode.dark,
                   onChanged: (val) {
@@ -66,10 +60,40 @@ class SettingsPage extends ConsumerWidget {
                   },
                 ),
               ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          SettingsSection(
+            title: '日誌與效能',
+            children: [
+              SettingsTile(
+                icon: Icons.bug_report_rounded,
+                iconColor: AppColors.primary,
+                title: '紀錄 API 日誌',
+                subtitle: '除錯用，開啟會影響下載效能',
+                trailing: AppSwitch(
+                  value: settingsState.enableApiLogging,
+                  onChanged: (val) {
+                    notifier.toggleApiLogging(val);
+                  },
+                ),
+              ),
+              SettingsTile(
+                icon: Icons.developer_board_rounded,
+                iconColor: AppColors.primary,
+                title: '紀錄系統日誌',
+                subtitle: '紀錄系統錯誤與背景事件',
+                trailing: AppSwitch(
+                  value: settingsState.enableSystemLogging,
+                  onChanged: (val) {
+                    notifier.toggleSystemLogging(val);
+                  },
+                ),
+              ),
               SettingsTile(
                 icon: Icons.history_rounded,
                 iconColor: AppColors.primary,
-                title: 'APP 系統日誌',
+                title: 'APP 系統日誌列表',
                 onTap: () {
                   Navigator.push(
                     context,
@@ -80,7 +104,7 @@ class SettingsPage extends ConsumerWidget {
               SettingsTile(
                 icon: Icons.network_ping_rounded,
                 iconColor: AppColors.primary,
-                title: 'API 網路日誌',
+                title: 'API 網路日誌列表',
                 onTap: () {
                   Navigator.push(
                     context,

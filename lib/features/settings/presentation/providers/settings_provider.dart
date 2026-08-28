@@ -8,22 +8,30 @@ class SettingsState {
   final ThemeMode themeMode;
   final String currentSourceId;
   final LibrarySortMode librarySortMode;
+  final bool enableApiLogging;
+  final bool enableSystemLogging;
 
   const SettingsState({
     required this.themeMode,
     required this.currentSourceId,
     required this.librarySortMode,
+    required this.enableApiLogging,
+    required this.enableSystemLogging,
   });
 
   SettingsState copyWith({
     ThemeMode? themeMode,
     String? currentSourceId,
     LibrarySortMode? librarySortMode,
+    bool? enableApiLogging,
+    bool? enableSystemLogging,
   }) {
     return SettingsState(
       themeMode: themeMode ?? this.themeMode,
       currentSourceId: currentSourceId ?? this.currentSourceId,
       librarySortMode: librarySortMode ?? this.librarySortMode,
+      enableApiLogging: enableApiLogging ?? this.enableApiLogging,
+      enableSystemLogging: enableSystemLogging ?? this.enableSystemLogging,
     );
   }
 }
@@ -48,10 +56,15 @@ class SettingsNotifier extends Notifier<SettingsState> {
       orElse: () => LibrarySortMode.added
     );
 
+    final apiLogging = _settingsBox.get('enableApiLogging') as bool? ?? false;
+    final systemLogging = _settingsBox.get('enableSystemLogging') as bool? ?? true;
+
     return SettingsState(
       themeMode: theme, 
       currentSourceId: sourceId,
       librarySortMode: sortMode,
+      enableApiLogging: apiLogging,
+      enableSystemLogging: systemLogging,
     );
   }
 
@@ -68,6 +81,16 @@ class SettingsNotifier extends Notifier<SettingsState> {
   Future<void> updateLibrarySortMode(LibrarySortMode mode) async {
     await _settingsBox.put('librarySortMode', mode.name);
     state = state.copyWith(librarySortMode: mode);
+  }
+
+  Future<void> toggleApiLogging(bool value) async {
+    await _settingsBox.put('enableApiLogging', value);
+    state = state.copyWith(enableApiLogging: value);
+  }
+
+  Future<void> toggleSystemLogging(bool value) async {
+    await _settingsBox.put('enableSystemLogging', value);
+    state = state.copyWith(enableSystemLogging: value);
   }
 }
 

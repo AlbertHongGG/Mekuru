@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mekuru/features/logger/domain/models/log_entry.dart';
-import 'package:mekuru/features/logger/presentation/providers/logger_provider.dart';
+import 'package:mekuru/features/logger/domain/services/app_logger_service.dart';
 import 'package:uuid/uuid.dart';
 import 'package:mekuru/core/notifications/models/app_notification.dart';
 
@@ -12,13 +11,10 @@ class NotificationController extends Notifier<List<AppNotification>> {
   }
 
   void _logNotification(String type, String message) {
-    final entry = LogEntry.system(
-      id: const Uuid().v4(),
-      timestamp: DateTime.now(),
-      eventType: 'notification',
-      data: {'type': type, 'message': message},
+    ref.read(appLoggerProvider).logSystemEvent(
+      'notification',
+      {'type': type, 'message': message},
     );
-    ref.read(loggerRepositoryProvider).log(entry);
   }
 
   void _addNotification(AppNotification notification) {

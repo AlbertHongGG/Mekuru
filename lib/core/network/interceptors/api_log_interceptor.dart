@@ -1,15 +1,15 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mekuru/features/logger/domain/models/log_entry.dart';
-import 'package:mekuru/features/logger/domain/repositories/i_logger_repository.dart';
+import 'package:mekuru/features/logger/domain/services/app_logger_service.dart';
 import 'package:uuid/uuid.dart';
 
 class ApiLogInterceptor extends Interceptor {
-  final ProviderListenable<ILoggerRepository> loggerRepositoryProvider;
+  final ProviderListenable<IAppLogger> appLoggerProviderListenable;
   final Ref ref;
   final String? providerId;
 
-  ApiLogInterceptor(this.ref, this.loggerRepositoryProvider, {this.providerId});
+  ApiLogInterceptor(this.ref, this.appLoggerProviderListenable, {this.providerId});
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
@@ -32,7 +32,7 @@ class ApiLogInterceptor extends Interceptor {
     // Save entire entry in extra to retrieve it in response
     options.extra['api_log_entry'] = entry;
     
-    ref.read(loggerRepositoryProvider).log(entry);
+    ref.read(appLoggerProviderListenable).logApi(entry as ApiLogEntry);
     
     super.onRequest(options, handler);
   }
@@ -68,7 +68,7 @@ class ApiLogInterceptor extends Interceptor {
       error: error,
     );
 
-    ref.read(loggerRepositoryProvider).log(updatedLog);
+    ref.read(appLoggerProviderListenable).logApi(updatedLog);
   }
 }
 

@@ -2,15 +2,14 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mekuru/features/settings/presentation/providers/settings_provider.dart';
 import 'package:mekuru/core/network/interceptors/api_log_interceptor.dart';
-import 'package:mekuru/features/logger/presentation/providers/logger_provider.dart';
-import 'package:mekuru/features/logger/domain/repositories/i_logger_repository.dart';
+import 'package:mekuru/features/logger/domain/services/app_logger_service.dart';
 
 class ApiClient {
   late final Dio _dio;
   final Ref _ref;
-  final ProviderListenable<ILoggerRepository> _loggerRepositoryProvider;
+  final ProviderListenable<IAppLogger> _appLoggerProvider;
   
-  ApiClient(String baseUrl, this._ref, this._loggerRepositoryProvider, {Dio? dioOverride}) {
+  ApiClient(String baseUrl, this._ref, this._appLoggerProvider, {Dio? dioOverride}) {
     _dio = dioOverride ?? Dio(
       BaseOptions(
         baseUrl: baseUrl,
@@ -20,7 +19,7 @@ class ApiClient {
     );
     
     if (dioOverride == null) {
-      _dio.interceptors.add(ApiLogInterceptor(_ref, _loggerRepositoryProvider));
+      _dio.interceptors.add(ApiLogInterceptor(_ref, _appLoggerProvider));
     }
   }
 
@@ -34,7 +33,7 @@ class ApiClient {
         receiveTimeout: const Duration(seconds: 15),
       ),
     );
-    newDio.interceptors.add(ApiLogInterceptor(_ref, _loggerRepositoryProvider, providerId: providerId));
+    newDio.interceptors.add(ApiLogInterceptor(_ref, _appLoggerProvider, providerId: providerId));
     return newDio;
   }
 }
@@ -44,7 +43,7 @@ final apiClientProvider = Provider<ApiClient>((ref) {
   return ApiClient(
     '' /* Legacy serverUrl removed */,
     ref,
-    loggerRepositoryProvider,
+    appLoggerProvider,
   );
 });
 

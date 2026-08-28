@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:mekuru/core/data/local/database_manager.dart';
 
 import 'widgets/splash_logo.dart';
 import 'widgets/splash_title.dart';
 
 class SplashPage extends StatefulWidget {
-  const SplashPage({super.key});
+  final VoidCallback? onInitializationComplete;
+
+  const SplashPage({
+    super.key,
+    this.onInitializationComplete,
+  });
 
   @override
   State<SplashPage> createState() => _SplashPageState();
@@ -23,29 +28,52 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
   late final Animation<Offset> _titleSlide;
   late final Animation<double> _titleFade;
 
+  bool _isAnimationDone = false;
+  bool _isDbInitDone = false;
+
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 2400), // Slightly longer for frame
+      duration: const Duration(milliseconds: 2400),
     );
 
     _setupAnimations();
 
-    // Start animation immediately
-    _controller.forward();
-
-    // Navigate to next screen when animation completes
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
-        _navigateToHome();
+        _isAnimationDone = true;
+        _checkCompletion();
       }
     });
+
+    _startPipeline();
+  }
+
+  Future<void> _startPipeline() async {
+    // 1. Start Animation (non-blocking UI task)
+    _controller.forward();
+
+    // 2. Start DB Initialization (async background task)
+    try {
+      await DatabaseManager.init();
+    } catch (e) {
+      debugPrint('Database init error: $e');
+    } finally {
+      _isDbInitDone = true;
+      _checkCompletion();
+    }
+  }
+
+  void _checkCompletion() {
+    // Wait until both the beautiful animation is fully played AND data is ready
+    if (_isAnimationDone && _isDbInitDone) {
+      _navigateToHome();
+    }
   }
 
   void _setupAnimations() {
-    // 1. Logo fades in and scales slightly
     _logoFade = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
@@ -59,7 +87,6 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
       ),
     );
 
-    // 2. Title unfolds, slides, and fades
     _titleUnfold = CurvedAnimation(
       parent: _controller,
       curve: const Interval(0.5, 0.9, curve: Curves.easeOutCubic),
@@ -78,13 +105,9 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
     );
   }
 
-  void _navigateToHome() async {
-    // Wait briefly after animation completes before routing to let user appreciate it
-    await Future.delayed(const Duration(milliseconds: 500));
-
-    if (mounted) {
-      // Use go() instead of push() to prevent going back to splash
-      context.go('/library');
+  void _navigateToHome() {
+    if (mounted && widget.onInitializationComplete != null) {
+      widget.onInitializationComplete!();
     }
   }
 
@@ -97,7 +120,7 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // Pure white for a professional look
+      backgroundColor: Colors.white,
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,

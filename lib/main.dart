@@ -12,24 +12,17 @@ import 'package:mekuru/features/comic/presentation/pages/comic_details_page.dart
 import 'package:mekuru/features/viewer/presentation/pages/comic_viewer_page.dart';
 import 'package:mekuru/core/notifications/presentation/widgets/global_notification_overlay.dart';
 
-
 import 'package:mekuru/presentation/splash/splash_page.dart';
-import 'package:mekuru/core/data/local/database_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await DatabaseManager.init();
-  runApp(const ProviderScope(child: MekuruApp()));
+  runApp(const ProviderScope(child: MekuruBootstrap()));
 }
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
-    initialLocation: '/splash',
+    initialLocation: '/library',
     routes: [
-          GoRoute(
-            path: '/splash',
-            builder: (context, state) => const SplashPage(),
-          ),
           GoRoute(
             path: '/details/:providerId/:comicId',
             builder: (context, state) => ComicDetailsPage(
@@ -73,6 +66,36 @@ final routerProvider = Provider<GoRouter>((ref) {
     ],
   );
 });
+
+class MekuruBootstrap extends StatefulWidget {
+  const MekuruBootstrap({super.key});
+
+  @override
+  State<MekuruBootstrap> createState() => _MekuruBootstrapState();
+}
+
+class _MekuruBootstrapState extends State<MekuruBootstrap> {
+  bool _isInitialized = false;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_isInitialized) {
+      return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: SplashPage(
+          onInitializationComplete: () {
+            if (mounted) {
+              setState(() {
+                _isInitialized = true;
+              });
+            }
+          },
+        ),
+      );
+    }
+    return const MekuruApp();
+  }
+}
 
 class MekuruApp extends ConsumerWidget {
   const MekuruApp({super.key});

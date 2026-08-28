@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mekuru/core/theme/app_colors.dart';
 import 'package:mekuru/core/notifications/presentation/controllers/notification_controller.dart';
 import 'package:mekuru/features/archive/presentation/providers/archive_provider.dart';
-import 'package:mekuru/core/models/archive_task.dart';
+import 'package:mekuru/features/archive/domain/models/archive_task.dart';
 import 'package:mekuru/core/widgets/comic_image.dart';
 
 class ArchivePage extends ConsumerWidget {

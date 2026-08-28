@@ -1,4 +1,4 @@
-import 'package:mekuru/core/models/comic_record.dart';
+import 'package:mekuru/features/library/domain/models/comic_record.dart';
 
 abstract class LibrarySortStrategy {
   int compare(ComicRecord a, ComicRecord b);

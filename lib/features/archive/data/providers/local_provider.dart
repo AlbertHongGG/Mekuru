@@ -1,13 +1,13 @@
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:mekuru/core/data/sources/i_comic_provider.dart';
-import 'package:mekuru/core/models/comic_models.dart';
-import 'package:mekuru/core/models/paginated_result.dart';
-import 'package:mekuru/core/models/chapter.dart';
-import 'package:mekuru/core/models/page.dart';
+import 'package:mekuru/features/comic/data/sources/i_comic_provider.dart';
+import 'package:mekuru/features/comic/domain/models/comic_models.dart';
+import 'package:mekuru/features/comic/domain/models/paginated_result.dart';
+import 'package:mekuru/features/comic/domain/models/chapter.dart';
+import 'package:mekuru/features/comic/domain/models/page.dart';
 import 'package:mekuru/core/error/result.dart';
 import 'package:mekuru/core/error/failures.dart';
-import 'package:mekuru/core/data/local/archive_storage.dart';
+import 'package:mekuru/features/archive/data/sources/archive_storage.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:mekuru/features/archive/domain/managers/i_local_library_manager.dart';
 

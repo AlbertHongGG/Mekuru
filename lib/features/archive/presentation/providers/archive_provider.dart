@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mekuru/core/models/archive_task.dart';
+import 'package:mekuru/features/archive/domain/models/archive_task.dart';
 import 'package:mekuru/features/archive/domain/managers/archive_task_manager.dart';
 import 'package:mekuru/features/archive/domain/managers/local_library_manager.dart';
 

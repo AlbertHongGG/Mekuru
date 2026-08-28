@@ -9,9 +9,9 @@ import 'package:mekuru/core/widgets/immersive_scaffold.dart';
 import 'package:mekuru/core/widgets/premium_config_header.dart';
 import 'package:mekuru/core/widgets/app_switch.dart';
 import 'package:mekuru/core/widgets/app_bottom_sheet.dart';
-import 'package:mekuru/core/data/sources/provider_registry.dart';
-import 'package:mekuru/core/notifications/presentation/screens/system_log_viewer_screen.dart';
-import 'package:mekuru/core/network/presentation/pages/api_log_list_page.dart';
+import 'package:mekuru/features/comic/data/sources/provider_registry.dart';
+import 'package:mekuru/features/logger/presentation/pages/system_log_viewer_screen.dart';
+import 'package:mekuru/features/logger/presentation/pages/api_log_list_page.dart';
 import 'package:mekuru/features/backup/presentation/widgets/backup_section.dart';
 
 class SettingsPage extends ConsumerWidget {

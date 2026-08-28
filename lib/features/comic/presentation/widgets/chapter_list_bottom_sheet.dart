@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mekuru/core/theme/app_colors.dart';
-import 'package:mekuru/core/models/chapter.dart';
+import 'package:mekuru/features/comic/domain/models/chapter.dart';
 
 class ChapterListBottomSheet extends StatefulWidget {
   final String providerId;

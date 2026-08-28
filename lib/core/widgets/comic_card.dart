@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mekuru/core/models/comic_card_data.dart';
+import 'package:mekuru/features/comic/domain/models/comic_card_data.dart';
 import 'package:mekuru/core/widgets/comic_image.dart';
 
 class ComicCard extends StatelessWidget {

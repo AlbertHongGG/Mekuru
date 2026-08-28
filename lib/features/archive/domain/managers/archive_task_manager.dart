@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mekuru/core/models/archive_task.dart';
+import 'package:mekuru/features/archive/domain/models/archive_task.dart';
 import 'package:mekuru/features/archive/domain/managers/i_archive_task_manager.dart';
 import 'package:mekuru/features/archive/domain/services/archive_download_service.dart';
 

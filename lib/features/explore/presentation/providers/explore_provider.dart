@@ -3,7 +3,7 @@ import 'package:mekuru/core/data/local/i_local_storage.dart';
 import 'package:mekuru/core/data/local/local_storage_providers.dart';
 import 'package:mekuru/core/data/providers/repository_providers.dart';
 import 'package:mekuru/core/notifications/presentation/controllers/notification_controller.dart';
-import 'package:mekuru/core/models/comic_card_data.dart';
+import 'package:mekuru/features/comic/domain/models/comic_card_data.dart';
 
 class ExploreState {
   final bool isLoading;

@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:crypto/crypto.dart';
 import 'dart:convert';
-import 'package:mekuru/core/data/sources/i_comic_provider.dart';
+import 'package:mekuru/features/comic/data/sources/i_comic_provider.dart';
 
 class ProviderImageProvider extends ImageProvider<ProviderImageProvider> {
   final String url;

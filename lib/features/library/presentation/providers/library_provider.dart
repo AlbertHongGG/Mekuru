@@ -1,10 +1,10 @@
-import 'package:mekuru/core/models/enums/library_sort_mode.dart';
-import 'package:mekuru/core/models/comic_record.dart';
+import 'package:mekuru/features/library/domain/models/library_sort_mode.dart';
+import 'package:mekuru/features/library/domain/models/comic_record.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mekuru/core/data/repositories/user_interaction_repository.dart';
+import 'package:mekuru/features/library/data/repositories/user_interaction_repository.dart';
 import 'package:mekuru/features/settings/presentation/providers/settings_provider.dart';
-import 'package:mekuru/core/models/comic_card_data.dart';
-import 'package:mekuru/core/data/sources/provider_registry.dart';
+import 'package:mekuru/features/comic/domain/models/comic_card_data.dart';
+import 'package:mekuru/features/comic/data/sources/provider_registry.dart';
 
 class LibraryState {
   final bool isLoading;

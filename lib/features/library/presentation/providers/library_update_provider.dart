@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mekuru/core/data/sources/provider_registry.dart';
-import 'package:mekuru/core/data/repositories/user_interaction_repository.dart';
-import 'package:mekuru/core/models/comic_record.dart';
+import 'package:mekuru/features/comic/data/sources/provider_registry.dart';
+import 'package:mekuru/features/library/data/repositories/user_interaction_repository.dart';
+import 'package:mekuru/features/library/domain/models/comic_record.dart';
 
 class LibraryUpdateState {
   final bool isUpdating;

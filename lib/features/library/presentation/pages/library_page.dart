@@ -1,6 +1,6 @@
-import 'package:mekuru/core/models/enums/library_sort_mode.dart';
+import 'package:mekuru/features/library/domain/models/library_sort_mode.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mekuru/core/models/comic_card_data.dart';
+import 'package:mekuru/features/comic/domain/models/comic_card_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mekuru/core/theme/app_colors.dart';
@@ -8,7 +8,7 @@ import 'package:mekuru/core/widgets/responsive_comic_grid.dart';
 import 'package:mekuru/features/library/presentation/providers/library_provider.dart';
 import 'package:mekuru/core/widgets/search_dialog.dart';
 import 'package:mekuru/core/widgets/app_bottom_sheet.dart';
-import 'package:mekuru/core/data/sources/provider_registry.dart';
+import 'package:mekuru/features/comic/data/sources/provider_registry.dart';
 import 'package:mekuru/features/library/presentation/providers/library_update_provider.dart';
 
 class LibraryPage extends ConsumerStatefulWidget {

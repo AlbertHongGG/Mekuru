@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mekuru/core/data/local/archive_storage.dart';
+import 'package:mekuru/features/archive/data/sources/archive_storage.dart';
 import 'package:mekuru/core/data/local/local_storage_providers.dart';
 import 'package:mekuru/core/data/local/models/local_comic_entity.dart';
 import 'package:mekuru/features/archive/domain/managers/i_local_library_manager.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mekuru/core/models/enums/library_sort_mode.dart';
+import 'package:mekuru/features/library/domain/models/library_sort_mode.dart';
 import 'package:mekuru/core/data/local/i_local_storage.dart';
 import 'package:mekuru/core/data/local/local_storage_providers.dart';
 

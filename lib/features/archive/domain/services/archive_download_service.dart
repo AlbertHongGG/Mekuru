@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mekuru/core/data/local/archive_storage.dart';
-import 'package:mekuru/core/models/archive_task.dart';
-import 'package:mekuru/core/data/sources/provider_registry.dart';
+import 'package:mekuru/features/archive/data/sources/archive_storage.dart';
+import 'package:mekuru/features/archive/domain/models/archive_task.dart';
+import 'package:mekuru/features/comic/data/sources/provider_registry.dart';
 import 'package:mekuru/features/archive/domain/managers/i_local_library_manager.dart';
 import 'package:mekuru/features/archive/domain/managers/local_library_manager.dart';
 import 'package:mekuru/core/data/local/models/local_comic_entity.dart';

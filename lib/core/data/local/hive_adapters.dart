@@ -4,7 +4,7 @@ import 'package:mekuru/core/data/local/models/comic_metadata_entity.dart';
 import 'package:mekuru/core/data/local/models/favorite_entity.dart';
 import 'package:mekuru/core/data/local/models/history_entity.dart';
 import 'package:mekuru/features/logger/domain/models/log_entry.dart';
-import 'package:mekuru/core/models/archive_task.dart';
+import 'package:mekuru/features/archive/domain/models/archive_task.dart';
 import 'package:mekuru/core/data/local/models/local_comic_entity.dart';
 
 class HiveAdapters {

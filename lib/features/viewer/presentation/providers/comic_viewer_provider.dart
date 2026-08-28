@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mekuru/core/data/providers/repository_providers.dart';
-import 'package:mekuru/core/data/repositories/user_interaction_repository.dart';
-import 'package:mekuru/core/models/page.dart';
+import 'package:mekuru/features/library/data/repositories/user_interaction_repository.dart';
+import 'package:mekuru/features/comic/domain/models/page.dart';
 import 'package:mekuru/core/notifications/presentation/controllers/notification_controller.dart';
 import 'package:mekuru/features/comic/presentation/providers/comic_details_provider.dart';
 import 'package:mekuru/features/settings/presentation/providers/settings_provider.dart';

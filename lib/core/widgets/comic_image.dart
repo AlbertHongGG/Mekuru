@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:extended_image/extended_image.dart';
-import 'package:mekuru/core/data/sources/provider_registry.dart';
-import 'package:mekuru/core/data/sources/i_comic_provider.dart';
+import 'package:mekuru/features/comic/data/sources/provider_registry.dart';
+import 'package:mekuru/features/comic/data/sources/i_comic_provider.dart';
 import 'package:mekuru/core/widgets/provider_image_provider.dart';
 
 class ComicImage extends ConsumerWidget {

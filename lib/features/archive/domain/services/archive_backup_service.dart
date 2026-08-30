@@ -5,13 +5,15 @@ import 'dart:isolate';
 import 'package:flutter/foundation.dart';
 import 'package:archive/archive_io.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mekuru/core/error/failures.dart';
+import 'package:mekuru/core/error/result.dart';
 import 'package:mekuru/features/archive/domain/models/archive_task.dart';
 import 'package:mekuru/features/archive/data/sources/archive_storage.dart';
 import 'package:mekuru/core/data/local/local_storage_providers.dart';
 import 'package:mekuru/core/data/local/models/local_comic_entity.dart';
 import 'package:mekuru/features/archive/domain/managers/i_local_library_manager.dart';
 import 'package:mekuru/features/archive/domain/managers/local_library_manager.dart';
-import 'package:mekuru/features/archive/domain/services/archive_download_service.dart';
+import 'package:mekuru/features/archive/domain/managers/archive_task_manager.dart';
 import 'package:mekuru/features/archive/presentation/providers/backup_task_provider.dart';
 import 'package:path/path.dart' as p;
 
@@ -208,16 +210,27 @@ class ArchiveBackupService {
   final ILocalLibraryManager _libraryManager;
   final IMediaStorage _mediaStorage;
   final IArchiveTaskStorage _taskStorage;
-  final ArchiveDownloadService _downloadService;
   final Ref _ref;
 
-  ArchiveBackupService(this._libraryManager, this._mediaStorage, this._taskStorage, this._downloadService, this._ref);
+  ArchiveBackupService(this._libraryManager, this._mediaStorage, this._taskStorage, this._ref);
 
-  Future<File> exportSingleComic(String providerId, String comicId, String destinationPath) async {
+  String _generateSafeFilename(String baseName, String extension) {
+    final now = DateTime.now();
+    final timestamp = '${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}_${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}';
+    final safeTitle = baseName.replaceAll(RegExp(r'[<>:"/\\|?*]'), '_');
+    return '${safeTitle}_$timestamp.$extension';
+  }
+
+  Future<Result<File, Failure>> exportSingleComic(String providerId, String comicId, String selectedDirectory) async {
     _ref.read(backupTaskProvider.notifier).start('準備單本漫畫...');
     
     final comic = await _libraryManager.getComic(comicId);
-    if (comic == null) throw Exception('Comic not found');
+    if (comic == null) {
+      _ref.read(backupTaskProvider.notifier).fail('漫畫不存在');
+      return const Error(LocalComicNotFoundFailure());
+    }
+
+    final destinationPath = '$selectedDirectory/${_generateSafeFilename(comic.title, 'mekuru_comic')}';
 
     final tasks = await _taskStorage.getActiveTasks();
     final task = tasks.where((t) => t.comicId == comicId).firstOrNull;
@@ -245,16 +258,16 @@ class ArchiveBackupService {
       ));
       
       _ref.read(backupTaskProvider.notifier).finish('匯出完成');
-      return File(destinationPath);
+      return Success(File(destinationPath));
     } catch (e) {
       _ref.read(backupTaskProvider.notifier).fail(e.toString());
-      rethrow;
+      return Error(BackupFailure(e.toString()));
     } finally {
       receivePort.close();
     }
   }
 
-  Future<void> importSingleComic(String zipFilePath) async {
+  Future<Result<void, Failure>> importSingleComic(String zipFilePath) async {
     _ref.read(backupTaskProvider.notifier).start('讀取備份檔...');
     
     final receivePort = ReceivePort();
@@ -284,21 +297,24 @@ class ArchiveBackupService {
         final taskJson = jsonDecode(result.taskJson!);
         final task = ArchiveTask.fromJson(taskJson);
         await _taskStorage.saveTask(task);
-        await _downloadService.reloadTasksFromStorage();
+        await _ref.read(archiveTaskManagerProvider.notifier).reloadTasksFromStorage();
       }
       
       _ref.read(backupTaskProvider.notifier).finish('匯入完成');
+      return const Success(null);
     } catch (e) {
       _ref.read(backupTaskProvider.notifier).fail(e.toString());
-      rethrow;
+      return Error(RestoreFailure(e.toString()));
     } finally {
       receivePort.close();
     }
   }
 
-  Future<File> exportFullArchive(String destinationPath) async {
+  Future<Result<File, Failure>> exportFullArchive(String selectedDirectory) async {
     _ref.read(backupTaskProvider.notifier).start('讀取書庫資料...');
     
+    final destinationPath = '$selectedDirectory/${_generateSafeFilename('MekuruBackup', 'mekuru_archive')}';
+
     final comics = await _libraryManager.getAllComics();
     final comicsJson = comics.map((c) => c.toJson()).toList();
 
@@ -328,16 +344,16 @@ class ArchiveBackupService {
       ));
       
       _ref.read(backupTaskProvider.notifier).finish('書庫匯出完成');
-      return File(destinationPath);
+      return Success(File(destinationPath));
     } catch (e) {
       _ref.read(backupTaskProvider.notifier).fail(e.toString());
-      rethrow;
+      return Error(BackupFailure(e.toString()));
     } finally {
       receivePort.close();
     }
   }
 
-  Future<void> importFullArchive(String zipFilePath) async {
+  Future<Result<void, Failure>> importFullArchive(String zipFilePath) async {
     _ref.read(backupTaskProvider.notifier).start('準備解壓縮書庫...');
     
     final receivePort = ReceivePort();
@@ -360,7 +376,8 @@ class ArchiveBackupService {
       _ref.read(backupTaskProvider.notifier).updateProgress(1.0, '註冊書庫資料...');
       
       if (result.libraryJson.isEmpty) {
-        throw Exception('Invalid full archive file: library.json missing');
+        _ref.read(backupTaskProvider.notifier).fail('無效的書庫備份檔 (library.json 遺失)');
+        return const Error(RestoreFailure('無效的書庫備份檔 (library.json 遺失)'));
       }
 
       final comicsJson = jsonDecode(result.libraryJson) as List;
@@ -375,13 +392,14 @@ class ArchiveBackupService {
         for (final task in tasks) {
           await _taskStorage.saveTask(task);
         }
-        await _downloadService.reloadTasksFromStorage();
+        await _ref.read(archiveTaskManagerProvider.notifier).reloadTasksFromStorage();
       }
       
       _ref.read(backupTaskProvider.notifier).finish('書庫匯入完成');
+      return const Success(null);
     } catch (e) {
       _ref.read(backupTaskProvider.notifier).fail(e.toString());
-      rethrow;
+      return Error(RestoreFailure(e.toString()));
     } finally {
       receivePort.close();
     }
@@ -392,6 +410,5 @@ final archiveBackupServiceProvider = Provider<ArchiveBackupService>((ref) {
   final libraryManager = ref.watch(localLibraryManagerProvider);
   final mediaStorage = ref.watch(mediaStorageProvider);
   final taskStorage = ref.watch(archiveTaskStorageProvider);
-  final downloadService = ref.watch(archiveDownloadServiceProvider);
-  return ArchiveBackupService(libraryManager, mediaStorage, taskStorage, downloadService, ref);
+  return ArchiveBackupService(libraryManager, mediaStorage, taskStorage, ref);
 });

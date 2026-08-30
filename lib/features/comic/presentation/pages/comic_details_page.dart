@@ -261,26 +261,21 @@ class ComicDetailsPage extends ConsumerWidget {
                                 } else if (added == 0) {
                                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('已是最新版本')));
                                 } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('成功追加 \$added 尚未封存的章節')));
+                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('成功追加 $added 尚未封存的章節')));
                                 }
                               }
                             } else if (value == 'export') {
                               final selectedDirectory = await FilePicker.getDirectoryPath(dialogTitle: '選擇匯出資料夾');
                               if (selectedDirectory != null) {
-                                final now = DateTime.now();
-                                final timestamp = '${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}_${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}';
-                                final safeTitle = state.comic?.title.replaceAll(RegExp(r'[<>:"/\\|?*]'), '_') ?? comicId;
-                                final destinationPath = '$selectedDirectory/${safeTitle}_$timestamp.mekuru_comic';
-                                
                                 await runWithBackupDialog(context, ref, () async {
-                                  await ref.read(comicDetailsProvider((providerId: providerId, comicId: comicId)).notifier).exportLocalComic(destinationPath);
+                                  await ref.read(comicDetailsProvider((providerId: providerId, comicId: comicId)).notifier).exportLocalComic(selectedDirectory);
                                 });
                                 
                                 final backupState = ref.read(backupTaskProvider);
                                 if (backupState.error != null) {
                                   ref.read(notificationProvider.notifier).showError('匯出漫畫失敗: ${backupState.error}');
                                 } else {
-                                  ref.read(notificationProvider.notifier).showSuccess('漫畫已成功匯出至:\n$destinationPath');
+                                  ref.read(notificationProvider.notifier).showSuccess('漫畫匯出完成！');
                                 }
                               }
                             } else if (value == 'delete') {

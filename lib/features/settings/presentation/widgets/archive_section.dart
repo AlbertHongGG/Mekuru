@@ -28,20 +28,16 @@ class ArchiveSection extends ConsumerWidget {
             );
             if (selectedDirectory == null) return;
             
-            final now = DateTime.now();
-            final timestamp = '${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}_${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}';
-            final destinationPath = '$selectedDirectory/mekuru_library_$timestamp.mekuru_archive';
-            
             await runWithBackupDialog(context, ref, () async {
               final service = ref.read(archiveBackupServiceProvider);
-              await service.exportFullArchive(destinationPath);
+              await service.exportFullArchive(selectedDirectory);
             });
             
             final state = ref.read(backupTaskProvider);
             if (state.error != null) {
               ref.read(notificationProvider.notifier).showError('書庫匯出失敗: ${state.error}');
             } else {
-              ref.read(notificationProvider.notifier).showSuccess('書庫已成功匯出至:\n$destinationPath');
+              ref.read(notificationProvider.notifier).showSuccess('書庫匯出完成！');
             }
           },
         ),
@@ -65,7 +61,7 @@ class ArchiveSection extends ConsumerWidget {
               if (state.error != null) {
                 ref.read(notificationProvider.notifier).showError('匯入失敗: ${state.error}');
               } else {
-                ref.read(notificationProvider.notifier).showSuccess('本地書庫匯入成功');
+                ref.read(notificationProvider.notifier).showSuccess('本地書庫匯入成功！');
               }
             }
           },

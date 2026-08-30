@@ -74,15 +74,18 @@ class ComicDetailsNotifier extends AutoDisposeFamilyNotifier<ComicDetailsState, 
     }
   }
 
-  Future<void> exportLocalComic(String destinationPath) async {
+  Future<void> exportLocalComic(String selectedDirectory) async {
     if (arg.providerId != 'local') return;
     
     final libraryManager = ref.read(localLibraryManagerProvider);
     final localComic = await libraryManager.getComic(arg.comicId);
-    if (localComic == null) throw Exception('Comic not found');
+    if (localComic == null) {
+      ref.read(notificationProvider.notifier).showError('漫畫不存在');
+      return;
+    }
     
     final service = ref.read(archiveBackupServiceProvider);
-    await service.exportSingleComic(localComic.providerId, arg.comicId, destinationPath);
+    await service.exportSingleComic(localComic.providerId, arg.comicId, selectedDirectory);
   }
 
   Future<void> confirmDeleteLocalComic() async {

@@ -10,6 +10,7 @@ abstract class ILocalLibraryStorage {
   Future<List<LocalComicEntity>> getAllComics();
   Future<LocalComicEntity?> getComic(String comicId);
   Future<void> deleteComic(String comicId);
+  Stream<void> watch();
 }
 
 abstract class IArchiveTaskStorage {
@@ -30,6 +31,9 @@ class HiveLocalLibraryStorage implements ILocalLibraryStorage {
   final Box<LocalComicEntity> _box;
 
   HiveLocalLibraryStorage(this._box);
+
+  @override
+  Stream<void> watch() => _box.watch().cast<void>();
 
   @override
   Future<void> saveComic(LocalComicEntity comic) async {

@@ -53,7 +53,7 @@ class GuaziProvider extends BaseComicProvider {
     try {
       int parsedTs = ts is int ? ts : int.parse(ts.toString());
       final dt = DateTime.fromMillisecondsSinceEpoch(parsedTs * 1000);
-      return dt.toIso8601String();
+      return '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')} ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}:${dt.second.toString().padLeft(2, '0')}';
     } catch (e) {
       return ts.toString();
     }

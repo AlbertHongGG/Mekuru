@@ -8,7 +8,7 @@ abstract class LocalChapterEntity with _$LocalChapterEntity {
   const factory LocalChapterEntity({
     required String chapterId,
     required String title,
-    required DateTime archivedAt,
+    DateTime? archivedAt,
   }) = _LocalChapterEntity;
 
   factory LocalChapterEntity.fromJson(Map<String, dynamic> json) => 

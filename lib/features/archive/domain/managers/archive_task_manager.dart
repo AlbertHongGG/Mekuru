@@ -161,7 +161,7 @@ class ArchiveTaskManager extends Notifier<List<ArchiveTask>> implements IArchive
       newLocalChapters.add(LocalChapterEntity(
         chapterId: ch.id,
         title: ch.title,
-        archivedAt: DateTime.now(), // Queued time, will be updated on completion
+        archivedAt: null, // Will be populated when the chapter finishes downloading
       ));
     }
 
@@ -288,7 +288,7 @@ class ArchiveTaskManager extends Notifier<List<ArchiveTask>> implements IArchive
               localChapters.add(LocalChapterEntity(
                 chapterId: ch.id,
                 title: ch.title,
-                archivedAt: DateTime.now(), // Will be updated when actually downloaded
+                archivedAt: null, // Will be updated when actually downloaded
               ));
             }
             

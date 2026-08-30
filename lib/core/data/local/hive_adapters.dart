@@ -407,10 +407,13 @@ class LocalChapterEntityAdapter extends TypeAdapter<LocalChapterEntity> {
 
   @override
   LocalChapterEntity read(BinaryReader reader) {
+    final chapterId = reader.readString();
+    final title = reader.readString();
+    final ms = reader.readInt();
     return LocalChapterEntity(
-      chapterId: reader.readString(),
-      title: reader.readString(),
-      archivedAt: DateTime.fromMillisecondsSinceEpoch(reader.readInt()),
+      chapterId: chapterId,
+      title: title,
+      archivedAt: ms == 0 ? null : DateTime.fromMillisecondsSinceEpoch(ms),
     );
   }
 
@@ -419,7 +422,6 @@ class LocalChapterEntityAdapter extends TypeAdapter<LocalChapterEntity> {
     writer
       ..writeString(obj.chapterId)
       ..writeString(obj.title)
-      ..writeInt(obj.archivedAt.millisecondsSinceEpoch);
+      ..writeInt(obj.archivedAt?.millisecondsSinceEpoch ?? 0);
   }
 }
-

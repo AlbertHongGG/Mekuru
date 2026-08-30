@@ -68,9 +68,10 @@ class LocalProvider implements IComicProvider {
         
         String? publishedAt;
         if (localCh != null) {
-          // Format DateTime to a readable string like "2026-08-30 17:14"
           final dt = localCh.archivedAt;
-          publishedAt = "${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')} ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}";
+          if (dt != null) {
+            publishedAt = "${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')} ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}";
+          }
         }
 
         return Chapter(

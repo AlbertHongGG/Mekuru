@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$LocalChapterEntity {
 
- String get chapterId; String get title; DateTime get archivedAt;
+ String get chapterId; String get title; DateTime? get archivedAt;
 /// Create a copy of LocalChapterEntity
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -49,7 +49,7 @@ abstract mixin class $LocalChapterEntityCopyWith<$Res>  {
   factory $LocalChapterEntityCopyWith(LocalChapterEntity value, $Res Function(LocalChapterEntity) _then) = _$LocalChapterEntityCopyWithImpl;
 @useResult
 $Res call({
- String chapterId, String title, DateTime archivedAt
+ String chapterId, String title, DateTime? archivedAt
 });
 
 
@@ -66,12 +66,12 @@ class _$LocalChapterEntityCopyWithImpl<$Res>
 
 /// Create a copy of LocalChapterEntity
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? chapterId = null,Object? title = null,Object? archivedAt = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? chapterId = null,Object? title = null,Object? archivedAt = freezed,}) {
   return _then(LocalChapterEntity(
 chapterId: null == chapterId ? _self.chapterId : chapterId // ignore: cast_nullable_to_non_nullable
 as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
-as String,archivedAt: null == archivedAt ? _self.archivedAt : archivedAt // ignore: cast_nullable_to_non_nullable
-as DateTime,
+as String,archivedAt: freezed == archivedAt ? _self.archivedAt : archivedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,
   ));
 }
 
@@ -156,7 +156,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String chapterId,  String title,  DateTime archivedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String chapterId,  String title,  DateTime? archivedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _LocalChapterEntity() when $default != null:
 return $default(_that.chapterId,_that.title,_that.archivedAt);case _:
@@ -177,7 +177,7 @@ return $default(_that.chapterId,_that.title,_that.archivedAt);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String chapterId,  String title,  DateTime archivedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String chapterId,  String title,  DateTime? archivedAt)  $default,) {final _that = this;
 switch (_that) {
 case _LocalChapterEntity():
 return $default(_that.chapterId,_that.title,_that.archivedAt);case _:
@@ -197,7 +197,7 @@ return $default(_that.chapterId,_that.title,_that.archivedAt);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String chapterId,  String title,  DateTime archivedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String chapterId,  String title,  DateTime? archivedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _LocalChapterEntity() when $default != null:
 return $default(_that.chapterId,_that.title,_that.archivedAt);case _:
@@ -212,12 +212,12 @@ return $default(_that.chapterId,_that.title,_that.archivedAt);case _:
 @JsonSerializable()
 
 class _LocalChapterEntity implements LocalChapterEntity {
-  const _LocalChapterEntity({required this.chapterId, required this.title, required this.archivedAt});
+  const _LocalChapterEntity({required this.chapterId, required this.title, this.archivedAt});
   factory _LocalChapterEntity.fromJson(Map<String, dynamic> json) => _$LocalChapterEntityFromJson(json);
 
 @override final  String chapterId;
 @override final  String title;
-@override final  DateTime archivedAt;
+@override final  DateTime? archivedAt;
 
 /// Create a copy of LocalChapterEntity
 /// with the given fields replaced by the non-null parameter values.
@@ -252,7 +252,7 @@ abstract mixin class _$LocalChapterEntityCopyWith<$Res> implements $LocalChapter
   factory _$LocalChapterEntityCopyWith(_LocalChapterEntity value, $Res Function(_LocalChapterEntity) _then) = __$LocalChapterEntityCopyWithImpl;
 @override @useResult
 $Res call({
- String chapterId, String title, DateTime archivedAt
+ String chapterId, String title, DateTime? archivedAt
 });
 
 
@@ -269,12 +269,12 @@ class __$LocalChapterEntityCopyWithImpl<$Res>
 
 /// Create a copy of LocalChapterEntity
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? chapterId = null,Object? title = null,Object? archivedAt = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? chapterId = null,Object? title = null,Object? archivedAt = freezed,}) {
   return _then(_LocalChapterEntity(
 chapterId: null == chapterId ? _self.chapterId : chapterId // ignore: cast_nullable_to_non_nullable
 as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
-as String,archivedAt: null == archivedAt ? _self.archivedAt : archivedAt // ignore: cast_nullable_to_non_nullable
-as DateTime,
+as String,archivedAt: freezed == archivedAt ? _self.archivedAt : archivedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,
   ));
 }
 

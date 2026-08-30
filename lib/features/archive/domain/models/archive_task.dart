@@ -20,6 +20,7 @@ abstract class ChapterTask with _$ChapterTask {
     @Default(0) int totalPages,
     @Default(0) int downloadedPages,
     String? errorMessage,
+    DateTime? archivedAt,
   }) = _ChapterTask;
 
   factory ChapterTask.fromJson(Map<String, dynamic> json) => _$ChapterTaskFromJson(json);

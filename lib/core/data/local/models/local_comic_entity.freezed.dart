@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$LocalComicEntity {
 
- String get providerId; String get comicId; String get title; String get coverUrl; List<String> get tags; String get author; String get description; List<String> get chapterIds; DateTime get archivedAt;
+ String get providerId; String get comicId; String get title; String get coverUrl; List<String> get tags; String get author; String get description; List<String> get chapterIds; List<LocalChapterEntity> get chapters; DateTime get archivedAt;
 /// Create a copy of LocalComicEntity
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -29,16 +29,16 @@ $LocalComicEntityCopyWith<LocalComicEntity> get copyWith => _$LocalComicEntityCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LocalComicEntity&&(identical(other.providerId, providerId) || other.providerId == providerId)&&(identical(other.comicId, comicId) || other.comicId == comicId)&&(identical(other.title, title) || other.title == title)&&(identical(other.coverUrl, coverUrl) || other.coverUrl == coverUrl)&&const DeepCollectionEquality().equals(other.tags, tags)&&(identical(other.author, author) || other.author == author)&&(identical(other.description, description) || other.description == description)&&const DeepCollectionEquality().equals(other.chapterIds, chapterIds)&&(identical(other.archivedAt, archivedAt) || other.archivedAt == archivedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LocalComicEntity&&(identical(other.providerId, providerId) || other.providerId == providerId)&&(identical(other.comicId, comicId) || other.comicId == comicId)&&(identical(other.title, title) || other.title == title)&&(identical(other.coverUrl, coverUrl) || other.coverUrl == coverUrl)&&const DeepCollectionEquality().equals(other.tags, tags)&&(identical(other.author, author) || other.author == author)&&(identical(other.description, description) || other.description == description)&&const DeepCollectionEquality().equals(other.chapterIds, chapterIds)&&const DeepCollectionEquality().equals(other.chapters, chapters)&&(identical(other.archivedAt, archivedAt) || other.archivedAt == archivedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,providerId,comicId,title,coverUrl,const DeepCollectionEquality().hash(tags),author,description,const DeepCollectionEquality().hash(chapterIds),archivedAt);
+int get hashCode => Object.hash(runtimeType,providerId,comicId,title,coverUrl,const DeepCollectionEquality().hash(tags),author,description,const DeepCollectionEquality().hash(chapterIds),const DeepCollectionEquality().hash(chapters),archivedAt);
 
 @override
 String toString() {
-  return 'LocalComicEntity(providerId: $providerId, comicId: $comicId, title: $title, coverUrl: $coverUrl, tags: $tags, author: $author, description: $description, chapterIds: $chapterIds, archivedAt: $archivedAt)';
+  return 'LocalComicEntity(providerId: $providerId, comicId: $comicId, title: $title, coverUrl: $coverUrl, tags: $tags, author: $author, description: $description, chapterIds: $chapterIds, chapters: $chapters, archivedAt: $archivedAt)';
 }
 
 
@@ -49,7 +49,7 @@ abstract mixin class $LocalComicEntityCopyWith<$Res>  {
   factory $LocalComicEntityCopyWith(LocalComicEntity value, $Res Function(LocalComicEntity) _then) = _$LocalComicEntityCopyWithImpl;
 @useResult
 $Res call({
- String providerId, String comicId, String title, String coverUrl, List<String> tags, String author, String description, List<String> chapterIds, DateTime archivedAt
+ String providerId, String comicId, String title, String coverUrl, List<String> tags, String author, String description, List<String> chapterIds, List<LocalChapterEntity> chapters, DateTime archivedAt
 });
 
 
@@ -66,7 +66,7 @@ class _$LocalComicEntityCopyWithImpl<$Res>
 
 /// Create a copy of LocalComicEntity
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? providerId = null,Object? comicId = null,Object? title = null,Object? coverUrl = null,Object? tags = null,Object? author = null,Object? description = null,Object? chapterIds = null,Object? archivedAt = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? providerId = null,Object? comicId = null,Object? title = null,Object? coverUrl = null,Object? tags = null,Object? author = null,Object? description = null,Object? chapterIds = null,Object? chapters = null,Object? archivedAt = null,}) {
   return _then(LocalComicEntity(
 providerId: null == providerId ? _self.providerId : providerId // ignore: cast_nullable_to_non_nullable
 as String,comicId: null == comicId ? _self.comicId : comicId // ignore: cast_nullable_to_non_nullable
@@ -76,7 +76,8 @@ as String,tags: null == tags ? _self.tags : tags // ignore: cast_nullable_to_non
 as List<String>,author: null == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
 as String,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String,chapterIds: null == chapterIds ? _self.chapterIds : chapterIds // ignore: cast_nullable_to_non_nullable
-as List<String>,archivedAt: null == archivedAt ? _self.archivedAt : archivedAt // ignore: cast_nullable_to_non_nullable
+as List<String>,chapters: null == chapters ? _self.chapters : chapters // ignore: cast_nullable_to_non_nullable
+as List<LocalChapterEntity>,archivedAt: null == archivedAt ? _self.archivedAt : archivedAt // ignore: cast_nullable_to_non_nullable
 as DateTime,
   ));
 }
@@ -162,10 +163,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String providerId,  String comicId,  String title,  String coverUrl,  List<String> tags,  String author,  String description,  List<String> chapterIds,  DateTime archivedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String providerId,  String comicId,  String title,  String coverUrl,  List<String> tags,  String author,  String description,  List<String> chapterIds,  List<LocalChapterEntity> chapters,  DateTime archivedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _LocalComicEntity() when $default != null:
-return $default(_that.providerId,_that.comicId,_that.title,_that.coverUrl,_that.tags,_that.author,_that.description,_that.chapterIds,_that.archivedAt);case _:
+return $default(_that.providerId,_that.comicId,_that.title,_that.coverUrl,_that.tags,_that.author,_that.description,_that.chapterIds,_that.chapters,_that.archivedAt);case _:
   return orElse();
 
 }
@@ -183,10 +184,10 @@ return $default(_that.providerId,_that.comicId,_that.title,_that.coverUrl,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String providerId,  String comicId,  String title,  String coverUrl,  List<String> tags,  String author,  String description,  List<String> chapterIds,  DateTime archivedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String providerId,  String comicId,  String title,  String coverUrl,  List<String> tags,  String author,  String description,  List<String> chapterIds,  List<LocalChapterEntity> chapters,  DateTime archivedAt)  $default,) {final _that = this;
 switch (_that) {
 case _LocalComicEntity():
-return $default(_that.providerId,_that.comicId,_that.title,_that.coverUrl,_that.tags,_that.author,_that.description,_that.chapterIds,_that.archivedAt);case _:
+return $default(_that.providerId,_that.comicId,_that.title,_that.coverUrl,_that.tags,_that.author,_that.description,_that.chapterIds,_that.chapters,_that.archivedAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -203,10 +204,10 @@ return $default(_that.providerId,_that.comicId,_that.title,_that.coverUrl,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String providerId,  String comicId,  String title,  String coverUrl,  List<String> tags,  String author,  String description,  List<String> chapterIds,  DateTime archivedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String providerId,  String comicId,  String title,  String coverUrl,  List<String> tags,  String author,  String description,  List<String> chapterIds,  List<LocalChapterEntity> chapters,  DateTime archivedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _LocalComicEntity() when $default != null:
-return $default(_that.providerId,_that.comicId,_that.title,_that.coverUrl,_that.tags,_that.author,_that.description,_that.chapterIds,_that.archivedAt);case _:
+return $default(_that.providerId,_that.comicId,_that.title,_that.coverUrl,_that.tags,_that.author,_that.description,_that.chapterIds,_that.chapters,_that.archivedAt);case _:
   return null;
 
 }
@@ -218,7 +219,7 @@ return $default(_that.providerId,_that.comicId,_that.title,_that.coverUrl,_that.
 @JsonSerializable()
 
 class _LocalComicEntity implements LocalComicEntity {
-  const _LocalComicEntity({required this.providerId, required this.comicId, required this.title, required this.coverUrl,  List<String> tags = const [], this.author = '', this.description = '',  List<String> chapterIds = const [], required this.archivedAt}): _tags = tags,_chapterIds = chapterIds;
+  const _LocalComicEntity({required this.providerId, required this.comicId, required this.title, required this.coverUrl,  List<String> tags = const [], this.author = '', this.description = '',  List<String> chapterIds = const [],  List<LocalChapterEntity> chapters = const [], required this.archivedAt}): _tags = tags,_chapterIds = chapterIds,_chapters = chapters;
   factory _LocalComicEntity.fromJson(Map<String, dynamic> json) => _$LocalComicEntityFromJson(json);
 
 @override final  String providerId;
@@ -241,6 +242,13 @@ class _LocalComicEntity implements LocalComicEntity {
   return EqualUnmodifiableListView(_chapterIds);
 }
 
+ final  List<LocalChapterEntity> _chapters;
+@override@JsonKey() List<LocalChapterEntity> get chapters {
+  if (_chapters is EqualUnmodifiableListView) return _chapters;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_chapters);
+}
+
 @override final  DateTime archivedAt;
 
 /// Create a copy of LocalComicEntity
@@ -256,16 +264,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LocalComicEntity&&(identical(other.providerId, providerId) || other.providerId == providerId)&&(identical(other.comicId, comicId) || other.comicId == comicId)&&(identical(other.title, title) || other.title == title)&&(identical(other.coverUrl, coverUrl) || other.coverUrl == coverUrl)&&const DeepCollectionEquality().equals(other._tags, _tags)&&(identical(other.author, author) || other.author == author)&&(identical(other.description, description) || other.description == description)&&const DeepCollectionEquality().equals(other._chapterIds, _chapterIds)&&(identical(other.archivedAt, archivedAt) || other.archivedAt == archivedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LocalComicEntity&&(identical(other.providerId, providerId) || other.providerId == providerId)&&(identical(other.comicId, comicId) || other.comicId == comicId)&&(identical(other.title, title) || other.title == title)&&(identical(other.coverUrl, coverUrl) || other.coverUrl == coverUrl)&&const DeepCollectionEquality().equals(other._tags, _tags)&&(identical(other.author, author) || other.author == author)&&(identical(other.description, description) || other.description == description)&&const DeepCollectionEquality().equals(other._chapterIds, _chapterIds)&&const DeepCollectionEquality().equals(other._chapters, _chapters)&&(identical(other.archivedAt, archivedAt) || other.archivedAt == archivedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,providerId,comicId,title,coverUrl,const DeepCollectionEquality().hash(_tags),author,description,const DeepCollectionEquality().hash(_chapterIds),archivedAt);
+int get hashCode => Object.hash(runtimeType,providerId,comicId,title,coverUrl,const DeepCollectionEquality().hash(_tags),author,description,const DeepCollectionEquality().hash(_chapterIds),const DeepCollectionEquality().hash(_chapters),archivedAt);
 
 @override
 String toString() {
-  return 'LocalComicEntity(providerId: $providerId, comicId: $comicId, title: $title, coverUrl: $coverUrl, tags: $tags, author: $author, description: $description, chapterIds: $chapterIds, archivedAt: $archivedAt)';
+  return 'LocalComicEntity(providerId: $providerId, comicId: $comicId, title: $title, coverUrl: $coverUrl, tags: $tags, author: $author, description: $description, chapterIds: $chapterIds, chapters: $chapters, archivedAt: $archivedAt)';
 }
 
 
@@ -276,7 +284,7 @@ abstract mixin class _$LocalComicEntityCopyWith<$Res> implements $LocalComicEnti
   factory _$LocalComicEntityCopyWith(_LocalComicEntity value, $Res Function(_LocalComicEntity) _then) = __$LocalComicEntityCopyWithImpl;
 @override @useResult
 $Res call({
- String providerId, String comicId, String title, String coverUrl, List<String> tags, String author, String description, List<String> chapterIds, DateTime archivedAt
+ String providerId, String comicId, String title, String coverUrl, List<String> tags, String author, String description, List<String> chapterIds, List<LocalChapterEntity> chapters, DateTime archivedAt
 });
 
 
@@ -293,7 +301,7 @@ class __$LocalComicEntityCopyWithImpl<$Res>
 
 /// Create a copy of LocalComicEntity
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? providerId = null,Object? comicId = null,Object? title = null,Object? coverUrl = null,Object? tags = null,Object? author = null,Object? description = null,Object? chapterIds = null,Object? archivedAt = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? providerId = null,Object? comicId = null,Object? title = null,Object? coverUrl = null,Object? tags = null,Object? author = null,Object? description = null,Object? chapterIds = null,Object? chapters = null,Object? archivedAt = null,}) {
   return _then(_LocalComicEntity(
 providerId: null == providerId ? _self.providerId : providerId // ignore: cast_nullable_to_non_nullable
 as String,comicId: null == comicId ? _self.comicId : comicId // ignore: cast_nullable_to_non_nullable
@@ -303,7 +311,8 @@ as String,tags: null == tags ? _self._tags : tags // ignore: cast_nullable_to_no
 as List<String>,author: null == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
 as String,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String,chapterIds: null == chapterIds ? _self._chapterIds : chapterIds // ignore: cast_nullable_to_non_nullable
-as List<String>,archivedAt: null == archivedAt ? _self.archivedAt : archivedAt // ignore: cast_nullable_to_non_nullable
+as List<String>,chapters: null == chapters ? _self._chapters : chapters // ignore: cast_nullable_to_non_nullable
+as List<LocalChapterEntity>,archivedAt: null == archivedAt ? _self.archivedAt : archivedAt // ignore: cast_nullable_to_non_nullable
 as DateTime,
   ));
 }

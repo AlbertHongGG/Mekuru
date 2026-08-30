@@ -63,7 +63,22 @@ class LocalProvider implements IComicProvider {
       if (comic == null) {
         return const Error(LocalComicNotFoundFailure());
       }
-      final chapters = comic.chapterIds.map((id) => Chapter(id: id, title: 'Chapter $id')).toList();
+      final chapters = comic.chapterIds.map((id) {
+        final localCh = comic.chapters.where((c) => c.chapterId == id).firstOrNull;
+        
+        String? publishedAt;
+        if (localCh != null) {
+          // Format DateTime to a readable string like "2026-08-30 17:14"
+          final dt = localCh.archivedAt;
+          publishedAt = "${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')} ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}";
+        }
+
+        return Chapter(
+          id: id,
+          title: localCh?.title ?? 'Chapter $id',
+          publishedAt: publishedAt,
+        );
+      }).toList();
       return Success(isDescending ? chapters.reversed.toList() : chapters);
     } catch (e) {
       return Error(ProviderFailure(e.toString()));

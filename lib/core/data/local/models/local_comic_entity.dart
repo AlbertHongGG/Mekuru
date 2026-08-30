@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:mekuru/core/data/local/models/local_chapter_entity.dart';
 
 part 'local_comic_entity.freezed.dart';
 part 'local_comic_entity.g.dart';
@@ -14,6 +15,7 @@ abstract class LocalComicEntity with _$LocalComicEntity {
     @Default('') String author,
     @Default('') String description,
     @Default([]) List<String> chapterIds,
+    @Default([]) List<LocalChapterEntity> chapters,
     required DateTime archivedAt,
   }) = _LocalComicEntity;
 

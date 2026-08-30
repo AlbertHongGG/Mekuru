@@ -6,6 +6,7 @@ import 'package:mekuru/core/data/local/models/history_entity.dart';
 import 'package:mekuru/features/logger/domain/models/log_entry.dart';
 import 'package:mekuru/features/archive/domain/models/archive_task.dart';
 import 'package:mekuru/core/data/local/models/local_comic_entity.dart';
+import 'package:mekuru/core/data/local/models/local_chapter_entity.dart';
 
 class HiveAdapters {
   static void registerAll() {
@@ -17,6 +18,7 @@ class HiveAdapters {
     Hive.registerAdapter(ArchiveTaskStatusAdapter());
     Hive.registerAdapter(ChapterTaskAdapter());
     Hive.registerAdapter(ArchiveTaskAdapter());
+    Hive.registerAdapter(LocalChapterEntityAdapter());
     Hive.registerAdapter(LocalComicEntityAdapter());
   }
 }
@@ -262,13 +264,23 @@ class ChapterTaskAdapter extends TypeAdapter<ChapterTask> {
 
   @override
   ChapterTask read(BinaryReader reader) {
+    final chapterId = reader.readString();
+    final title = reader.readString();
+    final status = reader.read();
+    final totalPages = reader.readInt();
+    final downloadedPages = reader.readInt();
+    final errorMessage = reader.readBool() ? reader.readString() : null;
+    
+    final archivedAt = reader.readBool() ? DateTime.fromMillisecondsSinceEpoch(reader.readInt()) : null;
+
     return ChapterTask(
-      chapterId: reader.readString(),
-      title: reader.readString(),
-      status: reader.read(), // Uses ArchiveTaskStatusAdapter
-      totalPages: reader.readInt(),
-      downloadedPages: reader.readInt(),
-      errorMessage: reader.readBool() ? reader.readString() : null,
+      chapterId: chapterId,
+      title: title,
+      status: status,
+      totalPages: totalPages,
+      downloadedPages: downloadedPages,
+      errorMessage: errorMessage,
+      archivedAt: archivedAt,
     );
   }
 
@@ -282,6 +294,9 @@ class ChapterTaskAdapter extends TypeAdapter<ChapterTask> {
       ..writeInt(obj.downloadedPages)
       ..writeBool(obj.errorMessage != null);
     if (obj.errorMessage != null) writer.writeString(obj.errorMessage!);
+    
+    writer.writeBool(obj.archivedAt != null);
+    if (obj.archivedAt != null) writer.writeInt(obj.archivedAt!.millisecondsSinceEpoch);
   }
 }
 
@@ -340,16 +355,31 @@ class LocalComicEntityAdapter extends TypeAdapter<LocalComicEntity> {
 
   @override
   LocalComicEntity read(BinaryReader reader) {
+    final providerId = reader.readString();
+    final comicId = reader.readString();
+    final title = reader.readString();
+    final coverUrl = reader.readString();
+    final tags = reader.readStringList();
+    final author = reader.readString();
+    final description = reader.readString();
+    final chapterIds = reader.readStringList();
+    final archivedAt = DateTime.fromMillisecondsSinceEpoch(reader.readInt());
+
+    final hasChapters = reader.readBool();
+    final chaptersList = hasChapters ? reader.readList() : [];
+    final chapters = chaptersList.cast<LocalChapterEntity>();
+
     return LocalComicEntity(
-      providerId: reader.readString(),
-      comicId: reader.readString(),
-      title: reader.readString(),
-      coverUrl: reader.readString(),
-      tags: reader.readStringList(),
-      author: reader.readString(),
-      description: reader.readString(),
-      chapterIds: reader.readStringList(),
-      archivedAt: DateTime.fromMillisecondsSinceEpoch(reader.readInt()),
+      providerId: providerId,
+      comicId: comicId,
+      title: title,
+      coverUrl: coverUrl,
+      tags: tags,
+      author: author,
+      description: description,
+      chapterIds: chapterIds,
+      chapters: chapters,
+      archivedAt: archivedAt,
     );
   }
 
@@ -364,6 +394,31 @@ class LocalComicEntityAdapter extends TypeAdapter<LocalComicEntity> {
       ..writeString(obj.author)
       ..writeString(obj.description)
       ..writeStringList(obj.chapterIds)
+      ..writeInt(obj.archivedAt.millisecondsSinceEpoch);
+      
+    writer.writeBool(true);
+    writer.writeList(obj.chapters);
+  }
+}
+
+class LocalChapterEntityAdapter extends TypeAdapter<LocalChapterEntity> {
+  @override
+  final int typeId = 11;
+
+  @override
+  LocalChapterEntity read(BinaryReader reader) {
+    return LocalChapterEntity(
+      chapterId: reader.readString(),
+      title: reader.readString(),
+      archivedAt: DateTime.fromMillisecondsSinceEpoch(reader.readInt()),
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, LocalChapterEntity obj) {
+    writer
+      ..writeString(obj.chapterId)
+      ..writeString(obj.title)
       ..writeInt(obj.archivedAt.millisecondsSinceEpoch);
   }
 }

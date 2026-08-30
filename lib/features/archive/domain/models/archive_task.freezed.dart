@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ChapterTask {
 
- String get chapterId; String get title; ArchiveTaskStatus get status; int get totalPages; int get downloadedPages; String? get errorMessage;
+ String get chapterId; String get title; ArchiveTaskStatus get status; int get totalPages; int get downloadedPages; String? get errorMessage; DateTime? get archivedAt;
 /// Create a copy of ChapterTask
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -29,16 +29,16 @@ $ChapterTaskCopyWith<ChapterTask> get copyWith => _$ChapterTaskCopyWithImpl<Chap
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChapterTask&&(identical(other.chapterId, chapterId) || other.chapterId == chapterId)&&(identical(other.title, title) || other.title == title)&&(identical(other.status, status) || other.status == status)&&(identical(other.totalPages, totalPages) || other.totalPages == totalPages)&&(identical(other.downloadedPages, downloadedPages) || other.downloadedPages == downloadedPages)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChapterTask&&(identical(other.chapterId, chapterId) || other.chapterId == chapterId)&&(identical(other.title, title) || other.title == title)&&(identical(other.status, status) || other.status == status)&&(identical(other.totalPages, totalPages) || other.totalPages == totalPages)&&(identical(other.downloadedPages, downloadedPages) || other.downloadedPages == downloadedPages)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.archivedAt, archivedAt) || other.archivedAt == archivedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,chapterId,title,status,totalPages,downloadedPages,errorMessage);
+int get hashCode => Object.hash(runtimeType,chapterId,title,status,totalPages,downloadedPages,errorMessage,archivedAt);
 
 @override
 String toString() {
-  return 'ChapterTask(chapterId: $chapterId, title: $title, status: $status, totalPages: $totalPages, downloadedPages: $downloadedPages, errorMessage: $errorMessage)';
+  return 'ChapterTask(chapterId: $chapterId, title: $title, status: $status, totalPages: $totalPages, downloadedPages: $downloadedPages, errorMessage: $errorMessage, archivedAt: $archivedAt)';
 }
 
 
@@ -49,7 +49,7 @@ abstract mixin class $ChapterTaskCopyWith<$Res>  {
   factory $ChapterTaskCopyWith(ChapterTask value, $Res Function(ChapterTask) _then) = _$ChapterTaskCopyWithImpl;
 @useResult
 $Res call({
- String chapterId, String title, ArchiveTaskStatus status, int totalPages, int downloadedPages, String? errorMessage
+ String chapterId, String title, ArchiveTaskStatus status, int totalPages, int downloadedPages, String? errorMessage, DateTime? archivedAt
 });
 
 
@@ -66,7 +66,7 @@ class _$ChapterTaskCopyWithImpl<$Res>
 
 /// Create a copy of ChapterTask
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? chapterId = null,Object? title = null,Object? status = null,Object? totalPages = null,Object? downloadedPages = null,Object? errorMessage = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? chapterId = null,Object? title = null,Object? status = null,Object? totalPages = null,Object? downloadedPages = null,Object? errorMessage = freezed,Object? archivedAt = freezed,}) {
   return _then(ChapterTask(
 chapterId: null == chapterId ? _self.chapterId : chapterId // ignore: cast_nullable_to_non_nullable
 as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
@@ -74,7 +74,8 @@ as String,status: null == status ? _self.status : status // ignore: cast_nullabl
 as ArchiveTaskStatus,totalPages: null == totalPages ? _self.totalPages : totalPages // ignore: cast_nullable_to_non_nullable
 as int,downloadedPages: null == downloadedPages ? _self.downloadedPages : downloadedPages // ignore: cast_nullable_to_non_nullable
 as int,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,archivedAt: freezed == archivedAt ? _self.archivedAt : archivedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,
   ));
 }
 
@@ -159,10 +160,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String chapterId,  String title,  ArchiveTaskStatus status,  int totalPages,  int downloadedPages,  String? errorMessage)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String chapterId,  String title,  ArchiveTaskStatus status,  int totalPages,  int downloadedPages,  String? errorMessage,  DateTime? archivedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ChapterTask() when $default != null:
-return $default(_that.chapterId,_that.title,_that.status,_that.totalPages,_that.downloadedPages,_that.errorMessage);case _:
+return $default(_that.chapterId,_that.title,_that.status,_that.totalPages,_that.downloadedPages,_that.errorMessage,_that.archivedAt);case _:
   return orElse();
 
 }
@@ -180,10 +181,10 @@ return $default(_that.chapterId,_that.title,_that.status,_that.totalPages,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String chapterId,  String title,  ArchiveTaskStatus status,  int totalPages,  int downloadedPages,  String? errorMessage)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String chapterId,  String title,  ArchiveTaskStatus status,  int totalPages,  int downloadedPages,  String? errorMessage,  DateTime? archivedAt)  $default,) {final _that = this;
 switch (_that) {
 case _ChapterTask():
-return $default(_that.chapterId,_that.title,_that.status,_that.totalPages,_that.downloadedPages,_that.errorMessage);case _:
+return $default(_that.chapterId,_that.title,_that.status,_that.totalPages,_that.downloadedPages,_that.errorMessage,_that.archivedAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -200,10 +201,10 @@ return $default(_that.chapterId,_that.title,_that.status,_that.totalPages,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String chapterId,  String title,  ArchiveTaskStatus status,  int totalPages,  int downloadedPages,  String? errorMessage)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String chapterId,  String title,  ArchiveTaskStatus status,  int totalPages,  int downloadedPages,  String? errorMessage,  DateTime? archivedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _ChapterTask() when $default != null:
-return $default(_that.chapterId,_that.title,_that.status,_that.totalPages,_that.downloadedPages,_that.errorMessage);case _:
+return $default(_that.chapterId,_that.title,_that.status,_that.totalPages,_that.downloadedPages,_that.errorMessage,_that.archivedAt);case _:
   return null;
 
 }
@@ -215,7 +216,7 @@ return $default(_that.chapterId,_that.title,_that.status,_that.totalPages,_that.
 @JsonSerializable()
 
 class _ChapterTask implements ChapterTask {
-  const _ChapterTask({required this.chapterId, required this.title, this.status = ArchiveTaskStatus.queued, this.totalPages = 0, this.downloadedPages = 0, this.errorMessage});
+  const _ChapterTask({required this.chapterId, required this.title, this.status = ArchiveTaskStatus.queued, this.totalPages = 0, this.downloadedPages = 0, this.errorMessage, this.archivedAt});
   factory _ChapterTask.fromJson(Map<String, dynamic> json) => _$ChapterTaskFromJson(json);
 
 @override final  String chapterId;
@@ -224,6 +225,7 @@ class _ChapterTask implements ChapterTask {
 @override@JsonKey() final  int totalPages;
 @override@JsonKey() final  int downloadedPages;
 @override final  String? errorMessage;
+@override final  DateTime? archivedAt;
 
 /// Create a copy of ChapterTask
 /// with the given fields replaced by the non-null parameter values.
@@ -238,16 +240,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChapterTask&&(identical(other.chapterId, chapterId) || other.chapterId == chapterId)&&(identical(other.title, title) || other.title == title)&&(identical(other.status, status) || other.status == status)&&(identical(other.totalPages, totalPages) || other.totalPages == totalPages)&&(identical(other.downloadedPages, downloadedPages) || other.downloadedPages == downloadedPages)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChapterTask&&(identical(other.chapterId, chapterId) || other.chapterId == chapterId)&&(identical(other.title, title) || other.title == title)&&(identical(other.status, status) || other.status == status)&&(identical(other.totalPages, totalPages) || other.totalPages == totalPages)&&(identical(other.downloadedPages, downloadedPages) || other.downloadedPages == downloadedPages)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.archivedAt, archivedAt) || other.archivedAt == archivedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,chapterId,title,status,totalPages,downloadedPages,errorMessage);
+int get hashCode => Object.hash(runtimeType,chapterId,title,status,totalPages,downloadedPages,errorMessage,archivedAt);
 
 @override
 String toString() {
-  return 'ChapterTask(chapterId: $chapterId, title: $title, status: $status, totalPages: $totalPages, downloadedPages: $downloadedPages, errorMessage: $errorMessage)';
+  return 'ChapterTask(chapterId: $chapterId, title: $title, status: $status, totalPages: $totalPages, downloadedPages: $downloadedPages, errorMessage: $errorMessage, archivedAt: $archivedAt)';
 }
 
 
@@ -258,7 +260,7 @@ abstract mixin class _$ChapterTaskCopyWith<$Res> implements $ChapterTaskCopyWith
   factory _$ChapterTaskCopyWith(_ChapterTask value, $Res Function(_ChapterTask) _then) = __$ChapterTaskCopyWithImpl;
 @override @useResult
 $Res call({
- String chapterId, String title, ArchiveTaskStatus status, int totalPages, int downloadedPages, String? errorMessage
+ String chapterId, String title, ArchiveTaskStatus status, int totalPages, int downloadedPages, String? errorMessage, DateTime? archivedAt
 });
 
 
@@ -275,7 +277,7 @@ class __$ChapterTaskCopyWithImpl<$Res>
 
 /// Create a copy of ChapterTask
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? chapterId = null,Object? title = null,Object? status = null,Object? totalPages = null,Object? downloadedPages = null,Object? errorMessage = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? chapterId = null,Object? title = null,Object? status = null,Object? totalPages = null,Object? downloadedPages = null,Object? errorMessage = freezed,Object? archivedAt = freezed,}) {
   return _then(_ChapterTask(
 chapterId: null == chapterId ? _self.chapterId : chapterId // ignore: cast_nullable_to_non_nullable
 as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
@@ -283,7 +285,8 @@ as String,status: null == status ? _self.status : status // ignore: cast_nullabl
 as ArchiveTaskStatus,totalPages: null == totalPages ? _self.totalPages : totalPages // ignore: cast_nullable_to_non_nullable
 as int,downloadedPages: null == downloadedPages ? _self.downloadedPages : downloadedPages // ignore: cast_nullable_to_non_nullable
 as int,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,archivedAt: freezed == archivedAt ? _self.archivedAt : archivedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,
   ));
 }
 

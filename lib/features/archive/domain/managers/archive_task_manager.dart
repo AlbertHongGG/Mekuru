@@ -6,6 +6,7 @@ import 'package:mekuru/features/comic/data/sources/provider_registry.dart';
 import 'package:mekuru/features/archive/domain/managers/i_local_library_manager.dart';
 import 'package:mekuru/features/archive/domain/managers/local_library_manager.dart';
 import 'package:mekuru/core/data/local/models/local_comic_entity.dart';
+import 'package:mekuru/core/data/local/models/local_chapter_entity.dart';
 import 'package:mekuru/core/data/local/local_storage_providers.dart';
 import 'package:mekuru/features/archive/domain/managers/i_archive_task_manager.dart';
 
@@ -153,16 +154,27 @@ class ArchiveTaskManager extends Notifier<List<ArchiveTask>> implements IArchive
       return 0; // nothing to update
     }
 
+    final newRemoteChapters = remoteChapters.where((c) => newChapterIds.contains(c.id)).toList();
+    
+    final newLocalChapters = List<LocalChapterEntity>.from(localComic.chapters);
+    for (final ch in newRemoteChapters) {
+      newLocalChapters.add(LocalChapterEntity(
+        chapterId: ch.id,
+        title: ch.title,
+        archivedAt: DateTime.now(), // Queued time, will be updated on completion
+      ));
+    }
+
     final updatedComic = localComic.copyWith(
       chapterIds: remoteChapters.map((c) => c.id).toList(),
+      chapters: newLocalChapters,
       title: comicDetail.title,
       coverUrl: comicDetail.coverUrl,
-      archivedAt: DateTime.now(),
     );
     await _libraryManager.saveComic(updatedComic);
 
     final chapterTasks = <String, ChapterTask>{};
-    for (final ch in remoteChapters.where((c) => newChapterIds.contains(c.id))) {
+    for (final ch in newRemoteChapters) {
       chapterTasks[ch.id] = ChapterTask(
         chapterId: ch.id,
         title: ch.title,
@@ -252,24 +264,57 @@ class ArchiveTaskManager extends Notifier<List<ArchiveTask>> implements IArchive
           final provider = _providerRegistry.getProvider(task.providerId);
           await _mediaStorage.getComicDirectory(task.providerId, task.comicId);
           
-          LocalComicEntity? localComic;
-          final detailResult = await provider.getComicDetail(task.comicId);
-          if (detailResult.isSuccess) {
+          LocalComicEntity? localComic = await _libraryManager.getComic(task.comicId);
+          
+          // 1. Fetch metadata and chapters if task has no chapters
+          if (task.chapters.isEmpty) {
+            final detailResult = await provider.getComicDetail(task.comicId);
+            if (detailResult.isFailure) throw Exception('Failed to fetch comic details');
             final comicDetail = detailResult.getOrThrow();
+            
+            final chaptersResult = await provider.getChapterList(task.comicId, isDescending: false);
+            if (chaptersResult.isFailure) throw Exception('Failed to fetch chapters');
+            final chapters = chaptersResult.getOrThrow();
+            
+            final chapterTasks = <String, ChapterTask>{};
+            final localChapters = <LocalChapterEntity>[];
+            
+            for (final ch in chapters) {
+              chapterTasks[ch.id] = ChapterTask(
+                chapterId: ch.id,
+                title: ch.title,
+                status: ArchiveTaskStatus.queued,
+              );
+              localChapters.add(LocalChapterEntity(
+                chapterId: ch.id,
+                title: ch.title,
+                archivedAt: DateTime.now(), // Will be updated when actually downloaded
+              ));
+            }
+            
             localComic = LocalComicEntity(
               comicId: task.comicId,
               providerId: task.providerId,
               archivedAt: DateTime.now(),
-              chapterIds: task.chapters.keys.toList(),
-              tags: [],
+              chapterIds: chapters.map((c) => c.id).toList(),
+              chapters: localChapters,
+              tags: comicDetail.tags,
+              author: comicDetail.author,
+              description: comicDetail.description,
               coverUrl: comicDetail.coverUrl,
               title: comicDetail.title,
             );
-            _updateTaskMemory(task.copyWith(comicTitle: comicDetail.title, coverUrl: comicDetail.coverUrl), persist: true);
-          } else {
-            localComic = await _libraryManager.getComic(task.comicId);
+            await _libraryManager.saveComic(localComic);
+            
+            task = task.copyWith(
+              chapters: chapterTasks,
+              comicTitle: comicDetail.title,
+              coverUrl: comicDetail.coverUrl,
+            );
+            _updateTaskMemory(task, persist: true);
           }
           
+          // 2. Download Chapters
           for (final chId in task.chapters.keys) {
             final currentTask = state.firstWhere((t) => t.taskId == task.taskId, orElse: () => task);
             if (currentTask.status != ArchiveTaskStatus.downloading) {
@@ -318,7 +363,30 @@ class ArchiveTaskManager extends Notifier<List<ArchiveTask>> implements IArchive
                  task = _updateChapterMemory(task.taskId, task.chapters[chId]!.copyWith(downloadedPages: downloaded), persist: false);
               }
               
-              task = _updateChapterMemory(task.taskId, task.chapters[chId]!.copyWith(status: ArchiveTaskStatus.completed), persist: true);
+              // Mark chapter as completed and set archivedAt
+              final completedAt = DateTime.now();
+              task = _updateChapterMemory(task.taskId, task.chapters[chId]!.copyWith(
+                status: ArchiveTaskStatus.completed,
+                archivedAt: completedAt,
+              ), persist: true);
+              
+              // Update local comic chapter metadata
+              if (localComic != null) {
+                final newChapters = List<LocalChapterEntity>.from(localComic.chapters);
+                final idx = newChapters.indexWhere((c) => c.chapterId == chId);
+                if (idx != -1) {
+                  newChapters[idx] = newChapters[idx].copyWith(archivedAt: completedAt);
+                } else {
+                  // Fallback for chapters added during update
+                  newChapters.add(LocalChapterEntity(
+                    chapterId: chId,
+                    title: task.chapters[chId]!.title,
+                    archivedAt: completedAt,
+                  ));
+                }
+                localComic = localComic.copyWith(chapters: newChapters, archivedAt: completedAt);
+                await _libraryManager.saveComic(localComic);
+              }
               
             } catch (e) {
               task = _updateChapterMemory(task.taskId, task.chapters[chId]!.copyWith(status: ArchiveTaskStatus.error, errorMessage: e.toString()), persist: true);
@@ -338,10 +406,8 @@ class ArchiveTaskManager extends Notifier<List<ArchiveTask>> implements IArchive
           }
           
         } catch (e) {
-           final errTask = state.firstWhere((t) => t.taskId == task.taskId, orElse: () => task);
-           if (errTask.status == ArchiveTaskStatus.downloading) {
-             _updateTaskMemory(errTask.copyWith(status: ArchiveTaskStatus.error, errorMessage: e.toString(), updatedAt: DateTime.now()), persist: true);
-           }
+          final errTask = state.firstWhere((t) => t.taskId == task.taskId, orElse: () => task);
+          _updateTaskMemory(errTask.copyWith(status: ArchiveTaskStatus.error, errorMessage: e.toString(), updatedAt: DateTime.now()), persist: true);
         }
       }
     } finally {

@@ -22,6 +22,13 @@ _LocalComicEntity _$LocalComicEntityFromJson(Map<String, dynamic> json) =>
               ?.map((e) => e as String)
               .toList() ??
           const [],
+      chapters:
+          (json['chapters'] as List<dynamic>?)
+              ?.map(
+                (e) => LocalChapterEntity.fromJson(e as Map<String, dynamic>),
+              )
+              .toList() ??
+          const [],
       archivedAt: DateTime.parse(json['archivedAt'] as String),
     );
 
@@ -35,5 +42,6 @@ Map<String, dynamic> _$LocalComicEntityToJson(_LocalComicEntity instance) =>
       'author': instance.author,
       'description': instance.description,
       'chapterIds': instance.chapterIds,
+      'chapters': instance.chapters,
       'archivedAt': instance.archivedAt.toIso8601String(),
     };

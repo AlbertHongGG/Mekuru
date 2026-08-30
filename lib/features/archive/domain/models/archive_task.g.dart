@@ -15,6 +15,9 @@ _ChapterTask _$ChapterTaskFromJson(Map<String, dynamic> json) => _ChapterTask(
   totalPages: (json['totalPages'] as num?)?.toInt() ?? 0,
   downloadedPages: (json['downloadedPages'] as num?)?.toInt() ?? 0,
   errorMessage: json['errorMessage'] as String?,
+  archivedAt: json['archivedAt'] == null
+      ? null
+      : DateTime.parse(json['archivedAt'] as String),
 );
 
 Map<String, dynamic> _$ChapterTaskToJson(_ChapterTask instance) =>
@@ -25,6 +28,7 @@ Map<String, dynamic> _$ChapterTaskToJson(_ChapterTask instance) =>
       'totalPages': instance.totalPages,
       'downloadedPages': instance.downloadedPages,
       'errorMessage': instance.errorMessage,
+      'archivedAt': instance.archivedAt?.toIso8601String(),
     };
 
 const _$ArchiveTaskStatusEnumMap = {

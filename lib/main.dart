@@ -11,6 +11,7 @@ import 'package:mekuru/features/archive/presentation/pages/archive_page.dart';
 import 'package:mekuru/features/comic/presentation/pages/comic_details_page.dart';
 import 'package:mekuru/features/viewer/presentation/pages/comic_viewer_page.dart';
 import 'package:mekuru/core/notifications/presentation/widgets/global_notification_overlay.dart';
+import 'package:mekuru/features/library/domain/services/local_interaction_sync_service.dart';
 
 import 'package:mekuru/presentation/splash/splash_page.dart';
 
@@ -104,6 +105,9 @@ class MekuruApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Initialize the sync service globally so it can always listen to events
+    ref.watch(localInteractionSyncServiceProvider);
+    
     final router = ref.watch(routerProvider);
     final settings = ref.watch(settingsProvider);
 

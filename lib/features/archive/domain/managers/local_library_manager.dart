@@ -12,13 +12,15 @@ class LocalLibraryManager implements ILocalLibraryManager {
   final Ref _ref;
   
   LocalLibraryManager(this._libraryStorage, this._mediaStorage, this._ref);
-  
+  final _eventController = StreamController<LibraryChangeEvent>.broadcast();
+
   @override
-  Stream<void> watchLibraryChanges() => _libraryStorage.watch();
+  Stream<LibraryChangeEvent> watchLibraryChanges() => _eventController.stream;
 
   @override
   Future<void> saveComic(LocalComicEntity comic) async {
     await _libraryStorage.saveComic(comic);
+    _eventController.add(ComicAddedEvent(comic.comicId));
   }
 
   @override
@@ -41,6 +43,8 @@ class LocalLibraryManager implements ILocalLibraryManager {
     
     // 3. Remove metadata from local database.
     await _libraryStorage.deleteComic(comicId);
+    
+    _eventController.add(ComicDeletedEvent(comicId));
   }
 }
 

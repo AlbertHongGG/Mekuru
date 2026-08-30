@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mekuru/features/archive/domain/models/archive_task.dart';
 import 'package:mekuru/features/archive/domain/managers/archive_task_manager.dart';
 import 'package:mekuru/features/archive/domain/managers/local_library_manager.dart';
-import 'package:mekuru/features/library/data/repositories/user_interaction_repository.dart';
+
 
 class ArchiveState {
   final bool isLoading;
@@ -57,11 +57,6 @@ class ArchiveNotifier extends Notifier<ArchiveState> {
     // Now explicitly delegates to LocalLibraryManager which safely halts tasks and wipes media
     try {
       await ref.read(localLibraryManagerProvider).deleteComic(providerId, comicId);
-      
-      // When the archive is deleted, the physical files are gone. 
-      // The corresponding library record is saved under the 'local' provider, so we must clean it up.
-      await ref.read(userInteractionRepositoryProvider).deleteInteraction(providerId: 'local', comicId: comicId);
-      
       return true;
     } catch (e) {
       return false;

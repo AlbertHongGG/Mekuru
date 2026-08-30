@@ -12,13 +12,15 @@ import 'package:path_provider/path_provider.dart';
 import 'package:mekuru/features/archive/domain/managers/i_local_library_manager.dart';
 
 class LocalProvider implements IComicProvider {
+  static const String providerIdentifier = 'local';
+  
   final ILocalLibraryManager _libraryManager;
   final IMediaStorage _mediaStorage;
 
   LocalProvider(this._libraryManager, this._mediaStorage);
 
   @override
-  String get providerId => 'local';
+  String get providerId => providerIdentifier;
 
   @override
   List<String> get aliases => [];

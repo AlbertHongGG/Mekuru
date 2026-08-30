@@ -5,6 +5,7 @@ import 'package:mekuru/features/comic/domain/models/comic_models.dart';
 import 'package:mekuru/features/comic/domain/models/chapter.dart';
 import 'package:mekuru/core/notifications/presentation/controllers/notification_controller.dart';
 import 'package:mekuru/features/library/domain/models/comic_record.dart';
+import 'package:mekuru/features/archive/data/providers/local_provider.dart';
 import 'package:mekuru/features/library/presentation/providers/library_provider.dart';
 import 'package:mekuru/features/settings/presentation/providers/settings_provider.dart';
 import 'package:mekuru/features/archive/domain/managers/local_library_manager.dart';
@@ -89,7 +90,7 @@ class ComicDetailsNotifier extends AutoDisposeFamilyNotifier<ComicDetailsState, 
   }
 
   Future<void> confirmDeleteLocalComic() async {
-    if (arg.providerId != 'local') return;
+    if (arg.providerId != LocalProvider.providerIdentifier) return;
     try {
       final libraryManager = ref.read(localLibraryManagerProvider);
       final localComic = await libraryManager.getComic(arg.comicId);

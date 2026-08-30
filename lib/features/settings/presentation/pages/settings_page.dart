@@ -140,6 +140,12 @@ class SettingsPage extends ConsumerWidget {
         case 'copymg':
           icon = Icons.library_books;
           break;
+        case 'manwa':
+          icon = Icons.auto_stories;
+          break;
+        case 'guazi':
+          icon = Icons.eco;
+          break;
         case 'local':
           icon = Icons.download_done;
           break;

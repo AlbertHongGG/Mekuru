@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mekuru/core/widgets/swipe_to_obliterate_button.dart';
 import 'package:mekuru/core/theme/app_colors.dart';
 import 'package:mekuru/core/notifications/presentation/controllers/notification_controller.dart';
 import 'package:mekuru/features/archive/presentation/providers/archive_provider.dart';
@@ -123,7 +124,7 @@ class ArchivePage extends ConsumerWidget {
                         ),
                       const SizedBox(width: 16),
                       InkWell(
-                        onTap: () => _confirmDelete(context, ref, task),
+                        onTap: () => _showDeleteBottomSheet(context, ref, task),
                         borderRadius: BorderRadius.circular(20),
                         child: const Padding(
                           padding: EdgeInsets.all(4.0),
@@ -366,39 +367,61 @@ class ArchivePage extends ConsumerWidget {
     }
   }
   
-  Future<void> _confirmDelete(BuildContext context, WidgetRef ref, ArchiveTask task) async {
-    final result = await showDialog<bool>(
+  void _showDeleteBottomSheet(BuildContext context, WidgetRef ref, ArchiveTask task) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    showModalBottomSheet(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('確認刪除', style: TextStyle(fontWeight: FontWeight.bold)),
-        content: const Text('您確定要刪除這個下載任務與已下載的檔案嗎？這項操作無法還原。'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('取消', style: TextStyle(fontWeight: FontWeight.w600)),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.redAccent,
-              foregroundColor: Colors.white,
-              elevation: 0,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (ctx) => Container(
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF2F2F7),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        padding: const EdgeInsets.only(left: 24, right: 24, top: 12, bottom: 48),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: isDark ? Colors.white24 : Colors.black12,
+                borderRadius: BorderRadius.circular(2),
+              ),
             ),
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('刪除', style: TextStyle(fontWeight: FontWeight.bold)),
-          ),
-        ],
+            const SizedBox(height: 24),
+            Center(
+              child: Text(
+                '刪除封存任務與漫畫',
+                style: TextStyle(
+                  fontFamily: 'Outfit',
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 2.0,
+                  color: isDark ? Colors.white54 : Colors.black54,
+                ),
+              ),
+            ),
+            const SizedBox(height: 32),
+            SwipeToObliterateButton(
+              title: '滑動以刪除',
+              isLoading: false,
+              activeColor: Colors.redAccent,
+              onConfirmed: () async {
+                Navigator.pop(ctx);
+                final success = await ref.read(archiveProvider.notifier).deleteComic(task.providerId, task.comicId);
+                final notificationCtrl = ref.read(notificationProvider.notifier);
+                if (success) {
+                  notificationCtrl.showSuccess('已刪除任務與漫畫');
+                } else {
+                  notificationCtrl.showError('刪除失敗');
+                }
+              },
+            ),
+          ],
+        ),
       ),
     );
-    
-    if (result == true) {
-      final success = await ref.read(archiveProvider.notifier).deleteComic(task.providerId, task.comicId);
-      final notificationCtrl = ref.read(notificationProvider.notifier);
-      if (success) {
-        notificationCtrl.showSuccess('已刪除任務');
-      } else {
-        notificationCtrl.showError('刪除失敗');
-      }
-    }
   }
 }

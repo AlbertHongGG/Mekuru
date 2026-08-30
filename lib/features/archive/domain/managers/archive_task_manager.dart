@@ -82,9 +82,9 @@ class ArchiveTaskManager extends Notifier<List<ArchiveTask>> implements IArchive
     }
   }
 
-  ArchiveTask _updateChapterMemory(String taskId, ChapterTask chTask, {bool persist = false}) {
+  ArchiveTask? _updateChapterMemory(String taskId, ChapterTask chTask, {bool persist = false}) {
     final idx = state.indexWhere((t) => t.taskId == taskId);
-    if (idx == -1) return const ArchiveTask(providerId: '', comicId: '');
+    if (idx == -1) return null;
     final currentTask = state[idx];
     final newChapters = Map<String, ChapterTask>.from(currentTask.chapters);
     newChapters[chTask.chapterId] = chTask;
@@ -234,13 +234,12 @@ class ArchiveTaskManager extends Notifier<List<ArchiveTask>> implements IArchive
 
   @override
   Future<void> cancelTask(String providerId, String comicId) async {
-    final idx = state.indexWhere((t) => t.providerId == providerId && t.comicId == comicId);
-    if (idx != -1) {
-      final task = state[idx];
-      final newTasks = List<ArchiveTask>.from(state);
-      newTasks.removeAt(idx);
-      state = newTasks;
-      await _taskStorage.deleteTask(task.taskId);
+    final tasksToRemove = state.where((t) => t.providerId == providerId && t.comicId == comicId).toList();
+    if (tasksToRemove.isNotEmpty) {
+      state = state.where((t) => !(t.providerId == providerId && t.comicId == comicId)).toList();
+      for (final t in tasksToRemove) {
+        await _taskStorage.deleteTask(t.taskId);
+      }
     }
   }
 
@@ -325,13 +324,17 @@ class ArchiveTaskManager extends Notifier<List<ArchiveTask>> implements IArchive
             final chTask = task.chapters[chId]!;
             if (chTask.status == ArchiveTaskStatus.completed) continue;
             
-            task = _updateChapterMemory(task.taskId, chTask.copyWith(status: ArchiveTaskStatus.downloading), persist: true);
+            final updatedTask = _updateChapterMemory(task.taskId, chTask.copyWith(status: ArchiveTaskStatus.downloading), persist: true);
+              if (updatedTask == null) throw Exception('Task deleted');
+              task = updatedTask;
             
             try {
               final pagesResult = await provider.getChapterImages(task.comicId, chId);
               final pages = pagesResult.getOrThrow();
               
-              task = _updateChapterMemory(task.taskId, task.chapters[chId]!.copyWith(totalPages: pages.length), persist: true);
+              final updatedTask = _updateChapterMemory(task.taskId, task.chapters[chId]!.copyWith(totalPages: pages.length), persist: true);
+              if (updatedTask == null) throw Exception('Task deleted');
+              task = updatedTask;
               
               int downloaded = task.chapters[chId]!.downloadedPages;
               
@@ -360,15 +363,19 @@ class ArchiveTaskManager extends Notifier<List<ArchiveTask>> implements IArchive
                  }));
                  
                  downloaded += batch.length;
-                 task = _updateChapterMemory(task.taskId, task.chapters[chId]!.copyWith(downloadedPages: downloaded), persist: false);
+                 final updatedTask = _updateChapterMemory(task.taskId, task.chapters[chId]!.copyWith(downloadedPages: downloaded), persist: false);
+              if (updatedTask == null) throw Exception('Task deleted');
+              task = updatedTask;
               }
               
               // Mark chapter as completed and set archivedAt
               final completedAt = DateTime.now();
-              task = _updateChapterMemory(task.taskId, task.chapters[chId]!.copyWith(
+              final updatedTask2 = _updateChapterMemory(task.taskId, task.chapters[chId]!.copyWith(
                 status: ArchiveTaskStatus.completed,
                 archivedAt: completedAt,
               ), persist: true);
+              if (updatedTask2 == null) throw Exception('Task deleted');
+              task = updatedTask2;
               
               // Update local comic chapter metadata
               if (localComic != null) {
@@ -389,7 +396,8 @@ class ArchiveTaskManager extends Notifier<List<ArchiveTask>> implements IArchive
               }
               
             } catch (e) {
-              task = _updateChapterMemory(task.taskId, task.chapters[chId]!.copyWith(status: ArchiveTaskStatus.error, errorMessage: e.toString()), persist: true);
+              final updatedTask = _updateChapterMemory(task.taskId, task.chapters[chId]!.copyWith(status: ArchiveTaskStatus.error, errorMessage: e.toString()), persist: true);
+              if (updatedTask != null) task = updatedTask;
               rethrow;
             }
           }

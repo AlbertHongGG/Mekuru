@@ -22,6 +22,8 @@ abstract class IMediaStorage {
   Future<String> saveImage(String providerId, String comicId, String chapterId, int pageIndex, Uint8List bytes, String ext);
   Future<Uint8List?> readImage(String relativePath);
   Future<void> deleteMedia(String providerId, String comicId);
+  Future<String> getBaseDirectory();
+  Future<String> getComicDirectory(String providerId, String comicId);
 }
 
 class HiveLocalLibraryStorage implements ILocalLibraryStorage {
@@ -111,5 +113,17 @@ class FileSystemMediaStorage implements IMediaStorage {
     if (await fileDir.exists()) {
       await fileDir.delete(recursive: true);
     }
+  }
+
+  @override
+  Future<String> getBaseDirectory() async {
+    final base = await _getBaseDir();
+    return base.path;
+  }
+
+  @override
+  Future<String> getComicDirectory(String providerId, String comicId) async {
+    final base = await _getBaseDir();
+    return '${base.path}/$providerId/$comicId';
   }
 }

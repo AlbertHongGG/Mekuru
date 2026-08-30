@@ -3,6 +3,7 @@ import 'package:mekuru/core/data/local/i_local_storage.dart';
 import 'package:mekuru/core/data/local/local_storage_providers.dart';
 import 'package:mekuru/core/data/providers/repository_providers.dart';
 import 'package:mekuru/core/notifications/presentation/controllers/notification_controller.dart';
+import 'package:mekuru/features/archive/domain/managers/local_library_manager.dart';
 import 'package:mekuru/features/comic/domain/models/comic_card_data.dart';
 
 class ExploreState {
@@ -67,6 +68,13 @@ class ExploreNotifier extends AutoDisposeFamilyNotifier<ExploreState, String> {
     final List<String> loadedKnownTags = (_tagsBox.get(_knownTagsKey) as List?)?.cast<String>() ?? <String>[];
     final List<String> loadedActiveTags = (_tagsBox.get(_activeTagsKey) as List?)?.cast<String>() ?? <String>[];
     final bool loadedExcludeMode = _tagsBox.get(_isExcludeModeKey) as bool? ?? false;
+
+    if (arg == 'local') {
+      final subscription = ref.watch(localLibraryManagerProvider).watchLibraryChanges().listen((_) {
+        loadExplore();
+      });
+      ref.onDispose(() => subscription.cancel());
+    }
 
     Future.microtask(() => loadExplore());
     return ExploreState(

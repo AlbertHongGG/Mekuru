@@ -10,6 +10,9 @@ import 'package:mekuru/features/archive/presentation/providers/archive_provider.
 import 'package:mekuru/features/comic/presentation/widgets/chapter_list_bottom_sheet.dart';
 import 'package:mekuru/core/widgets/comic_image.dart';
 import 'package:mekuru/core/widgets/expandable_text.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:mekuru/features/archive/presentation/widgets/backup_task_dialog.dart';
+import 'package:mekuru/features/archive/presentation/providers/backup_task_provider.dart';
 
 class ComicDetailsPage extends ConsumerWidget {
   final String providerId;
@@ -170,7 +173,8 @@ class ComicDetailsPage extends ConsumerWidget {
                   ),
                 ),
                 actions: [
-                  Padding(
+                  if (providerId != 'local')
+                    Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
                     child: Material(
                       color: Colors.black.withValues(alpha: 0.4),
@@ -179,7 +183,8 @@ class ComicDetailsPage extends ConsumerWidget {
                       child: Consumer(
                         builder: (context, ref, _) {
                           final archiveState = ref.watch(archiveProvider);
-                          final isQueued = archiveState.tasks.any((t) => t.comicId == comicId && t.providerId == providerId);
+                          final originalProviderId = comic.providerId;
+                          final isQueued = archiveState.tasks.any((t) => t.comicId == comicId && t.providerId == (providerId == 'local' ? originalProviderId : providerId));
                           
                           return IconButton(
                             icon: Icon(
@@ -193,7 +198,8 @@ class ComicDetailsPage extends ConsumerWidget {
                                 notificationCtrl.showInfo('已在下載佇列中');
                                 return;
                               }
-                              final error = await ref.read(archiveProvider.notifier).startDownload(providerId, comicId);
+                              final targetProvider = providerId == 'local' ? originalProviderId : providerId;
+                              final error = await ref.read(archiveProvider.notifier).startDownload(targetProvider, comicId);
                               if (error == null) {
                                 notificationCtrl.showSuccess('已加入下載任務');
                               } else {
@@ -237,6 +243,101 @@ class ComicDetailsPage extends ConsumerWidget {
                       ),
                     ),
                   ),
+                  if (providerId == 'local')
+                    Padding(
+                      padding: const EdgeInsets.only(left: 4.0, right: 12.0, top: 8.0, bottom: 8.0),
+                      child: Material(
+                        color: Colors.black.withValues(alpha: 0.4),
+                        shape: const CircleBorder(),
+                        clipBehavior: Clip.antiAlias,
+                        child: PopupMenuButton<String>(
+                          icon: const Icon(Icons.more_vert_rounded, color: Colors.white, size: 22),
+                          onSelected: (value) async {
+                            if (value == 'update') {
+                              final added = await ref.read(comicDetailsProvider((providerId: providerId, comicId: comicId)).notifier).checkLocalUpdate();
+                              if (context.mounted) {
+                                if (added == null) {
+                                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('檢查更新失敗')));
+                                } else if (added == 0) {
+                                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('已是最新版本')));
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('成功追加 \$added 尚未封存的章節')));
+                                }
+                              }
+                            } else if (value == 'export') {
+                              final selectedDirectory = await FilePicker.getDirectoryPath(dialogTitle: '選擇匯出資料夾');
+                              if (selectedDirectory != null) {
+                                final now = DateTime.now();
+                                final timestamp = '${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}_${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}';
+                                final safeTitle = state.comic?.title.replaceAll(RegExp(r'[<>:"/\\|?*]'), '_') ?? comicId;
+                                final destinationPath = '$selectedDirectory/${safeTitle}_$timestamp.mekuru_comic';
+                                
+                                await runWithBackupDialog(context, ref, () async {
+                                  await ref.read(comicDetailsProvider((providerId: providerId, comicId: comicId)).notifier).exportLocalComic(destinationPath);
+                                });
+                                
+                                final backupState = ref.read(backupTaskProvider);
+                                if (backupState.error != null) {
+                                  ref.read(notificationProvider.notifier).showError('匯出漫畫失敗: ${backupState.error}');
+                                } else {
+                                  ref.read(notificationProvider.notifier).showSuccess('漫畫已成功匯出至:\n$destinationPath');
+                                }
+                              }
+                            } else if (value == 'delete') {
+                              final confirmed = await showDialog<bool>(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: const Text('確認刪除'),
+                                  content: const Text('確定要徹底刪除此本地漫畫與所有下載的圖檔嗎？此動作無法復原。'),
+                                  actions: [
+                                    TextButton(onPressed: () => context.pop(false), child: const Text('取消')),
+                                    TextButton(onPressed: () => context.pop(true), child: const Text('刪除', style: TextStyle(color: Colors.red))),
+                                  ],
+                                ),
+                              );
+                              if (confirmed == true) {
+                                await ref.read(comicDetailsProvider((providerId: providerId, comicId: comicId)).notifier).confirmDeleteLocalComic();
+                                if (context.mounted) {
+                                  context.pop(); // Go back after deletion
+                                }
+                              }
+                            }
+                          },
+                          itemBuilder: (BuildContext context) => [
+                            const PopupMenuItem<String>(
+                              value: 'update',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.update_rounded, size: 20),
+                                  SizedBox(width: 8),
+                                  Text('補封存 / 更新章節'),
+                                ],
+                              ),
+                            ),
+                            const PopupMenuItem<String>(
+                              value: 'export',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.ios_share_rounded, size: 20),
+                                  SizedBox(width: 8),
+                                  Text('匯出漫畫'),
+                                ],
+                              ),
+                            ),
+                            const PopupMenuItem<String>(
+                              value: 'delete',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.delete_forever_rounded, color: Colors.red, size: 20),
+                                  SizedBox(width: 8),
+                                  Text('徹底刪除', style: TextStyle(color: Colors.red)),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                 ],
               ),
               

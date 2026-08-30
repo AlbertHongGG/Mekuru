@@ -45,6 +45,11 @@ class ArchiveTaskManager extends Notifier<List<ArchiveTask>> implements IArchive
   Future<void> cancelTask(String providerId, String comicId) async {
     await _downloadService.cancelTask(providerId, comicId);
   }
+
+  @override
+  Future<int> enqueueUpdateTask(String providerId, String comicId) async {
+    return await _downloadService.enqueueUpdateTask(providerId, comicId);
+  }
 }
 
 final archiveTaskManagerProvider = NotifierProvider<ArchiveTaskManager, List<ArchiveTask>>(() {

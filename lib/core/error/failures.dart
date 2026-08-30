@@ -16,6 +16,10 @@ class ProviderFailure extends Failure {
   const ProviderFailure(super.message);
 }
 
+class LocalComicNotFoundFailure extends Failure {
+  const LocalComicNotFoundFailure([super.message = '當前漫畫資料遺失']);
+}
+
 class UnknownFailure extends Failure {
   const UnknownFailure([super.message = '發生未知的錯誤']);
 }

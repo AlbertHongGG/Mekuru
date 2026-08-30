@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mekuru/features/archive/data/sources/archive_storage.dart';
 import 'package:mekuru/core/data/local/local_storage_providers.dart';
@@ -9,12 +10,18 @@ class LocalLibraryManager implements ILocalLibraryManager {
   final ILocalLibraryStorage _libraryStorage;
   final IMediaStorage _mediaStorage;
   final Ref _ref;
+  
+  final _changeController = StreamController<void>.broadcast();
 
   LocalLibraryManager(this._libraryStorage, this._mediaStorage, this._ref);
+  
+  @override
+  Stream<void> watchLibraryChanges() => _changeController.stream;
 
   @override
   Future<void> saveComic(LocalComicEntity comic) async {
     await _libraryStorage.saveComic(comic);
+    _changeController.add(null);
   }
 
   @override
@@ -37,6 +44,9 @@ class LocalLibraryManager implements ILocalLibraryManager {
     
     // 3. Remove metadata from local database.
     await _libraryStorage.deleteComic(comicId);
+    
+    // 4. Notify listeners that the library has changed.
+    _changeController.add(null);
   }
 }
 

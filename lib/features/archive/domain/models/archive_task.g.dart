@@ -64,7 +64,7 @@ Map<String, dynamic> _$ArchiveTaskToJson(_ArchiveTask instance) =>
       'comicTitle': instance.comicTitle,
       'coverUrl': instance.coverUrl,
       'status': _$ArchiveTaskStatusEnumMap[instance.status]!,
-      'chapters': instance.chapters.map((k, e) => MapEntry(k, e.toJson())),
+      'chapters': instance.chapters,
       'errorMessage': instance.errorMessage,
       'createdAt': instance.createdAt?.toIso8601String(),
       'updatedAt': instance.updatedAt?.toIso8601String(),

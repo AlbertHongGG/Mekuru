@@ -62,6 +62,14 @@ class ArchiveNotifier extends Notifier<ArchiveState> {
     }
   }
 
+  Future<int?> checkUpdate(String providerId, String comicId) async {
+    try {
+      return await ref.read(archiveTaskManagerProvider.notifier).enqueueUpdateTask(providerId, comicId);
+    } catch (e) {
+      return null;
+    }
+  }
+
   Future<String?> startDownload(String providerId, String comicId) async {
     try {
       await ref.read(archiveTaskManagerProvider.notifier).enqueueTask(providerId, comicId);

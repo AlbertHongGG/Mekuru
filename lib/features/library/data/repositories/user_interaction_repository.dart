@@ -288,6 +288,15 @@ class UserInteractionRepository {
       await _favoritesBox.delete(id);
     }
   }
+  Future<void> deleteInteraction({
+    required String providerId,
+    required String comicId,
+  }) async {
+    final id = _genId(providerId, comicId);
+    await _favoritesBox.delete(id);
+    await _historyBox.delete(id);
+    await _metadataBox.delete(id);
+  }
 }
 
 final userInteractionRepositoryProvider = Provider<UserInteractionRepository>((ref) {

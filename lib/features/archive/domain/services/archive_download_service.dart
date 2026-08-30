@@ -53,6 +53,21 @@ class ArchiveDownloadService {
     }
   }
 
+  Future<void> reloadTasksFromStorage() async {
+    final storedTasks = await _taskStorage.getActiveTasks();
+    // Merge with current in-memory tasks
+    for (final st in storedTasks) {
+      final index = _tasks.indexWhere((t) => t.taskId == st.taskId);
+      if (index == -1) {
+        _tasks.add(st);
+      } else {
+        _tasks[index] = st;
+      }
+    }
+    _emit(force: true);
+    _processQueue();
+  }
+
   // Throttle emit logic
   DateTime _lastEmitTime = DateTime.now();
   void _emit({bool force = false}) {
@@ -131,6 +146,77 @@ class ArchiveDownloadService {
     } catch (e) {
       throw Exception('Failed to enqueue task: $e');
     }
+  }
+
+  Future<int> enqueueUpdateTask(String providerId, String comicId) async {
+    final provider = _providerRegistry.getProvider(providerId);
+    final detailResult = await provider.getComicDetail(comicId);
+    if (detailResult.isFailure) throw Exception('Failed to get comic details');
+    final comicDetail = detailResult.getOrThrow();
+    
+    final chaptersResult = await provider.getChapterList(comicId, isDescending: false);
+    if (chaptersResult.isFailure) throw Exception('Failed to get chapters');
+    final remoteChapters = chaptersResult.getOrThrow();
+
+    final localComic = await _libraryManager.getComic(comicId);
+    if (localComic == null) throw Exception('Comic not found locally. Please perform a full download first.');
+
+    final newChapterIds = remoteChapters.map((c) => c.id).where((id) => !localComic.chapterIds.contains(id)).toList();
+    
+    if (newChapterIds.isEmpty) {
+      return 0; // nothing to update
+    }
+
+    // Update local metadata chapterIds
+    final updatedComic = localComic.copyWith(
+      chapterIds: remoteChapters.map((c) => c.id).toList(),
+      title: comicDetail.title, // sync metadata if needed
+      coverUrl: comicDetail.coverUrl,
+      archivedAt: DateTime.now(),
+    );
+    await _libraryManager.saveComic(updatedComic);
+
+    // Build the delta chapters for the task
+    final chapterTasks = <String, ChapterTask>{};
+    for (final ch in remoteChapters.where((c) => newChapterIds.contains(c.id))) {
+      chapterTasks[ch.id] = ChapterTask(
+        chapterId: ch.id,
+        title: ch.title,
+        status: ArchiveTaskStatus.queued,
+      );
+    }
+
+    final taskId = '${providerId}_$comicId';
+    final existingIndex = _tasks.indexWhere((t) => t.taskId == taskId);
+
+    if (existingIndex != -1) {
+      // Merge delta chapters into existing task
+      var existingTask = _tasks[existingIndex];
+      final newChapters = Map<String, ChapterTask>.from(existingTask.chapters);
+      newChapters.addAll(chapterTasks);
+      existingTask = existingTask.copyWith(
+        chapters: newChapters,
+        status: ArchiveTaskStatus.queued,
+        updatedAt: DateTime.now(),
+      );
+      _updateTaskMemory(existingTask, persist: true, emit: true);
+    } else {
+      final task = ArchiveTask(
+        providerId: providerId,
+        comicId: comicId,
+        comicTitle: comicDetail.title,
+        coverUrl: comicDetail.coverUrl,
+        chapters: chapterTasks,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+      _tasks.add(task);
+      await _taskStorage.saveTask(task);
+      _emit(force: true);
+    }
+
+    _processQueue();
+    return newChapterIds.length;
   }
 
   Future<void> pauseTask(String providerId, String comicId) async {

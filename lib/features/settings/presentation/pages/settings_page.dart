@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mekuru/features/settings/presentation/providers/settings_provider.dart';
@@ -13,6 +12,7 @@ import 'package:mekuru/features/comic/data/sources/provider_registry.dart';
 import 'package:mekuru/features/logger/presentation/pages/system_log_viewer_screen.dart';
 import 'package:mekuru/features/logger/presentation/pages/api_log_list_page.dart';
 import 'package:mekuru/features/backup/presentation/widgets/backup_section.dart';
+import 'package:mekuru/features/settings/presentation/widgets/archive_section.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
@@ -116,6 +116,8 @@ class SettingsPage extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
           const BackupSection(),
+          const SizedBox(height: 16),
+          const ArchiveSection(),
         ],
       ),
     );

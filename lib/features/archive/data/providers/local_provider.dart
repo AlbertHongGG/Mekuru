@@ -40,7 +40,7 @@ class LocalProvider implements IComicProvider {
     try {
       final comic = await _libraryManager.getComic(comicId);
       if (comic == null) {
-        return Error(ProviderFailure('Comic not found in local library'));
+        return const Error(LocalComicNotFoundFailure());
       }
       return Success(ComicDetail(
         providerId: 'local',
@@ -61,7 +61,7 @@ class LocalProvider implements IComicProvider {
     try {
       final comic = await _libraryManager.getComic(comicId);
       if (comic == null) {
-        return Error(ProviderFailure('Comic not found'));
+        return const Error(LocalComicNotFoundFailure());
       }
       final chapters = comic.chapterIds.map((id) => Chapter(id: id, title: 'Chapter $id')).toList();
       return Success(isDescending ? chapters.reversed.toList() : chapters);

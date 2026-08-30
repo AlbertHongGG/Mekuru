@@ -8,7 +8,6 @@ import 'package:mekuru/features/comic/presentation/widgets/chapter_list_bottom_s
 import 'package:mekuru/features/viewer/presentation/providers/comic_viewer_provider.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:mekuru/features/viewer/presentation/widgets/webtoon_image_placeholder.dart';
-import 'package:mekuru/core/widgets/app_bottom_sheet.dart';
 import 'package:mekuru/core/widgets/comic_image.dart';
 import 'package:mekuru/features/viewer/presentation/widgets/viewer_top_bar.dart';
 import 'package:mekuru/features/viewer/presentation/widgets/viewer_bottom_bar.dart';

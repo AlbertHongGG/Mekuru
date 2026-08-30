@@ -87,8 +87,6 @@ class ComicViewerNotifier extends AutoDisposeFamilyNotifier<ComicViewerState, ({
       final comic = detailsState.comic;
       final chapter = detailsState.chapters.firstWhere((c) => c.id == arg.chapterId);
 
-      final settings = ref.read(settingsProvider);
-      
       _interactionRepo = interactionRepo;
       _comic = comic;
       _chapterTitle = chapter.title;

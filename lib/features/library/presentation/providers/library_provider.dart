@@ -92,8 +92,6 @@ class LibraryNotifier extends Notifier<LibraryState> {
     state = state.copyWith(isLoading: true, error: null);
     try {
       final interactionRepo = ref.read(userInteractionRepositoryProvider);
-      final settings = ref.read(settingsProvider);
-      
       final records = await interactionRepo.getAllFavorites();
 
       final availableProviders = records.map((r) => r.providerId).toSet().toList();

@@ -5,6 +5,10 @@ import 'package:mekuru/core/data/providers/repository_providers.dart';
 import 'package:mekuru/core/notifications/presentation/controllers/notification_controller.dart';
 import 'package:mekuru/features/archive/domain/managers/local_library_manager.dart';
 import 'package:mekuru/features/comic/domain/models/comic_card_data.dart';
+import 'package:mekuru/features/comic/domain/models/paginated_result.dart';
+import 'package:mekuru/features/comic/domain/models/comic_base.dart';
+import 'package:mekuru/features/comic/domain/usecases/search_comics_usecase.dart';
+import 'package:mekuru/core/error/result.dart';
 
 class ExploreState {
   final bool isLoading;
@@ -130,15 +134,26 @@ class ExploreNotifier extends AutoDisposeFamilyNotifier<ExploreState, String> {
     if (state.isLoading || (!state.hasNext && loadMore)) return;
 
     final repo = ref.read(comicRepositoryProvider);
+    final searchUseCase = ref.read(searchComicsUseCaseProvider);
     final nextPage = loadMore ? state.page + 1 : 1;
 
     if (!loadMore) {
-      state = state.copyWith(isLoading: true, comics: [], error: null, page: 1, searchQuery: '');
+      if (state.searchQuery.isEmpty) {
+        state = state.copyWith(isLoading: true, comics: [], error: null, page: 1, searchQuery: '');
+      } else {
+        state = state.copyWith(isLoading: true, comics: [], error: null, page: 1);
+      }
     } else {
       state = state.copyWith(isLoading: true, error: null);
     }
 
-    final result = await repo.exploreComics(arg, nextPage);
+    final Result<PaginatedResult<IComicItem>, Failure> result;
+    
+    if (state.searchQuery.isNotEmpty) {
+      result = await searchUseCase.execute(arg, state.searchQuery, nextPage);
+    } else {
+      result = await repo.exploreComics(arg, nextPage);
+    }
     
     result.fold(
       (paginated) {
@@ -153,38 +168,19 @@ class ExploreNotifier extends AutoDisposeFamilyNotifier<ExploreState, String> {
       },
       (failure) {
         state = state.copyWith(isLoading: false, error: failure.message);
-        ref.read(notificationProvider.notifier).showError('探索加載失敗: ${failure.message}');
+        ref.read(notificationProvider.notifier).showError('加載失敗: ${failure.message}');
       },
     );
   }
 
   Future<void> search(String query) async {
     if (query.trim().isEmpty) {
+      state = state.copyWith(searchQuery: '');
       return loadExplore();
     }
 
-    final repo = ref.read(comicRepositoryProvider);
-    
-    state = state.copyWith(isLoading: true, comics: [], error: null, searchQuery: query, page: 1, hasNext: false);
-
-    final result = await repo.searchComics(arg, query, 1);
-    
-    result.fold(
-      (paginated) {
-        final cardDataList = paginated.items.map((c) => ComicCardData.fromComic(c)).toList();
-        _extractTags(cardDataList);
-        state = state.copyWith(
-          isLoading: false,
-          comics: cardDataList,
-          page: paginated.page,
-          hasNext: paginated.hasNext,
-        );
-      },
-      (failure) {
-        state = state.copyWith(isLoading: false, error: failure.message);
-        ref.read(notificationProvider.notifier).showError('搜尋失敗: ${failure.message}');
-      },
-    );
+    state = state.copyWith(searchQuery: query);
+    return loadExplore();
   }
 }
 

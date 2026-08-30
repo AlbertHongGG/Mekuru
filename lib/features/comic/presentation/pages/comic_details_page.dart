@@ -13,6 +13,7 @@ import 'package:mekuru/core/widgets/expandable_text.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:mekuru/features/archive/presentation/widgets/backup_task_dialog.dart';
 import 'package:mekuru/features/archive/presentation/providers/backup_task_provider.dart';
+import 'package:mekuru/core/widgets/swipe_to_obliterate_button.dart';
 
 class ComicDetailsPage extends ConsumerWidget {
   final String providerId;
@@ -173,166 +174,87 @@ class ComicDetailsPage extends ConsumerWidget {
                   ),
                 ),
                 actions: [
-                  if (providerId != 'local')
-                    Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
-                    child: Material(
-                      color: Colors.black.withValues(alpha: 0.4),
-                      shape: const CircleBorder(),
-                      clipBehavior: Clip.antiAlias,
-                      child: Consumer(
-                        builder: (context, ref, _) {
-                          final archiveState = ref.watch(archiveProvider);
-                          final originalProviderId = comic.providerId;
-                          final isQueued = archiveState.tasks.any((t) => t.comicId == comicId && t.providerId == (providerId == 'local' ? originalProviderId : providerId));
-                          
-                          return IconButton(
-                            icon: Icon(
-                              isQueued ? Icons.cloud_done_rounded : Icons.download_rounded,
-                              color: isQueued ? Colors.greenAccent : Colors.white,
-                              size: 22,
-                            ),
-                            onPressed: () async {
-                              final notificationCtrl = ref.read(notificationProvider.notifier);
-                              if (isQueued) {
-                                notificationCtrl.showInfo('已在下載佇列中');
-                                return;
-                              }
-                              final targetProvider = providerId == 'local' ? originalProviderId : providerId;
-                              final error = await ref.read(archiveProvider.notifier).startDownload(targetProvider, comicId);
-                              if (error == null) {
-                                notificationCtrl.showSuccess('已加入下載任務');
-                              } else {
-                                notificationCtrl.showError('加入失敗: $error');
-                              }
-                            },
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
-                    child: Material(
-                      color: Colors.black.withValues(alpha: 0.4),
-                      shape: const CircleBorder(),
-                      clipBehavior: Clip.antiAlias,
-                      child: IconButton(
-                        icon: Icon(
-                          isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                          color: isFavorite ? Colors.redAccent : Colors.white,
-                          size: 22,
-                        ),
-                        onPressed: () => notifier.toggleFavorite(),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 4.0, right: 12.0, top: 8.0, bottom: 8.0),
-                    child: Material(
-                      color: Colors.black.withValues(alpha: 0.4),
-                      shape: const CircleBorder(),
-                      clipBehavior: Clip.antiAlias,
-                      child: IconButton(
-                        icon: const Icon(
-                          Icons.format_list_bulleted_rounded,
-                          color: Colors.white,
-                          size: 22,
-                        ),
-                        onPressed: () => _showChapterList(context, ref, state, notifier),
-                      ),
-                    ),
-                  ),
                   if (providerId == 'local')
-                    Padding(
-                      padding: const EdgeInsets.only(left: 4.0, right: 12.0, top: 8.0, bottom: 8.0),
-                      child: Material(
-                        color: Colors.black.withValues(alpha: 0.4),
-                        shape: const CircleBorder(),
-                        clipBehavior: Clip.antiAlias,
-                        child: PopupMenuButton<String>(
-                          icon: const Icon(Icons.more_vert_rounded, color: Colors.white, size: 22),
-                          onSelected: (value) async {
-                            if (value == 'update') {
-                              final added = await ref.read(comicDetailsProvider((providerId: providerId, comicId: comicId)).notifier).checkLocalUpdate();
-                              if (context.mounted) {
-                                if (added == null) {
-                                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('檢查更新失敗')));
-                                } else if (added == 0) {
-                                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('已是最新版本')));
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('成功追加 $added 尚未封存的章節')));
-                                }
-                              }
-                            } else if (value == 'export') {
-                              final selectedDirectory = await FilePicker.getDirectoryPath(dialogTitle: '選擇匯出資料夾');
-                              if (selectedDirectory != null) {
-                                await runWithBackupDialog(context, ref, () async {
-                                  await ref.read(comicDetailsProvider((providerId: providerId, comicId: comicId)).notifier).exportLocalComic(selectedDirectory);
-                                });
-                                
-                                final backupState = ref.read(backupTaskProvider);
-                                if (backupState.error != null) {
-                                  ref.read(notificationProvider.notifier).showError('匯出漫畫失敗: ${backupState.error}');
-                                } else {
-                                  ref.read(notificationProvider.notifier).showSuccess('漫畫匯出完成！');
-                                }
-                              }
-                            } else if (value == 'delete') {
-                              final confirmed = await showDialog<bool>(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                  title: const Text('確認刪除'),
-                                  content: const Text('確定要徹底刪除此本地漫畫與所有下載的圖檔嗎？此動作無法復原。'),
-                                  actions: [
-                                    TextButton(onPressed: () => context.pop(false), child: const Text('取消')),
-                                    TextButton(onPressed: () => context.pop(true), child: const Text('刪除', style: TextStyle(color: Colors.red))),
-                                  ],
-                                ),
-                              );
-                              if (confirmed == true) {
-                                await ref.read(comicDetailsProvider((providerId: providerId, comicId: comicId)).notifier).confirmDeleteLocalComic();
-                                if (context.mounted) {
-                                  context.pop(); // Go back after deletion
-                                }
-                              }
+                    _buildActionButton(
+                      icon: Icons.update_rounded,
+                      onPressed: () async {
+                        final notificationCtrl = ref.read(notificationProvider.notifier);
+                        final added = await ref.read(comicDetailsProvider((providerId: providerId, comicId: comicId)).notifier).checkLocalUpdate();
+                        if (added == null) {
+                          notificationCtrl.showError('檢查更新失敗');
+                        } else if (added == 0) {
+                          notificationCtrl.showInfo('已是最新版本');
+                        } else {
+                          notificationCtrl.showSuccess('成功追加 $added 尚未封存章節');
+                        }
+                      },
+                    ),
+                  if (providerId != 'local')
+                    Consumer(
+                      builder: (context, ref, _) {
+                        final archiveState = ref.watch(archiveProvider);
+                        final originalProviderId = comic.providerId;
+                        final isQueued = archiveState.tasks.any((t) => t.comicId == comicId && t.providerId == (providerId == 'local' ? originalProviderId : providerId));
+                        
+                        return _buildActionButton(
+                          icon: isQueued ? Icons.cloud_done_rounded : Icons.download_rounded,
+                          color: isQueued ? Colors.greenAccent : Colors.white,
+                          onPressed: () async {
+                            final notificationCtrl = ref.read(notificationProvider.notifier);
+                            if (isQueued) {
+                              notificationCtrl.showInfo('已在下載佇列');
+                              return;
+                            }
+                            final targetProvider = providerId == 'local' ? originalProviderId : providerId;
+                            final error = await ref.read(archiveProvider.notifier).startDownload(targetProvider, comicId);
+                            if (error == null) {
+                              notificationCtrl.showSuccess('已加入下載任務');
+                            } else {
+                              notificationCtrl.showError('加入失敗: $error');
                             }
                           },
-                          itemBuilder: (BuildContext context) => [
-                            const PopupMenuItem<String>(
-                              value: 'update',
-                              child: Row(
-                                children: [
-                                  Icon(Icons.update_rounded, size: 20),
-                                  SizedBox(width: 8),
-                                  Text('補封存 / 更新章節'),
-                                ],
-                              ),
-                            ),
-                            const PopupMenuItem<String>(
-                              value: 'export',
-                              child: Row(
-                                children: [
-                                  Icon(Icons.ios_share_rounded, size: 20),
-                                  SizedBox(width: 8),
-                                  Text('匯出漫畫'),
-                                ],
-                              ),
-                            ),
-                            const PopupMenuItem<String>(
-                              value: 'delete',
-                              child: Row(
-                                children: [
-                                  Icon(Icons.delete_forever_rounded, color: Colors.red, size: 20),
-                                  SizedBox(width: 8),
-                                  Text('徹底刪除', style: TextStyle(color: Colors.red)),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                        );
+                      },
                     ),
+                  if (providerId == 'local')
+                    _buildActionButton(
+                      icon: Icons.ios_share_rounded,
+                      onPressed: () async {
+                        final selectedDirectory = await FilePicker.getDirectoryPath(dialogTitle: '選擇匯出資料夾');
+                        if (selectedDirectory != null) {
+                          if (!context.mounted) return;
+                          final notificationCtrl = ref.read(notificationProvider.notifier);
+                          await runWithBackupDialog(context, ref, () async {
+                            await ref.read(comicDetailsProvider((providerId: providerId, comicId: comicId)).notifier).exportLocalComic(selectedDirectory);
+                          });
+                          
+                          final backupState = ref.read(backupTaskProvider);
+                          if (backupState.error != null) {
+                            notificationCtrl.showError('匯出漫畫失敗: ${backupState.error}');
+                          } else {
+                            notificationCtrl.showSuccess('漫畫匯出完成');
+                          }
+                        }
+                      },
+                    ),
+                  _buildActionButton(
+                    icon: isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                    color: isFavorite ? Colors.redAccent : Colors.white,
+                    onPressed: () => notifier.toggleFavorite(),
+                  ),
+                  _buildActionButton(
+                    icon: Icons.format_list_bulleted_rounded,
+                    onPressed: () => _showChapterList(context, ref, state, notifier),
+                  ),
+                  if (providerId == 'local')
+                    _buildActionButton(
+                      icon: Icons.delete_outline_rounded,
+                      color: Colors.redAccent,
+                      padding: const EdgeInsets.only(left: 4.0, right: 12.0, top: 8.0, bottom: 8.0),
+                      onPressed: () => _showDeleteBottomSheet(context, ref, comicId),
+                    ),
+                  if (providerId != 'local')
+                    const SizedBox(width: 8.0),
                 ],
               ),
               
@@ -620,6 +542,82 @@ class ComicDetailsPage extends ConsumerWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+
+  Widget _buildActionButton({
+    required IconData icon,
+    required VoidCallback onPressed,
+    Color color = Colors.white,
+    EdgeInsetsGeometry padding = const EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
+  }) {
+    return Padding(
+      padding: padding,
+      child: Material(
+        color: Colors.black.withValues(alpha: 0.4),
+        shape: const CircleBorder(),
+        clipBehavior: Clip.antiAlias,
+        child: IconButton(
+          icon: Icon(icon, color: color, size: 22),
+          onPressed: onPressed,
+        ),
+      ),
+    );
+  }
+
+  void _showDeleteBottomSheet(BuildContext context, WidgetRef ref, String comicId) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (ctx) => Container(
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF2F2F7),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        padding: const EdgeInsets.only(left: 24, right: 24, top: 12, bottom: 48),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: isDark ? Colors.white24 : Colors.black12,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Center(
+              child: Text(
+                '徹底刪除漫畫',
+                style: TextStyle(
+                  fontFamily: 'Outfit',
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 2.0,
+                  color: isDark ? Colors.white54 : Colors.black54,
+                ),
+              ),
+            ),
+            const SizedBox(height: 32),
+            SwipeToObliterateButton(
+              title: '滑動以刪除',
+              isLoading: false,
+              activeColor: Colors.redAccent,
+              onConfirmed: () async {
+                Navigator.pop(ctx);
+                await ref.read(comicDetailsProvider((providerId: 'local', comicId: comicId)).notifier).confirmDeleteLocalComic();
+                if (context.mounted) {
+                  context.pop();
+                }
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

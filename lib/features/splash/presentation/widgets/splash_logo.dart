@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../core/constants/app_assets.dart';
+import 'package:mekuru/core/constants/app_assets.dart';
 
 class SplashLogo extends StatelessWidget {
   final Animation<double> fadeAnimation;

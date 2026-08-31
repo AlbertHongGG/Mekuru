@@ -13,7 +13,7 @@ import 'package:mekuru/features/viewer/presentation/pages/comic_viewer_page.dart
 import 'package:mekuru/core/notifications/presentation/widgets/global_notification_overlay.dart';
 import 'package:mekuru/features/library/domain/services/local_interaction_sync_service.dart';
 
-import 'package:mekuru/presentation/splash/splash_page.dart';
+import 'package:mekuru/features/splash/presentation/pages/splash_page.dart';
 
 import 'package:mekuru/core/routes/app_routes.dart';
 

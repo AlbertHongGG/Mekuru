@@ -40,7 +40,7 @@ class SplashTitle extends StatelessWidget {
                   return Container(
                     width: 120 * fadeAnimation.value, // Line grows from center
                     height: 1,
-                    color: const Color(0xFF1D1D1F).withOpacity(0.3),
+                    color: const Color(0xFF1D1D1F).withValues(alpha: 0.3),
                   );
                 },
               ),

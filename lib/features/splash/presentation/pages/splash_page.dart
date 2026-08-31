@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mekuru/core/data/local/database_manager.dart';
 
-import 'widgets/splash_logo.dart';
-import 'widgets/splash_title.dart';
+import '../widgets/splash_logo.dart';
+import '../widgets/splash_title.dart';
 
 class SplashPage extends StatefulWidget {
   final VoidCallback? onInitializationComplete;

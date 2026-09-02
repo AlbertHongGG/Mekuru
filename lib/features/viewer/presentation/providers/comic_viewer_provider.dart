@@ -4,7 +4,6 @@ import 'package:mekuru/features/library/data/repositories/user_interaction_repos
 import 'package:mekuru/features/comic/domain/models/page.dart';
 import 'package:mekuru/core/notifications/presentation/controllers/notification_controller.dart';
 import 'package:mekuru/features/comic/presentation/providers/comic_details_provider.dart';
-import 'package:mekuru/features/settings/presentation/providers/settings_provider.dart';
 
 class ComicViewerState {
   final bool isLoading;
@@ -12,6 +11,10 @@ class ComicViewerState {
   final String? error;
   final int initialAnchorIndex;
   final double initialAnchorOffset;
+  final String comicTitle;
+  final String chapterTitle;
+  final String? prevChapterId;
+  final String? nextChapterId;
 
   ComicViewerState({
     this.isLoading = true,
@@ -19,6 +22,10 @@ class ComicViewerState {
     this.error,
     this.initialAnchorIndex = 0,
     this.initialAnchorOffset = 0.0,
+    this.comicTitle = '',
+    this.chapterTitle = '載入中...',
+    this.prevChapterId,
+    this.nextChapterId,
   });
 
   ComicViewerState copyWith({
@@ -27,6 +34,10 @@ class ComicViewerState {
     String? error,
     int? initialAnchorIndex,
     double? initialAnchorOffset,
+    String? comicTitle,
+    String? chapterTitle,
+    String? prevChapterId,
+    String? nextChapterId,
   }) {
     return ComicViewerState(
       isLoading: isLoading ?? this.isLoading,
@@ -34,6 +45,10 @@ class ComicViewerState {
       error: error ?? this.error,
       initialAnchorIndex: initialAnchorIndex ?? this.initialAnchorIndex,
       initialAnchorOffset: initialAnchorOffset ?? this.initialAnchorOffset,
+      comicTitle: comicTitle ?? this.comicTitle,
+      chapterTitle: chapterTitle ?? this.chapterTitle,
+      prevChapterId: prevChapterId ?? this.prevChapterId,
+      nextChapterId: nextChapterId ?? this.nextChapterId,
     );
   }
 }
@@ -106,11 +121,42 @@ class ComicViewerNotifier extends AutoDisposeFamilyNotifier<ComicViewerState, ({
         }
       } catch (_) {}
 
+      String? prevChapterId;
+      String? nextChapterId;
+      if (detailsState.chapters.isNotEmpty) {
+        final index = detailsState.chapters.indexWhere((c) => c.id == arg.chapterId);
+        if (index != -1) {
+          bool isNativeDescending = false; 
+          if (detailsState.chapters.length > 1) {
+            final chaptersWithNumbers = detailsState.chapters.where((c) => RegExp(r'\d+').hasMatch(c.title)).toList();
+            if (chaptersWithNumbers.length > 1) {
+              final int1 = int.parse(RegExp(r'\d+').firstMatch(chaptersWithNumbers.first.title)!.group(0)!);
+              final int2 = int.parse(RegExp(r'\d+').firstMatch(chaptersWithNumbers.last.title)!.group(0)!);
+              if (int1 > int2) {
+                isNativeDescending = true;
+              }
+            }
+          }
+          final chronologicallyPrevIndex = isNativeDescending ? index + 1 : index - 1;
+          final chronologicallyNextIndex = isNativeDescending ? index - 1 : index + 1;
+          if (chronologicallyPrevIndex >= 0 && chronologicallyPrevIndex < detailsState.chapters.length) {
+            prevChapterId = detailsState.chapters[chronologicallyPrevIndex].id;
+          }
+          if (chronologicallyNextIndex >= 0 && chronologicallyNextIndex < detailsState.chapters.length) {
+            nextChapterId = detailsState.chapters[chronologicallyNextIndex].id;
+          }
+        }
+      }
+
       state = state.copyWith(
         isLoading: false,
         pages: pages,
         initialAnchorIndex: initAnchorIndex,
         initialAnchorOffset: initAnchorOffset,
+        comicTitle: comic?.title ?? '',
+        chapterTitle: chapter.title,
+        prevChapterId: prevChapterId,
+        nextChapterId: nextChapterId,
       );
 
       if (comic != null) {

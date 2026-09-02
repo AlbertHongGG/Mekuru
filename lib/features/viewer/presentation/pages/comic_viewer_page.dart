@@ -36,10 +36,8 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
   
   Timer? _debounceTimer;
   
-  // Radar system keys
-  final GlobalKey _viewportKey = GlobalKey();
-  List<GlobalKey> _sliverKeys = [];
-  List<GlobalKey> _itemKeys = [];
+  // Phase 1: Lightweight dynamic radar
+  final Map<int, GlobalKey> _activeKeys = {};
   
   bool _initialized = false;
   int _lastSavedPacked = -1;
@@ -51,6 +49,7 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
     super.initState();
     _notifier = ref.read(comicViewerProvider((providerId: widget.providerId, comicId: widget.comicId, chapterId: widget.chapterId)).notifier);
   }
+  
   @override
   void dispose() {
     _debounceTimer?.cancel();
@@ -64,16 +63,18 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
   double _currentAnchorOffset = 0.0;
 
   void _calculateCurrentAnchor() {
-    if (_itemKeys.isEmpty) return;
+    if (_activeKeys.isEmpty || _scrollController == null || !_scrollController!.hasClients) return;
     
-    final viewportContext = _viewportKey.currentContext;
-    if (viewportContext == null) return;
-    
-    final viewportBox = viewportContext.findRenderObject() as RenderBox?;
+    final context = _scrollController!.position.context.notificationContext;
+    if (context == null) return;
+    final viewportBox = context.findRenderObject() as RenderBox?;
     if (viewportBox == null) return;
 
-    for (int i = 0; i < _itemKeys.length; i++) {
-      final key = _itemKeys[i];
+    double? bestOffset;
+    int bestIndex = 0;
+
+    for (final entry in _activeKeys.entries) {
+      final key = entry.value;
       if (key.currentContext != null) {
         final renderBox = key.currentContext!.findRenderObject() as RenderBox?;
         if (renderBox != null) {
@@ -82,12 +83,24 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
           final bottom = top + renderBox.size.height;
           
           if (bottom > 0) { 
-            _currentAnchorIndex = i;
-            _currentAnchorOffset = top < 0 ? -top : 0.0;
-            break;
+            if (top <= 0 && bottom > 0) {
+              _currentAnchorIndex = entry.key;
+              _currentAnchorOffset = -top;
+              return;
+            } else if (top > 0) {
+              if (bestOffset == null || top < bestOffset) {
+                bestOffset = top;
+                bestIndex = entry.key;
+              }
+            }
           }
         }
       }
+    }
+    
+    if (bestOffset != null) {
+      _currentAnchorIndex = bestIndex;
+      _currentAnchorOffset = 0.0; 
     }
   }
 
@@ -102,10 +115,8 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
   bool _onScrollNotification(ScrollNotification notification) {
     if (_scrollController == null || !_scrollController!.hasClients) return false;
     
-    // 1. Instantly calculate visual anchor on every frame (O(N) where N is only loaded slivers - extremely fast)
     _calculateCurrentAnchor();
     
-    // 2. UI Progress calculation
     final offset = _scrollController!.offset;
     final minOffset = _scrollController!.position.minScrollExtent;
     final maxOffset = _scrollController!.position.maxScrollExtent;
@@ -116,7 +127,6 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
        _progressNotifier.value = percentage;
     }
 
-    // 3. Debounce the actual Hive DB write
     if (notification is ScrollEndNotification) {
       _saveProgress();
     } else {
@@ -176,7 +186,7 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
   }
 
   void _navigateToChapter(String chapterId) {
-    _saveProgress(); // Save before navigating away
+    _saveProgress(); 
     context.pushReplacement('/viewer/${widget.providerId}/${widget.comicId}/$chapterId');
   }
 
@@ -185,65 +195,27 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
     final arg = (providerId: widget.providerId, comicId: widget.comicId, chapterId: widget.chapterId);
     final state = ref.watch(comicViewerProvider(arg));
     
-    final detailsArg = (providerId: widget.providerId, comicId: widget.comicId);
-    final detailsState = ref.watch(comicDetailsProvider(detailsArg));
-
-    String chapterTitle = '載入中...';
-    String comicTitle = detailsState.comic?.title ?? '';
-    String? prevChapterId;
-    String? nextChapterId;
-
-    if (detailsState.chapters.isNotEmpty) {
-      final index = detailsState.chapters.indexWhere((c) => c.id == widget.chapterId);
-      if (index != -1) {
-        chapterTitle = detailsState.chapters[index].title;
-        bool isNativeDescending = false; 
-        if (detailsState.chapters.length > 1) {
-          final chaptersWithNumbers = detailsState.chapters.where((c) => RegExp(r'\d+').hasMatch(c.title)).toList();
-          if (chaptersWithNumbers.length > 1) {
-            final int1 = int.parse(RegExp(r'\d+').firstMatch(chaptersWithNumbers.first.title)!.group(0)!);
-            final int2 = int.parse(RegExp(r'\d+').firstMatch(chaptersWithNumbers.last.title)!.group(0)!);
-            if (int1 > int2) {
-              isNativeDescending = true;
-            }
-          }
-        }
-        
-        final chronologicallyPrevIndex = isNativeDescending ? index + 1 : index - 1;
-        final chronologicallyNextIndex = isNativeDescending ? index - 1 : index + 1;
-
-        if (chronologicallyPrevIndex >= 0 && chronologicallyPrevIndex < detailsState.chapters.length) {
-          prevChapterId = detailsState.chapters[chronologicallyPrevIndex].id;
-        }
-        if (chronologicallyNextIndex >= 0 && chronologicallyNextIndex < detailsState.chapters.length) {
-          nextChapterId = detailsState.chapters[chronologicallyNextIndex].id;
-        }
-      }
-    }
-
     if (!_initialized && state.pages.isNotEmpty) {
-      // Generate keys for the radar system
-      _sliverKeys = List.generate(state.pages.length, (_) => GlobalKey());
-      _itemKeys = List.generate(state.pages.length, (_) => GlobalKey());
-      
-      int targetIndex = state.initialAnchorIndex;
-      if (targetIndex >= state.pages.length) targetIndex = state.pages.length - 1;
-      if (targetIndex < 0) targetIndex = 0;
-      
       _scrollController = ScrollController(initialScrollOffset: state.initialAnchorOffset);
       _initialized = true;
+      _currentAnchorIndex = state.initialAnchorIndex;
+      _currentAnchorOffset = state.initialAnchorOffset;
       
-      // Calculate initial percentage UI 
       if (state.pages.length > 1) {
-         _progressNotifier.value = targetIndex / (state.pages.length - 1);
+         _progressNotifier.value = state.initialAnchorIndex / (state.pages.length - 1);
       }
     }
+
+    int initialIndex = state.initialAnchorIndex;
+    if (initialIndex >= state.pages.length) initialIndex = state.pages.length - 1;
+    if (initialIndex < 0) initialIndex = 0;
+    
+    final centerKey = const ValueKey('center_sliver');
 
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          // 1. Image Viewer Layer
           state.isLoading && state.pages.isEmpty
               ? GestureDetector(
                   onTap: _toggleUI,
@@ -259,79 +231,90 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
                   : NotificationListener<ScrollNotification>(
                       onNotification: _onScrollNotification,
                       child: CustomScrollView(
-                        key: _viewportKey,
                         controller: _scrollController,
-                        cacheExtent: 5000.0, 
                         physics: const ClampingScrollPhysics(),
-                        center: state.pages.isNotEmpty && _sliverKeys.isNotEmpty 
-                            ? _sliverKeys[state.initialAnchorIndex < state.pages.length ? state.initialAnchorIndex : 0]
-                            : null,
+                        center: state.pages.isNotEmpty ? centerKey : null,
                         slivers: [
+                          if (state.pages.isNotEmpty && initialIndex > 0)
+                            SliverList.builder(
+                              itemCount: initialIndex,
+                              itemBuilder: (context, idx) {
+                                final reversedIndex = initialIndex - 1 - idx;
+                                return _buildPage(state.pages[reversedIndex].imageUrl, reversedIndex);
+                              },
+                            ),
                           if (state.pages.isNotEmpty)
-                            for (int i = 0; i < state.pages.length; i++)
-                              SliverToBoxAdapter(
-                                key: _sliverKeys[i], // Center anchor key
-                                child: GestureDetector(
-                                  onTap: _toggleUI,
-                                  behavior: HitTestBehavior.opaque,
-                                  child: Container(
-                                    key: _itemKeys[i], // Position radar key
-                                    width: double.infinity,
-                                    color: Colors.transparent,
-                                    child: ComicImage(
-                                      imageUrl: state.pages[i].imageUrl,
-                                      providerId: widget.providerId,
-                                      fit: BoxFit.fitWidth, 
-                                      loadStateChanged: (ExtendedImageState imgState) {
-                                        switch (imgState.extendedImageLoadState) {
-                                          case LoadState.loading:
-                                            return WebtoonImagePlaceholder(index: i);
-                                          case LoadState.completed:
-                                            return null; 
-                                          case LoadState.failed:
-                                            return SizedBox(
-                                              height: 200,
-                                              child: Center(
-                                                child: Column(
-                                                  mainAxisAlignment: MainAxisAlignment.center,
-                                                  children: [
-                                                    const Icon(Icons.broken_image, color: Colors.white54, size: 48),
-                                                    const SizedBox(height: 8),
-                                                    TextButton(
-                                                      onPressed: () => imgState.reLoadImage(),
-                                                      child: const Text('重新載入', style: TextStyle(color: Colors.white)),
-                                                    )
-                                                  ],
-                                                ),
-                                              ),
-                                            );
-                                        }
-                                      },
-                                    ),
-                                  ),
-                                ),
-                              ),
+                            SliverList.builder(
+                              key: centerKey,
+                              itemCount: state.pages.length - initialIndex,
+                              itemBuilder: (context, idx) {
+                                final realIndex = initialIndex + idx;
+                                return _buildPage(state.pages[realIndex].imageUrl, realIndex);
+                              },
+                            ),
                         ],
                       ),
                     ),
 
-          // 2. Top Bar
           ViewerTopBar(
             isVisible: _showUI,
-            comicTitle: comicTitle,
-            chapterTitle: chapterTitle,
+            comicTitle: state.comicTitle,
+            chapterTitle: state.chapterTitle,
             onMenuPressed: () => _showChapterList(),
           ),
 
-          // 3. Bottom Bar
           ViewerBottomBar(
             isVisible: _showUI,
             progressNotifier: _progressNotifier,
             hasPages: state.pages.isNotEmpty,
-            onPrevChapter: prevChapterId != null ? () => _navigateToChapter(prevChapterId!) : null,
-            onNextChapter: nextChapterId != null ? () => _navigateToChapter(nextChapterId!) : null,
+            onPrevChapter: state.prevChapterId != null ? () => _navigateToChapter(state.prevChapterId!) : null,
+            onNextChapter: state.nextChapterId != null ? () => _navigateToChapter(state.nextChapterId!) : null,
           ),
         ],
+      ),
+    );
+  }
+  
+  Widget _buildPage(String imageUrl, int index) {
+    final key = _activeKeys.putIfAbsent(index, () => GlobalKey());
+    
+    return GestureDetector(
+      onTap: _toggleUI,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        key: key,
+        width: double.infinity,
+        color: Colors.transparent,
+        child: ComicImage(
+          imageUrl: imageUrl,
+          providerId: widget.providerId,
+          fit: BoxFit.fitWidth, 
+          loadStateChanged: (ExtendedImageState imgState) {
+            switch (imgState.extendedImageLoadState) {
+              case LoadState.loading:
+                return WebtoonImagePlaceholder(index: index);
+              case LoadState.completed:
+                return null; 
+              case LoadState.failed:
+                return SizedBox(
+                  height: 200,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.broken_image, color: Colors.white54, size: 48),
+                        const SizedBox(height: 8),
+                        TextButton(
+                          onPressed: () => imgState.reLoadImage(),
+                          child: const Text('重新載入', style: TextStyle(color: Colors.white)),
+                        )
+                      ],
+                    ),
+                  ),
+                );
+            }
+          },
+        ),
       ),
     );
   }

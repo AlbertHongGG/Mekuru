@@ -93,4 +93,30 @@ class ProviderImageProvider extends ImageProvider<ProviderImageProvider> {
 
   @override
   int get hashCode => Object.hash(url, provider.providerId);
+
+  /// Phase 1: Pure Disk Preloading
+  /// Downloads the image and saves it to the disk cache without decoding it into memory.
+  static Future<void> preload(String url, IComicProvider provider) async {
+    try {
+      final tempDir = await getTemporaryDirectory();
+      final cacheDir = Directory('${tempDir.path}/mekuru_image_cache_v3');
+      if (!await cacheDir.exists()) {
+        await cacheDir.create(recursive: true);
+      }
+
+      final hash = md5.convert(utf8.encode(url)).toString();
+      final cacheFile = File('${cacheDir.path}/$hash');
+
+      if (await cacheFile.exists()) {
+        final len = await cacheFile.length();
+        if (len >= 100) return; // Already cached and seems valid
+      }
+
+      // Fetch and write to disk
+      final bytes = await provider.fetchImageBytes(url);
+      await cacheFile.writeAsBytes(bytes);
+    } catch (e) {
+      debugPrint('Preload failed for $url: $e');
+    }
+  }
 }

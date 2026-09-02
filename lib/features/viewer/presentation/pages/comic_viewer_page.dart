@@ -232,6 +232,7 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
                       onNotification: _onScrollNotification,
                       child: CustomScrollView(
                         controller: _scrollController,
+                        cacheExtent: 500.0, // Reduced from 2500 since we have disk preloading
                         physics: const ClampingScrollPhysics(),
                         center: state.pages.isNotEmpty ? centerKey : null,
                         slivers: [

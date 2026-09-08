@@ -32,7 +32,7 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
   bool _showUI = false;
   
   ScrollController? _scrollController;
-  final ValueNotifier<double> _progressNotifier = ValueNotifier<double>(0.0);
+  final ValueNotifier<int> _currentIndexNotifier = ValueNotifier<int>(0);
   
   Timer? _debounceTimer;
   
@@ -40,6 +40,7 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
   final Map<int, GlobalKey> _activeKeys = {};
   
   bool _initialized = false;
+  bool _targetImageLoaded = false;
   int _lastSavedPacked = -1;
 
   late final dynamic _notifier;
@@ -55,7 +56,7 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
     _debounceTimer?.cancel();
     _saveProgress(); // GUARANTEED PERSISTENCE ON EXIT
     _scrollController?.dispose();
-    _progressNotifier.dispose();
+    _currentIndexNotifier.dispose();
     super.dispose();
   }
   
@@ -63,7 +64,7 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
   double _currentAnchorOffset = 0.0;
 
   void _calculateCurrentAnchor() {
-    if (_activeKeys.isEmpty || _scrollController == null || !_scrollController!.hasClients) return;
+    if (!_targetImageLoaded || _activeKeys.isEmpty || _scrollController == null || !_scrollController!.hasClients) return;
     
     final context = _scrollController!.position.context.notificationContext;
     if (context == null) return;
@@ -116,16 +117,7 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
     if (_scrollController == null || !_scrollController!.hasClients) return false;
     
     _calculateCurrentAnchor();
-    
-    final offset = _scrollController!.offset;
-    final minOffset = _scrollController!.position.minScrollExtent;
-    final maxOffset = _scrollController!.position.maxScrollExtent;
-    final totalRange = maxOffset - minOffset;
-    
-    if (totalRange > 0) {
-       double percentage = ((offset - minOffset) / totalRange).clamp(0.0, 1.0);
-       _progressNotifier.value = percentage;
-    }
+    _currentIndexNotifier.value = _currentAnchorIndex;
 
     if (notification is ScrollEndNotification) {
       _saveProgress();
@@ -201,8 +193,9 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
       _currentAnchorIndex = state.initialAnchorIndex;
       _currentAnchorOffset = state.initialAnchorOffset;
       
-      if (state.pages.length > 1) {
-         _progressNotifier.value = state.initialAnchorIndex / (state.pages.length - 1);
+      _currentIndexNotifier.value = _currentAnchorIndex;
+      if (_currentAnchorOffset <= 0.0) {
+        _targetImageLoaded = true;
       }
     }
 
@@ -230,28 +223,39 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
                     )
                   : NotificationListener<ScrollNotification>(
                       onNotification: _onScrollNotification,
-                      child: CustomScrollView(
-                        controller: _scrollController,
-                        cacheExtent: 500.0, // Reduced from 2500 since we have disk preloading
-                        physics: const ClampingScrollPhysics(),
-                        center: state.pages.isNotEmpty ? centerKey : null,
-                        slivers: [
-                          if (state.pages.isNotEmpty && initialIndex > 0)
-                            SliverList.builder(
-                              itemCount: initialIndex,
-                              itemBuilder: (context, idx) {
-                                final reversedIndex = initialIndex - 1 - idx;
-                                return _buildPage(state.pages[reversedIndex].imageUrl, reversedIndex);
-                              },
-                            ),
-                          if (state.pages.isNotEmpty)
-                            SliverList.builder(
-                              key: centerKey,
-                              itemCount: state.pages.length - initialIndex,
-                              itemBuilder: (context, idx) {
-                                final realIndex = initialIndex + idx;
-                                return _buildPage(state.pages[realIndex].imageUrl, realIndex);
-                              },
+                      child: Stack(
+                        children: [
+                          CustomScrollView(
+                            controller: _scrollController,
+                            cacheExtent: 5000.0, // Increased to 5000 to prevent dynamic unmounting issues
+                            physics: const ClampingScrollPhysics(),
+                            center: state.pages.isNotEmpty ? centerKey : null,
+                            slivers: [
+                              if (state.pages.isNotEmpty && initialIndex > 0)
+                                SliverList.builder(
+                                  itemCount: initialIndex,
+                                  itemBuilder: (context, idx) {
+                                    final reversedIndex = initialIndex - 1 - idx;
+                                    return _buildPage(state.pages[reversedIndex].imageUrl, reversedIndex, state.initialAnchorIndex);
+                                  },
+                                ),
+                              if (state.pages.isNotEmpty)
+                                SliverList.builder(
+                                  key: centerKey,
+                                  itemCount: state.pages.length - initialIndex,
+                                  itemBuilder: (context, idx) {
+                                    final realIndex = initialIndex + idx;
+                                    return _buildPage(state.pages[realIndex].imageUrl, realIndex, state.initialAnchorIndex);
+                                  },
+                                ),
+                            ],
+                          ),
+                          if (!_targetImageLoaded)
+                            Container(
+                              color: Colors.black,
+                              child: const Center(
+                                child: CircularProgressIndicator(color: AppColors.primary),
+                              ),
                             ),
                         ],
                       ),
@@ -266,7 +270,8 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
 
           ViewerBottomBar(
             isVisible: _showUI,
-            progressNotifier: _progressNotifier,
+            currentIndexNotifier: _currentIndexNotifier,
+            totalPages: state.pages.length,
             hasPages: state.pages.isNotEmpty,
             onPrevChapter: state.prevChapterId != null ? () => _navigateToChapter(state.prevChapterId!) : null,
             onNextChapter: state.nextChapterId != null ? () => _navigateToChapter(state.nextChapterId!) : null,
@@ -276,7 +281,7 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
     );
   }
   
-  Widget _buildPage(String imageUrl, int index) {
+  Widget _buildPage(String imageUrl, int index, int initialAnchorIndex) {
     final key = _activeKeys.putIfAbsent(index, () => GlobalKey());
     
     return GestureDetector(
@@ -291,7 +296,21 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
           providerId: widget.providerId,
           fit: BoxFit.fitWidth, 
           loadStateChanged: (ExtendedImageState imgState) {
-            switch (imgState.extendedImageLoadState) {
+            final loadState = imgState.extendedImageLoadState;
+            
+            if (loadState == LoadState.completed || loadState == LoadState.failed) {
+              if (index == initialAnchorIndex && !_targetImageLoaded) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (mounted) {
+                    setState(() {
+                      _targetImageLoaded = true;
+                    });
+                  }
+                });
+              }
+            }
+
+            switch (loadState) {
               case LoadState.loading:
                 return WebtoonImagePlaceholder(index: index);
               case LoadState.completed:

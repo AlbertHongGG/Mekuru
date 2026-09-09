@@ -11,7 +11,6 @@ import 'package:mekuru/features/viewer/presentation/widgets/webtoon_image_placeh
 import 'package:mekuru/core/widgets/comic_image.dart';
 import 'package:mekuru/features/viewer/presentation/widgets/viewer_top_bar.dart';
 import 'package:mekuru/features/viewer/presentation/widgets/viewer_bottom_bar.dart';
-import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class ComicViewerPage extends ConsumerStatefulWidget {
   final String providerId;
@@ -32,8 +31,13 @@ class ComicViewerPage extends ConsumerStatefulWidget {
 class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
   bool _showUI = false;
   
+  ScrollController? _scrollController;
   final ValueNotifier<int> _currentIndexNotifier = ValueNotifier<int>(0);
-  Timer? _debounceTimer;
+  
+  Timer? _actionDebounceTimer;
+  
+  final Map<int, GlobalKey> _activeKeys = {};
+  final Map<int, double> _pageHeights = {};
   
   bool _initialized = false;
   bool _targetImageLoaded = false;
@@ -41,102 +45,167 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
 
   late final dynamic _notifier;
 
-  // 動態視口核心控制器
-  final ItemScrollController _itemScrollController = ItemScrollController();
-  final ItemPositionsListener _itemPositionsListener = ItemPositionsListener.create();
-
   int _currentAnchorIndex = 0;
   double _currentAnchorOffset = 0.0;
-  double _viewportHeight = 0.0;
 
   @override
   void initState() {
     super.initState();
     _notifier = ref.read(comicViewerProvider((providerId: widget.providerId, comicId: widget.comicId, chapterId: widget.chapterId)).notifier);
-    _itemPositionsListener.itemPositions.addListener(_onItemPositionsChanged);
   }
   
+  void _setupScrollController(double initialOffset) {
+    if (_scrollController != null) return;
+    _scrollController = ScrollController(initialScrollOffset: initialOffset);
+    _scrollController!.addListener(() {
+      _calculateUIProgress();
+      _calculateSaveAnchor();
+      
+      // 【效能徹底解放】: 當畫面在滑動時，絕對不進行任何重度運算。
+      // 只有當手指離開、且畫面完全靜止 500 毫秒後，才在背景存檔與預載。
+      _actionDebounceTimer?.cancel();
+      _actionDebounceTimer = Timer(const Duration(milliseconds: 500), () {
+        _saveProgress();
+        _notifier.triggerPreload(_currentIndexNotifier.value);
+      });
+    });
+  }
+
   @override
   void dispose() {
-    _debounceTimer?.cancel();
-    _saveProgress(); // 保證退出時存檔
+    _actionDebounceTimer?.cancel();
+    _saveProgress(); 
+    _scrollController?.dispose();
     _currentIndexNotifier.dispose();
-    _itemPositionsListener.itemPositions.removeListener(_onItemPositionsChanged);
     super.dispose();
   }
 
-  void _onItemPositionsChanged() {
-    final positions = _itemPositionsListener.itemPositions.value;
-    if (positions.isEmpty || _viewportHeight <= 0) return;
+  void _updatePageHeight(int index, double height) {
+    if (_pageHeights[index] != height) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          setState(() {
+            _pageHeights[index] = height;
+          });
+        }
+      });
+    }
+  }
+
+  void _calculateSaveAnchor() {
+    if (!_targetImageLoaded || _activeKeys.isEmpty || _scrollController == null || !_scrollController!.hasClients) return;
+    
+    final context = _scrollController!.position.context.notificationContext;
+    if (context == null) return;
+    final viewportBox = context.findRenderObject() as RenderBox?;
+    if (viewportBox == null) return;
+
+    double? bestOffset;
+    int bestIndex = 0;
 
     final arg = (providerId: widget.providerId, comicId: widget.comicId, chapterId: widget.chapterId);
     final totalPages = ref.read(comicViewerProvider(arg)).pages.length;
     if (totalPages == 0) return;
 
-    // 1. Pixel-Perfect Memory: 找出跨越頂部邊界的圖片
-    ItemPosition? bestSavePosition;
-    for (final pos in positions) {
-      if (pos.itemLeadingEdge <= 0 && pos.itemTrailingEdge > 0) {
-        bestSavePosition = pos;
-        break;
-      }
-      if (pos.itemLeadingEdge > 0) {
-        if (bestSavePosition == null || pos.itemLeadingEdge < bestSavePosition.itemLeadingEdge) {
-          bestSavePosition = pos;
+    final currentIndex = _currentIndexNotifier.value;
+    final startIndex = (currentIndex - 3).clamp(0, totalPages > 0 ? totalPages - 1 : 0);
+    final endIndex = (currentIndex + 3).clamp(0, totalPages > 0 ? totalPages - 1 : 0);
+
+    for (int i = startIndex; i <= endIndex; i++) {
+      final key = _activeKeys[i];
+      if (key != null && key.currentContext != null) {
+        final renderBox = key.currentContext!.findRenderObject() as RenderBox?;
+        if (renderBox != null) {
+          final position = renderBox.localToGlobal(Offset.zero, ancestor: viewportBox);
+          final top = position.dy;
+          final bottom = top + renderBox.size.height;
+          
+          if (bottom > 0) { 
+            if (top <= 0 && bottom > 0) {
+              _currentAnchorIndex = i;
+              _currentAnchorOffset = -top;
+              return;
+            } else if (top > 0) {
+              if (bestOffset == null || top < bestOffset) {
+                bestOffset = top;
+                bestIndex = i;
+              }
+            }
+          }
         }
       }
     }
     
-    if (bestSavePosition != null) {
-      _currentAnchorIndex = bestSavePosition.index;
-      _currentAnchorOffset = -bestSavePosition.itemLeadingEdge * _viewportHeight;
-      if (_currentAnchorOffset < 0) _currentAnchorOffset = 0;
+    if (bestOffset != null) {
+      _currentAnchorIndex = bestIndex;
+      _currentAnchorOffset = 0.0; 
+    }
+  }
+
+  void _calculateUIProgress() {
+    if (!_targetImageLoaded || _activeKeys.isEmpty || _scrollController == null || !_scrollController!.hasClients) return;
+    
+    final context = _scrollController!.position.context.notificationContext;
+    if (context == null) return;
+    final viewportBox = context.findRenderObject() as RenderBox?;
+    if (viewportBox == null) return;
+    
+    final viewportHeight = viewportBox.size.height;
+    
+    final arg = (providerId: widget.providerId, comicId: widget.comicId, chapterId: widget.chapterId);
+    final state = ref.read(comicViewerProvider(arg));
+    final totalPages = state.pages.length;
+    if (totalPages == 0) return;
+
+    final position = _scrollController!.position;
+    
+    if (position.pixels >= position.maxScrollExtent - 2) {
+      _updateUiIndex(totalPages - 1);
+      return;
+    }
+    
+    if (position.pixels <= position.minScrollExtent + 2) {
+      _updateUiIndex(0);
+      return;
     }
 
-    // 2. UI Progress: 計算面積最大的圖片
     int maxAreaIndex = _currentIndexNotifier.value;
     double maxArea = -1.0;
-    
-    bool isAtAbsoluteBottom = false;
-    bool isAtAbsoluteTop = false;
 
-    for (final pos in positions) {
-      final visibleTop = pos.itemLeadingEdge < 0 ? 0.0 : pos.itemLeadingEdge;
-      final visibleBottom = pos.itemTrailingEdge > 1 ? 1.0 : pos.itemTrailingEdge;
-      final visibleHeight = visibleBottom - visibleTop;
-      
-      if (visibleHeight > maxArea) {
-         maxArea = visibleHeight;
-         maxAreaIndex = pos.index;
-      }
-      
-      // 動態鎖定邊界，徹底消滅估算坍塌的浮點數誤差
-      if (pos.index == totalPages - 1 && pos.itemTrailingEdge <= 1.001) {
-         isAtAbsoluteBottom = true;
-      }
-      if (pos.index == 0 && pos.itemLeadingEdge >= -0.001) {
-         isAtAbsoluteTop = true;
-      }
-    }
+    final currentIndex = _currentIndexNotifier.value;
+    final startIndex = (currentIndex - 3).clamp(0, totalPages > 0 ? totalPages - 1 : 0);
+    final endIndex = (currentIndex + 3).clamp(0, totalPages > 0 ? totalPages - 1 : 0);
 
-    int newUiIndex = maxAreaIndex;
-    if (isAtAbsoluteBottom) {
-      newUiIndex = totalPages - 1;
-    } else if (isAtAbsoluteTop) {
-      newUiIndex = 0;
-    }
-
-    if (_currentIndexNotifier.value != newUiIndex) {
-      _currentIndexNotifier.value = newUiIndex;
-      // 獨立預載引擎：即時觸發，不等存檔
-      _notifier.triggerPreload(newUiIndex);
+    for (int i = startIndex; i <= endIndex; i++) {
+      final key = _activeKeys[i];
+      if (key != null && key.currentContext != null) {
+        final renderBox = key.currentContext!.findRenderObject() as RenderBox?;
+        if (renderBox != null) {
+          final renderPosition = renderBox.localToGlobal(Offset.zero, ancestor: viewportBox);
+          final top = renderPosition.dy;
+          final bottom = top + renderBox.size.height;
+          
+          if (bottom > 0 && top < viewportHeight) {
+            final visibleTop = top < 0 ? 0.0 : top;
+            final visibleBottom = bottom > viewportHeight ? viewportHeight : bottom;
+            final visibleHeight = visibleBottom - visibleTop;
+            
+            if (visibleHeight > maxArea) {
+               maxArea = visibleHeight;
+               maxAreaIndex = i;
+            }
+          }
+        }
+      }
     }
     
-    // 存檔防抖機制
-    _debounceTimer?.cancel();
-    _debounceTimer = Timer(const Duration(milliseconds: 800), () {
-      _saveProgress();
-    });
+    _updateUiIndex(maxAreaIndex);
+  }
+
+  void _updateUiIndex(int newIndex) {
+    if (_currentIndexNotifier.value != newIndex) {
+      _currentIndexNotifier.value = newIndex;
+    }
   }
 
   void _saveProgress() {
@@ -195,6 +264,7 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
   }
 
   void _navigateToChapter(String chapterId) {
+    _actionDebounceTimer?.cancel();
     _saveProgress(); 
     context.pushReplacement('/viewer/${widget.providerId}/${widget.comicId}/$chapterId');
   }
@@ -204,6 +274,9 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
     final arg = (providerId: widget.providerId, comicId: widget.comicId, chapterId: widget.chapterId);
     final state = ref.watch(comicViewerProvider(arg));
     
+    final screenWidth = MediaQuery.of(context).size.width;
+    final defaultHeight = screenWidth > 0 ? screenWidth * 1.5 : 800.0;
+
     if (!_initialized && state.pages.isNotEmpty) {
       _initialized = true;
       _currentAnchorIndex = state.initialAnchorIndex;
@@ -213,11 +286,14 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
       if (_currentAnchorOffset <= 0.0) {
         _targetImageLoaded = true;
       }
+      _setupScrollController(state.initialAnchorOffset);
     }
 
     int initialIndex = state.initialAnchorIndex;
     if (initialIndex >= state.pages.length) initialIndex = state.pages.length - 1;
     if (initialIndex < 0) initialIndex = 0;
+
+    final centerKey = const ValueKey('center_sliver');
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -235,39 +311,49 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
                       behavior: HitTestBehavior.opaque,
                       child: Center(child: Text('錯誤: ${state.error}', style: const TextStyle(color: Colors.white))),
                     )
-                  : LayoutBuilder(
-                      builder: (context, constraints) {
-                        _viewportHeight = constraints.maxHeight;
-                        
-                        double initialAlignment = 0;
-                        if (_viewportHeight > 0 && state.initialAnchorOffset > 0) {
-                          // 動態數學轉換：利用 Alignment 達成像素級偏移還原
-                          initialAlignment = -(state.initialAnchorOffset / _viewportHeight);
-                        }
-
-                        return Stack(
-                          children: [
-                            ScrollablePositionedList.builder(
-                              itemCount: state.pages.length,
-                              itemBuilder: (context, index) {
-                                return _buildPage(state.pages[index].imageUrl, index, initialIndex);
-                              },
-                              itemScrollController: _itemScrollController,
-                              itemPositionsListener: _itemPositionsListener,
-                              initialScrollIndex: initialIndex,
-                              initialAlignment: initialAlignment,
-                              minCacheExtent: 5000.0, // 強制在動態錨點外也進行大範圍快取
-                            ),
-                            if (!_targetImageLoaded)
-                              Container(
-                                color: Colors.black,
-                                child: const Center(
-                                  child: CircularProgressIndicator(color: AppColors.primary),
+                  // 【全域手勢隔離】: 點擊偵測統一放在最外層，不干擾底層 Scrollable 的手勢判定優先權
+                  : GestureDetector(
+                      onTap: _toggleUI,
+                      behavior: HitTestBehavior.deferToChild,
+                      child: Stack(
+                        children: [
+                          CustomScrollView(
+                            controller: _scrollController,
+                            // 【邊界鎖死】: 強迫掛載整話空殼，徹底剝奪 Flutter 在邊界瞎猜高度的權力，根除瞬間位移
+                            // ignore: deprecated_member_use
+                            cacheExtent: double.infinity,
+                            physics: const ClampingScrollPhysics(), 
+                            center: state.pages.isNotEmpty ? centerKey : null,
+                            slivers: [
+                              // 【完美跳轉架構】: 回歸原生 centerKey 雙向列表，確保絕對無損精準跳轉
+                              if (state.pages.isNotEmpty && initialIndex > 0)
+                                SliverList.builder(
+                                  itemCount: initialIndex,
+                                  itemBuilder: (context, idx) {
+                                    final reversedIndex = initialIndex - 1 - idx;
+                                    return _buildPage(state.pages[reversedIndex].imageUrl, reversedIndex, state.initialAnchorIndex, screenWidth, defaultHeight);
+                                  },
                                 ),
+                              if (state.pages.isNotEmpty)
+                                SliverList.builder(
+                                  key: centerKey,
+                                  itemCount: state.pages.length - initialIndex,
+                                  itemBuilder: (context, idx) {
+                                    final realIndex = initialIndex + idx;
+                                    return _buildPage(state.pages[realIndex].imageUrl, realIndex, state.initialAnchorIndex, screenWidth, defaultHeight);
+                                  },
+                                ),
+                            ],
+                          ),
+                          if (!_targetImageLoaded)
+                            Container(
+                              color: Colors.black,
+                              child: const Center(
+                                child: CircularProgressIndicator(color: AppColors.primary),
                               ),
-                          ],
-                        );
-                      }
+                            ),
+                        ],
+                      ),
                     ),
 
           ViewerTopBar(
@@ -290,58 +376,89 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
     );
   }
   
-  Widget _buildPage(String imageUrl, int index, int initialAnchorIndex) {
-    return GestureDetector(
-      onTap: _toggleUI,
-      behavior: HitTestBehavior.opaque,
-      child: Container(
-        width: double.infinity,
-        color: Colors.transparent,
-        child: ComicImage(
-          imageUrl: imageUrl,
-          providerId: widget.providerId,
-          fit: BoxFit.fitWidth, 
-          loadStateChanged: (ExtendedImageState imgState) {
-            final loadState = imgState.extendedImageLoadState;
-            
-            if (loadState == LoadState.completed || loadState == LoadState.failed) {
-              if (index == initialAnchorIndex && !_targetImageLoaded) {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  if (mounted) {
-                    setState(() {
-                      _targetImageLoaded = true;
-                    });
-                  }
-                });
-              }
-            }
+  Widget _buildPage(String imageUrl, int index, int initialAnchorIndex, double screenWidth, double defaultHeight) {
+    final key = _activeKeys.putIfAbsent(index, () => GlobalKey());
+    
+    // 【極限資源虛擬化】: 利用 ValueListenableBuilder 單獨更新此元件，防爆 OOM
+    return ValueListenableBuilder<int>(
+      valueListenable: _currentIndexNotifier,
+      builder: (context, currentIndex, child) {
+        final isNear = (index - currentIndex).abs() <= 5;
+        final exactHeight = _pageHeights[index] ?? defaultHeight;
 
-            switch (loadState) {
-              case LoadState.loading:
-                return WebtoonImagePlaceholder(index: index);
-              case LoadState.completed:
+        // 如果超出視角 5 頁外，立刻卸載真實圖片，只留下輕量的精確高度空殼
+        if (!isNear) {
+          return Container(
+            key: key,
+            width: double.infinity,
+            height: exactHeight,
+            color: Colors.transparent,
+          );
+        }
+
+        return Container(
+          key: key,
+          width: double.infinity,
+          color: Colors.transparent,
+          child: ComicImage(
+            imageUrl: imageUrl,
+            providerId: widget.providerId,
+            fit: BoxFit.fitWidth, 
+            loadStateChanged: (ExtendedImageState imgState) {
+              final loadState = imgState.extendedImageLoadState;
+              
+              if (loadState == LoadState.completed || loadState == LoadState.failed) {
+                if (index == initialAnchorIndex && !_targetImageLoaded) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if (mounted) {
+                      setState(() {
+                        _targetImageLoaded = true;
+                      });
+                    }
+                  });
+                }
+              }
+
+              if (loadState == LoadState.completed) {
+                final imgInfo = imgState.extendedImageInfo;
+                if (imgInfo != null && screenWidth > 0) {
+                   final image = imgInfo.image;
+                   final actualHeight = screenWidth * (image.height / image.width);
+                   _updatePageHeight(index, actualHeight);
+                }
                 return null; 
-              case LoadState.failed:
-                return SizedBox(
-                  height: 200,
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.broken_image, color: Colors.white54, size: 48),
-                        const SizedBox(height: 8),
-                        TextButton(
-                          onPressed: () => imgState.reLoadImage(),
-                          child: const Text('重新載入', style: TextStyle(color: Colors.white)),
-                        )
-                      ],
+              }
+
+              switch (loadState) {
+                case LoadState.loading:
+                  return SizedBox(
+                    height: exactHeight,
+                    child: WebtoonImagePlaceholder(index: index),
+                  );
+                case LoadState.completed:
+                  return null; 
+                case LoadState.failed:
+                  return SizedBox(
+                    height: exactHeight,
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.broken_image, color: Colors.white54, size: 48),
+                          const SizedBox(height: 8),
+                          TextButton(
+                            onPressed: () => imgState.reLoadImage(),
+                            child: const Text('重新載入', style: TextStyle(color: Colors.white)),
+                          )
+                        ],
+                      ),
                     ),
-                  ),
-                );
-            }
-          },
-        ),
-      ),
+                  );
+              }
+            },
+          ),
+        );
+      },
     );
   }
 }

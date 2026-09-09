@@ -194,10 +194,6 @@ class ComicViewerNotifier extends AutoDisposeFamilyNotifier<ComicViewerState, ({
           chapterIndex: _chronologicalIndex,
         );
       }
-      
-      // Phase 2: Trigger smart background preloading
-      _triggerPreload(anchorIndex);
-      
     } catch (_) {}
   }
 
@@ -205,7 +201,7 @@ class ComicViewerNotifier extends AutoDisposeFamilyNotifier<ComicViewerState, ({
   bool _isPreloading = false;
   final Set<int> _preloadedIndices = {};
 
-  Future<void> _triggerPreload(int currentIndex) async {
+  Future<void> triggerPreload(int currentIndex) async {
     if (state.pages.isEmpty || _isPreloading) return;
     
     final registry = ref.read(providerRegistryProvider);
@@ -213,8 +209,8 @@ class ComicViewerNotifier extends AutoDisposeFamilyNotifier<ComicViewerState, ({
 
     _isPreloading = true;
     try {
-      // Preload next 3 pages
-      for (int i = 1; i <= 3; i++) {
+      // Preload next 5 pages for a smoother experience
+      for (int i = 1; i <= 5; i++) {
         final targetIndex = currentIndex + i;
         if (targetIndex < state.pages.length && !_preloadedIndices.contains(targetIndex)) {
            final url = state.pages[targetIndex].imageUrl;

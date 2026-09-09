@@ -63,7 +63,7 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
   int _currentAnchorIndex = 0;
   double _currentAnchorOffset = 0.0;
 
-  void _calculateCurrentAnchor() {
+  void _calculateSaveAnchor() {
     if (!_targetImageLoaded || _activeKeys.isEmpty || _scrollController == null || !_scrollController!.hasClients) return;
     
     final context = _scrollController!.position.context.notificationContext;
@@ -73,6 +73,9 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
 
     double? bestOffset;
     int bestIndex = 0;
+
+    // Clean up unmounted keys (GC)
+    _activeKeys.removeWhere((key, value) => value.currentContext == null);
 
     for (final entry in _activeKeys.entries) {
       final key = entry.value;
@@ -84,11 +87,13 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
           final bottom = top + renderBox.size.height;
           
           if (bottom > 0) { 
+            // The image crosses the top of the viewport
             if (top <= 0 && bottom > 0) {
               _currentAnchorIndex = entry.key;
               _currentAnchorOffset = -top;
               return;
             } else if (top > 0) {
+              // The image is fully below the top of the viewport
               if (bestOffset == null || top < bestOffset) {
                 bestOffset = top;
                 bestIndex = entry.key;
@@ -99,10 +104,70 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
       }
     }
     
+    // Fallback if no item crosses top (e.g. at absolute top)
     if (bestOffset != null) {
       _currentAnchorIndex = bestIndex;
       _currentAnchorOffset = 0.0; 
     }
+  }
+
+  void _calculateUIProgress() {
+    if (!_targetImageLoaded || _activeKeys.isEmpty || _scrollController == null || !_scrollController!.hasClients) return;
+    
+    final context = _scrollController!.position.context.notificationContext;
+    if (context == null) return;
+    final viewportBox = context.findRenderObject() as RenderBox?;
+    if (viewportBox == null) return;
+    
+    final viewportHeight = viewportBox.size.height;
+    
+    final arg = (providerId: widget.providerId, comicId: widget.comicId, chapterId: widget.chapterId);
+    final state = ref.read(comicViewerProvider(arg));
+    final totalPages = state.pages.length;
+    if (totalPages == 0) return;
+
+    // Phase 2: Introduce ScrollMetrics Bounding
+    final position = _scrollController!.position;
+    
+    // Bottom Lock: Strictly use the native physics scroll bounds (with a 2px tolerance for float rounding errors)
+    if (position.pixels >= position.maxScrollExtent - 2) {
+      _currentIndexNotifier.value = totalPages - 1;
+      return;
+    }
+    
+    // Top Lock: Strictly use the native physics scroll bounds
+    if (position.pixels <= position.minScrollExtent + 2) {
+      _currentIndexNotifier.value = 0;
+      return;
+    }
+
+    // Phase 3: Middle State Area Calculation
+    int maxAreaIndex = _currentIndexNotifier.value;
+    double maxArea = -1.0;
+
+    for (final entry in _activeKeys.entries) {
+      final index = entry.key;
+      final key = entry.value;
+      if (key.currentContext != null) {
+        final renderBox = key.currentContext!.findRenderObject() as RenderBox?;
+        if (renderBox != null) {
+          final renderPosition = renderBox.localToGlobal(Offset.zero, ancestor: viewportBox);
+          final top = renderPosition.dy;
+          final bottom = top + renderBox.size.height;
+          
+          final visibleTop = top < 0 ? 0.0 : top;
+          final visibleBottom = bottom > viewportHeight ? viewportHeight : bottom;
+          final visibleHeight = visibleBottom - visibleTop;
+          
+          if (visibleHeight > maxArea) {
+             maxArea = visibleHeight;
+             maxAreaIndex = index;
+          }
+        }
+      }
+    }
+    
+    _currentIndexNotifier.value = maxAreaIndex;
   }
 
   void _saveProgress() {
@@ -116,8 +181,8 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
   bool _onScrollNotification(ScrollNotification notification) {
     if (_scrollController == null || !_scrollController!.hasClients) return false;
     
-    _calculateCurrentAnchor();
-    _currentIndexNotifier.value = _currentAnchorIndex;
+    _calculateUIProgress();
+    _calculateSaveAnchor();
 
     if (notification is ScrollEndNotification) {
       _saveProgress();

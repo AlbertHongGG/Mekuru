@@ -311,11 +311,7 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
                       behavior: HitTestBehavior.opaque,
                       child: Center(child: Text('錯誤: ${state.error}', style: const TextStyle(color: Colors.white))),
                     )
-                  // 【全域手勢隔離】: 點擊偵測統一放在最外層，不干擾底層 Scrollable 的手勢判定優先權
-                  : GestureDetector(
-                      onTap: _toggleUI,
-                      behavior: HitTestBehavior.deferToChild,
-                      child: Stack(
+                  : Stack(
                         children: [
                           CustomScrollView(
                             controller: _scrollController,
@@ -354,7 +350,6 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
                             ),
                         ],
                       ),
-                    ),
 
           ViewerTopBar(
             isVisible: _showUI,
@@ -380,85 +375,89 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
     final key = _activeKeys.putIfAbsent(index, () => GlobalKey());
     
     // 【極限資源虛擬化】: 利用 ValueListenableBuilder 單獨更新此元件，防爆 OOM
-    return ValueListenableBuilder<int>(
-      valueListenable: _currentIndexNotifier,
-      builder: (context, currentIndex, child) {
-        final isNear = (index - currentIndex).abs() <= 5;
-        final exactHeight = _pageHeights[index] ?? defaultHeight;
+    return GestureDetector(
+      onTap: _toggleUI,
+      behavior: HitTestBehavior.opaque,
+      child: ValueListenableBuilder<int>(
+        valueListenable: _currentIndexNotifier,
+        builder: (context, currentIndex, child) {
+          final isNear = (index - currentIndex).abs() <= 5;
+          final exactHeight = _pageHeights[index] ?? defaultHeight;
 
-        // 如果超出視角 5 頁外，立刻卸載真實圖片，只留下輕量的精確高度空殼
-        if (!isNear) {
+          // 如果超出視角 5 頁外，立刻卸載真實圖片，只留下輕量的精確高度空殼
+          if (!isNear) {
+            return Container(
+              key: key,
+              width: double.infinity,
+              height: exactHeight,
+              color: Colors.transparent,
+            );
+          }
+
           return Container(
             key: key,
             width: double.infinity,
-            height: exactHeight,
             color: Colors.transparent,
-          );
-        }
-
-        return Container(
-          key: key,
-          width: double.infinity,
-          color: Colors.transparent,
-          child: ComicImage(
-            imageUrl: imageUrl,
-            providerId: widget.providerId,
-            fit: BoxFit.fitWidth, 
-            loadStateChanged: (ExtendedImageState imgState) {
-              final loadState = imgState.extendedImageLoadState;
-              
-              if (loadState == LoadState.completed || loadState == LoadState.failed) {
-                if (index == initialAnchorIndex && !_targetImageLoaded) {
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    if (mounted) {
-                      setState(() {
-                        _targetImageLoaded = true;
-                      });
-                    }
-                  });
+            child: ComicImage(
+              imageUrl: imageUrl,
+              providerId: widget.providerId,
+              fit: BoxFit.fitWidth, 
+              loadStateChanged: (ExtendedImageState imgState) {
+                final loadState = imgState.extendedImageLoadState;
+                
+                if (loadState == LoadState.completed || loadState == LoadState.failed) {
+                  if (index == initialAnchorIndex && !_targetImageLoaded) {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      if (mounted) {
+                        setState(() {
+                          _targetImageLoaded = true;
+                        });
+                      }
+                    });
+                  }
                 }
-              }
 
-              if (loadState == LoadState.completed) {
-                final imgInfo = imgState.extendedImageInfo;
-                if (imgInfo != null && screenWidth > 0) {
-                   final image = imgInfo.image;
-                   final actualHeight = screenWidth * (image.height / image.width);
-                   _updatePageHeight(index, actualHeight);
-                }
-                return null; 
-              }
-
-              switch (loadState) {
-                case LoadState.loading:
-                  return SizedBox(
-                    height: exactHeight,
-                    child: WebtoonImagePlaceholder(index: index),
-                  );
-                case LoadState.completed:
+                if (loadState == LoadState.completed) {
+                  final imgInfo = imgState.extendedImageInfo;
+                  if (imgInfo != null && screenWidth > 0) {
+                     final image = imgInfo.image;
+                     final actualHeight = screenWidth * (image.height / image.width);
+                     _updatePageHeight(index, actualHeight);
+                  }
                   return null; 
-                case LoadState.failed:
-                  return SizedBox(
-                    height: exactHeight,
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.broken_image, color: Colors.white54, size: 48),
-                          const SizedBox(height: 8),
-                          TextButton(
-                            onPressed: () => imgState.reLoadImage(),
-                            child: const Text('重新載入', style: TextStyle(color: Colors.white)),
-                          )
-                        ],
+                }
+
+                switch (loadState) {
+                  case LoadState.loading:
+                    return SizedBox(
+                      height: exactHeight,
+                      child: WebtoonImagePlaceholder(index: index),
+                    );
+                  case LoadState.completed:
+                    return null; 
+                  case LoadState.failed:
+                    return SizedBox(
+                      height: exactHeight,
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.broken_image, color: Colors.white54, size: 48),
+                            const SizedBox(height: 8),
+                            TextButton(
+                              onPressed: () => imgState.reLoadImage(),
+                              child: const Text('重新載入', style: TextStyle(color: Colors.white)),
+                            )
+                          ],
+                        ),
                       ),
-                    ),
-                  );
-              }
-            },
-          ),
-        );
-      },
+                    );
+                }
+              },
+            ),
+          );
+        },
+      ),
     );
   }
 }

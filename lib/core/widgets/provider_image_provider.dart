@@ -1,18 +1,24 @@
-import 'dart:io';
 import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:crypto/crypto.dart';
-import 'dart:convert';
+import 'package:mekuru/core/cache/comic_disk_cache_manager.dart';
+import 'package:mekuru/core/cache/i_comic_cache_manager.dart';
 import 'package:mekuru/features/comic/data/sources/i_comic_provider.dart';
 
+/// A custom [ImageProvider] that loads image bytes from an [IComicProvider]
+/// and caches them using [IComicCacheManager].
 class ProviderImageProvider extends ImageProvider<ProviderImageProvider> {
   final String url;
   final IComicProvider provider;
   final bool useCache;
+  final IComicCacheManager cacheManager;
 
-  const ProviderImageProvider(this.url, this.provider, {this.useCache = true});
+  ProviderImageProvider(
+    this.url,
+    this.provider, {
+    this.useCache = true,
+    IComicCacheManager? cacheManager,
+  }) : cacheManager = cacheManager ?? ComicDiskCacheManager.instance;
 
   @override
   Future<ProviderImageProvider> obtainKey(ImageConfiguration configuration) {
@@ -34,34 +40,17 @@ class ProviderImageProvider extends ImageProvider<ProviderImageProvider> {
   Future<ui.Codec> _loadAsync(ProviderImageProvider key, ImageDecoderCallback decode) async {
     assert(key == this);
 
-    File? cacheFile;
     Uint8List? bytes;
 
     if (useCache) {
       try {
-        final tempDir = await getTemporaryDirectory();
-        final cacheDir = Directory('${tempDir.path}/mekuru_image_cache_v3');
-        if (!await cacheDir.exists()) {
-          await cacheDir.create(recursive: true);
-        }
-
-        final hash = md5.convert(utf8.encode(key.url)).toString();
-        cacheFile = File('${cacheDir.path}/$hash');
-
-        if (await cacheFile.exists()) {
-          bytes = await cacheFile.readAsBytes();
-          // Extremely basic check for corrupt/empty files
-          if (bytes.length < 100) {
-            bytes = null;
-          }
-        }
-        
+        bytes = await cacheManager.getCachedBytes(provider.providerId, key.url);
         if (bytes == null) {
           bytes = await key.provider.fetchImageBytes(key.url);
-          await cacheFile.writeAsBytes(bytes);
+          await cacheManager.putBytes(provider.providerId, key.url, bytes);
         }
       } catch (e) {
-        // Cache read/write failed, fetch directly
+        // Cache read/write failed, fetch directly from network
         bytes = await key.provider.fetchImageBytes(key.url);
       }
     } else {
@@ -72,13 +61,10 @@ class ProviderImageProvider extends ImageProvider<ProviderImageProvider> {
       final buffer = await ui.ImmutableBuffer.fromUint8List(bytes);
       return await decode(buffer);
     } catch (e) {
-      // If decoding fails, the cache is corrupted. Delete it.
-      if (cacheFile != null && await cacheFile.exists()) {
-        try {
-          await cacheFile.delete();
-        } catch (_) {}
+      // If decoding fails, the cache might be corrupt. Remove it and re-fetch once.
+      if (useCache) {
+        await cacheManager.remove(provider.providerId, key.url);
       }
-      // Re-fetch once from network as fallback
       bytes = await key.provider.fetchImageBytes(key.url);
       final buffer = await ui.ImmutableBuffer.fromUint8List(bytes);
       return await decode(buffer);
@@ -88,35 +74,31 @@ class ProviderImageProvider extends ImageProvider<ProviderImageProvider> {
   @override
   bool operator ==(Object other) {
     if (other.runtimeType != runtimeType) return false;
-    return other is ProviderImageProvider && other.url == url && other.provider.providerId == provider.providerId;
+    return other is ProviderImageProvider &&
+        other.url == url &&
+        other.provider.providerId == provider.providerId;
   }
 
   @override
   int get hashCode => Object.hash(url, provider.providerId);
 
-  /// Phase 1: Pure Disk Preloading
-  /// Downloads the image and saves it to the disk cache without decoding it into memory.
-  static Future<void> preload(String url, IComicProvider provider) async {
+  /// Downloads the image and stores it to disk cache.
+  static Future<void> preload(
+    String url,
+    IComicProvider provider, {
+    IComicCacheManager? cacheManager,
+  }) async {
+    final cache = cacheManager ?? ComicDiskCacheManager.instance;
     try {
-      final tempDir = await getTemporaryDirectory();
-      final cacheDir = Directory('${tempDir.path}/mekuru_image_cache_v3');
-      if (!await cacheDir.exists()) {
-        await cacheDir.create(recursive: true);
-      }
+      final isCached = await cache.isCached(provider.providerId, url);
+      if (isCached) return;
 
-      final hash = md5.convert(utf8.encode(url)).toString();
-      final cacheFile = File('${cacheDir.path}/$hash');
-
-      if (await cacheFile.exists()) {
-        final len = await cacheFile.length();
-        if (len >= 100) return; // Already cached and seems valid
-      }
-
-      // Fetch and write to disk
       final bytes = await provider.fetchImageBytes(url);
-      await cacheFile.writeAsBytes(bytes);
+      if (bytes.length >= 100) {
+        await cache.putBytes(provider.providerId, url, bytes);
+      }
     } catch (e) {
-      debugPrint('Preload failed for $url: $e');
+      debugPrint('[ProviderImageProvider] Preload failed for $url: $e');
     }
   }
 }

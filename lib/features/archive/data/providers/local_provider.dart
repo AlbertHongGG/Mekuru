@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:dio/dio.dart';
 import 'package:mekuru/features/comic/data/sources/i_comic_provider.dart';
 import 'package:mekuru/features/comic/domain/models/comic_models.dart';
 import 'package:mekuru/features/comic/domain/models/paginated_result.dart';
@@ -29,7 +30,7 @@ class LocalProvider implements IComicProvider {
   String get providerName => 'local';
 
   @override
-  Future<Uint8List> fetchImageBytes(String url) async {
+  Future<Uint8List> fetchImageBytes(String url, {CancelToken? cancelToken}) async {
     final bytes = await _mediaStorage.readImage(url);
     if (bytes == null) {
       throw Exception('Image not found: $url');

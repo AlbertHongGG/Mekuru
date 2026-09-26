@@ -43,10 +43,11 @@ class ManwaProvider extends BaseComicProvider {
   String get providerName => _name;
 
   @override
-  Future<Uint8List> fetchImageBytes(String url) async {
+  Future<Uint8List> fetchImageBytes(String url, {CancelToken? cancelToken}) async {
     final response = await imageDio.get<List<int>>(
       url,
       options: Options(responseType: ResponseType.bytes),
+      cancelToken: cancelToken,
     );
     final encryptedBytes = Uint8List.fromList(response.data!);
     final decryptedBytes = ManwaCrypto.decryptImageBytes(encryptedBytes);

@@ -6,6 +6,8 @@ import 'package:mekuru/features/comic/domain/models/chapter.dart';
 import 'package:mekuru/features/comic/domain/models/page.dart';
 import 'package:mekuru/core/error/result.dart';
 
+import 'package:dio/dio.dart';
+
 /// The standard contract that ALL comic providers must implement.
 abstract class IComicProvider {
   /// A unique identifier for this provider (e.g., 'comicwf', 'webtoon').
@@ -18,7 +20,7 @@ abstract class IComicProvider {
   String get providerName;
 
   /// Fetch the image bytes for a specific url using the provider's internal client.
-  Future<Uint8List> fetchImageBytes(String url);
+  Future<Uint8List> fetchImageBytes(String url, {CancelToken? cancelToken});
 
   /// Fetch basic details and metadata for a specific comic.
   Future<Result<ComicDetail, Failure>> getComicDetail(String comicId);

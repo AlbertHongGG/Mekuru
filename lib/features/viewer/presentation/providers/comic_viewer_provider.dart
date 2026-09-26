@@ -4,8 +4,6 @@ import 'package:mekuru/features/library/data/repositories/user_interaction_repos
 import 'package:mekuru/features/comic/domain/models/page.dart';
 import 'package:mekuru/core/notifications/presentation/controllers/notification_controller.dart';
 import 'package:mekuru/features/comic/presentation/providers/comic_details_provider.dart';
-import 'package:mekuru/features/comic/data/sources/provider_registry.dart';
-import 'package:mekuru/core/widgets/provider_image_provider.dart';
 
 class ComicViewerState {
   final bool isLoading;
@@ -195,32 +193,6 @@ class ComicViewerNotifier extends AutoDisposeFamilyNotifier<ComicViewerState, ({
         );
       }
     } catch (_) {}
-  }
-
-  // Preload Queue Management
-  bool _isPreloading = false;
-  final Set<int> _preloadedIndices = {};
-
-  Future<void> triggerPreload(int currentIndex) async {
-    if (state.pages.isEmpty || _isPreloading) return;
-    
-    final registry = ref.read(providerRegistryProvider);
-    final provider = registry.getProvider(arg.providerId);
-
-    _isPreloading = true;
-    try {
-      // Preload next 5 pages for a smoother experience
-      for (int i = 1; i <= 5; i++) {
-        final targetIndex = currentIndex + i;
-        if (targetIndex < state.pages.length && !_preloadedIndices.contains(targetIndex)) {
-           final url = state.pages[targetIndex].imageUrl;
-           await ProviderImageProvider.preload(url, provider);
-           _preloadedIndices.add(targetIndex);
-        }
-      }
-    } finally {
-      _isPreloading = false;
-    }
   }
 }
 

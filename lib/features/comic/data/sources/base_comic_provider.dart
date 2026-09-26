@@ -12,10 +12,11 @@ abstract class BaseComicProvider implements IComicProvider {
   List<String> get aliases => [];
 
   @override
-  Future<Uint8List> fetchImageBytes(String url) async {
+  Future<Uint8List> fetchImageBytes(String url, {CancelToken? cancelToken}) async {
     final response = await imageDio.get<List<int>>(
       url,
       options: Options(responseType: ResponseType.bytes),
+      cancelToken: cancelToken,
     );
     return Uint8List.fromList(response.data!);
   }

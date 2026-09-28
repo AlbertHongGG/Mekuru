@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mekuru/core/theme/app_colors.dart';
@@ -79,22 +79,25 @@ class ApiLogDetailPage extends ConsumerWidget {
             ),
           ),
           
-          Positioned(
-            left: 16,
-            bottom: 24,
-            child: FloatingActionButton(
-              heroTag: 'back_btn',
-              mini: true,
-              backgroundColor: isDark ? const Color(0xFF2C2C2E) : Colors.white,
-              elevation: 4,
-              onPressed: () => Navigator.pop(context),
-              child: Icon(
-                Icons.arrow_back_rounded,
-                color: isDark ? Colors.white : Colors.black87,
-              ),
-            ),
-          ),
+          _buildEdgeSwipeDetector(context),
         ],
+      ),
+    );
+  }
+
+  Widget _buildEdgeSwipeDetector(BuildContext context) {
+    return Positioned(
+      left: 0,
+      top: 0,
+      bottom: 0,
+      width: 40,
+      child: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onHorizontalDragEnd: (details) {
+          if (details.primaryVelocity != null && details.primaryVelocity! > 300) {
+            Navigator.of(context).pop();
+          }
+        },
       ),
     );
   }

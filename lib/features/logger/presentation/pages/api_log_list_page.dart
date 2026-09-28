@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -308,7 +309,7 @@ class _ApiLogListPageState extends ConsumerState<ApiLogListPage>
   void _openLogDetail(ApiLogEntry log, bool isDark) {
     Navigator.push(
       context,
-      MaterialPageRoute(
+      CupertinoPageRoute(
         builder: (context) => ApiLogDetailPage(shallowLog: log),
       ),
     );

@@ -67,22 +67,16 @@ class SettingsPage extends ConsumerWidget {
             title: '日誌與效能',
             children: [
               SettingsTile(
-                icon: Icons.bug_report_rounded,
-                iconColor: AppColors.primary,
-                title: '紀錄 API 日誌',
-                subtitle: '除錯用，開啟會影響下載效能',
-                trailing: AppSwitch(
-                  value: settingsState.enableApiLogging,
-                  onChanged: (val) {
-                    notifier.toggleApiLogging(val);
-                  },
-                ),
-              ),
-              SettingsTile(
                 icon: Icons.developer_board_rounded,
                 iconColor: AppColors.primary,
-                title: '紀錄系統日誌',
+                title: 'APP 系統日誌',
                 subtitle: '紀錄系統錯誤與背景事件',
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const SystemLogViewerScreen()),
+                  );
+                },
                 trailing: AppSwitch(
                   value: settingsState.enableSystemLogging,
                   onChanged: (val) {
@@ -91,26 +85,22 @@ class SettingsPage extends ConsumerWidget {
                 ),
               ),
               SettingsTile(
-                icon: Icons.history_rounded,
-                iconColor: AppColors.primary,
-                title: 'APP 系統日誌列表',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const SystemLogViewerScreen()),
-                  );
-                },
-              ),
-              SettingsTile(
                 icon: Icons.network_ping_rounded,
                 iconColor: AppColors.primary,
-                title: 'API 網路日誌列表',
+                title: 'API 網路日誌',
+                subtitle: '除錯用，開啟會影響下載效能',
                 onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => const ApiLogListPage()),
                   );
                 },
+                trailing: AppSwitch(
+                  value: settingsState.enableApiLogging,
+                  onChanged: (val) {
+                    notifier.toggleApiLogging(val);
+                  },
+                ),
               ),
             ],
           ),

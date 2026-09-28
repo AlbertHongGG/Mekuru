@@ -7,9 +7,7 @@ import 'package:mekuru/features/comic/domain/models/chapter.dart';
 import 'package:mekuru/features/comic/domain/models/page.dart';
 import 'package:mekuru/features/comic/domain/models/paginated_result.dart';
 
-import 'guazi_constants.dart';
 import 'guazi_interceptor.dart';
-import 'guazi_auth_session.dart';
 import 'guazi_api_client.dart';
 
 class GuaziProvider extends BaseComicProvider {
@@ -17,22 +15,19 @@ class GuaziProvider extends BaseComicProvider {
   static const String _name = 'Guazi';
 
   late final GuaziApiClient _apiClient;
-  late final GuaziAuthSession _authSession;
   late final Dio _apiDio;
   late final Dio _imageDio;
 
   GuaziProvider(ApiClient apiClient) {
-    _authSession = GuaziAuthSession();
-
-    _apiDio = apiClient.createProviderDio(GuaziConstants.baseUrl, providerId: _id);
-    _apiDio.interceptors.add(GuaziInterceptor(_authSession, _apiDio));
+    _apiDio = apiClient.createProviderDio(GuaziInterceptor.baseUrl, providerId: _id);
+    _apiDio.interceptors.add(GuaziInterceptor(_apiDio));
 
     _apiClient = GuaziApiClient(_apiDio);
 
     _imageDio = apiClient.createProviderDio('', providerId: _id);
     _imageDio.options.headers.addAll({
       "user-agent": "okhttp/4.7.2",
-      "referer": "https://api.guaziapp.com",
+      "referer": GuaziInterceptor.baseUrl,
     });
   }
 

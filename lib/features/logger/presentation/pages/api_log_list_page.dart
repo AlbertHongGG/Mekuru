@@ -1,14 +1,14 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:mekuru/core/theme/app_colors.dart';
 import 'package:mekuru/features/logger/domain/models/log_entry.dart';
 import 'package:mekuru/features/logger/presentation/providers/logger_provider.dart';
+import 'package:go_router/go_router.dart';
+import 'package:mekuru/core/routes/app_routes.dart';
 import 'package:mekuru/core/widgets/swipe_to_obliterate_button.dart';
-import 'api_log_detail_page.dart';
 
 // --- ApiLogListTab WITH KEEPALIVE ---
 class ApiLogListTab extends StatefulWidget {
@@ -307,12 +307,7 @@ class _ApiLogListPageState extends ConsumerState<ApiLogListPage>
   }
 
   void _openLogDetail(ApiLogEntry log, bool isDark) {
-    Navigator.push(
-      context,
-      CupertinoPageRoute(
-        builder: (context) => ApiLogDetailPage(shallowLog: log),
-      ),
-    );
+    context.push(AppRoutes.apiLogDetail, extra: log);
   }
   
   Widget _buildEdgeSwipeDetector() {

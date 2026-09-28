@@ -9,6 +9,11 @@ class AppRoutes {
   static const String detailsPath = '/details/:providerId/:comicId';
   static const String viewerPath = '/viewer/:providerId/:comicId/:chapterId';
 
+  // Standalone logger routes (outside ShellRoute, no bottom bar)
+  static const String systemLogs = '/system-logs';
+  static const String apiLogs = '/api-logs';
+  static const String apiLogDetail = '/api-logs/detail';
+
   // Helper methods for dynamic path generation
   static String details(String providerId, String comicId) => '/details/$providerId/$comicId';
   static String viewer(String providerId, String comicId, String chapterId) => '/viewer/$providerId/$comicId/$chapterId';

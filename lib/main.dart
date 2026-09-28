@@ -15,7 +15,12 @@ import 'package:mekuru/features/library/domain/services/local_interaction_sync_s
 
 import 'package:mekuru/features/splash/presentation/pages/splash_page.dart';
 
+import 'package:flutter/cupertino.dart';
 import 'package:mekuru/core/routes/app_routes.dart';
+import 'package:mekuru/features/logger/presentation/pages/system_log_viewer_screen.dart';
+import 'package:mekuru/features/logger/presentation/pages/api_log_list_page.dart';
+import 'package:mekuru/features/logger/presentation/pages/api_log_detail_page.dart';
+import 'package:mekuru/features/logger/domain/models/log_entry.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -39,6 +44,26 @@ final routerProvider = Provider<GoRouter>((ref) {
               providerId: state.pathParameters['providerId']!,
               comicId: state.pathParameters['comicId']!,
               chapterId: state.pathParameters['chapterId']!,
+            ),
+          ),
+          GoRoute(
+            path: AppRoutes.systemLogs,
+            pageBuilder: (context, state) => const CupertinoPage(
+              child: SystemLogViewerScreen(),
+            ),
+          ),
+          GoRoute(
+            path: AppRoutes.apiLogs,
+            pageBuilder: (context, state) => const CupertinoPage(
+              child: ApiLogListPage(),
+            ),
+          ),
+          GoRoute(
+            path: AppRoutes.apiLogDetail,
+            pageBuilder: (context, state) => CupertinoPage(
+              child: ApiLogDetailPage(
+                shallowLog: state.extra as ApiLogEntry,
+              ),
             ),
           ),
 

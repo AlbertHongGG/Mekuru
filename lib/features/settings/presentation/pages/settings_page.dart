@@ -9,8 +9,8 @@ import 'package:mekuru/core/widgets/premium_config_header.dart';
 import 'package:mekuru/core/widgets/app_switch.dart';
 import 'package:mekuru/core/widgets/app_bottom_sheet.dart';
 import 'package:mekuru/features/comic/data/sources/provider_registry.dart';
-import 'package:mekuru/features/logger/presentation/pages/system_log_viewer_screen.dart';
-import 'package:mekuru/features/logger/presentation/pages/api_log_list_page.dart';
+import 'package:go_router/go_router.dart';
+import 'package:mekuru/core/routes/app_routes.dart';
 import 'package:mekuru/features/backup/presentation/widgets/backup_section.dart';
 import 'package:mekuru/features/settings/presentation/widgets/archive_section.dart';
 
@@ -71,12 +71,7 @@ class SettingsPage extends ConsumerWidget {
                 iconColor: AppColors.primary,
                 title: 'APP 系統日誌',
                 subtitle: '紀錄系統錯誤與背景事件',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const SystemLogViewerScreen()),
-                  );
-                },
+                onTap: () => context.push(AppRoutes.systemLogs),
                 trailing: AppSwitch(
                   value: settingsState.enableSystemLogging,
                   onChanged: (val) {
@@ -89,12 +84,7 @@ class SettingsPage extends ConsumerWidget {
                 iconColor: AppColors.primary,
                 title: 'API 網路日誌',
                 subtitle: '除錯用，開啟會影響下載效能',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const ApiLogListPage()),
-                  );
-                },
+                onTap: () => context.push(AppRoutes.apiLogs),
                 trailing: AppSwitch(
                   value: settingsState.enableApiLogging,
                   onChanged: (val) {

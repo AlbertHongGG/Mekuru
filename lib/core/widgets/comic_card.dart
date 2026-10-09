@@ -5,17 +5,20 @@ import 'package:mekuru/core/widgets/comic_image.dart';
 class ComicCard extends StatelessWidget {
   final ComicCardData data;
   final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
 
   const ComicCard({
     super.key,
     required this.data,
     this.onTap,
+    this.onLongPress,
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
+      onLongPress: onLongPress,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

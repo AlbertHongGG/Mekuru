@@ -1,5 +1,6 @@
 import 'package:mekuru/features/library/domain/models/library_sort_mode.dart';
 import 'package:mekuru/features/library/domain/models/comic_record.dart';
+import 'package:mekuru/features/library/domain/models/library_filter_criteria.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mekuru/features/library/data/repositories/user_interaction_repository.dart';
 import 'package:mekuru/features/settings/presentation/providers/settings_provider.dart';
@@ -11,9 +12,7 @@ class LibraryState {
   final List<ComicRecord> rawFavorites;
   final List<ComicCardData> displayItems;
   final List<String> availableProviders;
-  final String? activeProviderFilter;
-  final String searchQuery;
-  final LibrarySortMode sortMode;
+  final LibraryFilterCriteria criteria;
   final String? error;
 
   LibraryState({
@@ -21,21 +20,21 @@ class LibraryState {
     this.rawFavorites = const [],
     this.displayItems = const [],
     this.availableProviders = const [],
-    this.activeProviderFilter,
-    this.searchQuery = '',
-    required this.sortMode,
+    this.criteria = const LibraryFilterCriteria(),
     this.error,
   });
+
+  // Convenient domain-aware getters
+  String? get activeProviderFilter => criteria.providerId;
+  String get searchQuery => criteria.searchQuery;
+  LibrarySortMode get sortMode => criteria.sortMode;
 
   LibraryState copyWith({
     bool? isLoading,
     List<ComicRecord>? rawFavorites,
     List<ComicCardData>? displayItems,
     List<String>? availableProviders,
-    String? activeProviderFilter,
-    bool clearProviderFilter = false,
-    String? searchQuery,
-    LibrarySortMode? sortMode,
+    LibraryFilterCriteria? criteria,
     String? error,
   }) {
     return LibraryState(
@@ -43,9 +42,7 @@ class LibraryState {
       rawFavorites: rawFavorites ?? this.rawFavorites,
       displayItems: displayItems ?? this.displayItems,
       availableProviders: availableProviders ?? this.availableProviders,
-      activeProviderFilter: clearProviderFilter ? null : (activeProviderFilter ?? this.activeProviderFilter),
-      searchQuery: searchQuery ?? this.searchQuery,
-      sortMode: sortMode ?? this.sortMode,
+      criteria: criteria ?? this.criteria,
       error: error,
     );
   }
@@ -54,7 +51,7 @@ class LibraryState {
 class LibraryNotifier extends Notifier<LibraryState> {
   @override
   LibraryState build() {
-    final sortMode = ref.read(settingsProvider).librarySortMode;
+    final initialSortMode = ref.read(settingsProvider).librarySortMode;
         
     // Subscribe to DB changes so Library auto-updates when progress is saved or favorites are toggled
     final subscription = ref.watch(userInteractionRepositoryProvider).watchGlobalChanges().listen((_) {
@@ -66,65 +63,93 @@ class LibraryNotifier extends Notifier<LibraryState> {
     });
     
     Future.microtask(() => loadLibrary());
-    return LibraryState(sortMode: sortMode);
+    return LibraryState(
+      criteria: LibraryFilterCriteria(sortMode: initialSortMode),
+    );
   }
 
   void setProviderFilter(String? providerId) {
     state = state.copyWith(
-      activeProviderFilter: providerId,
-      clearProviderFilter: providerId == null,
+      criteria: state.criteria.copyWith(
+        providerId: providerId,
+        clearProviderFilter: providerId == null,
+      ),
     );
     _updateDisplayItems();
   }
 
   void setSearchQuery(String query) {
-    state = state.copyWith(searchQuery: query);
+    state = state.copyWith(
+      criteria: state.criteria.copyWith(searchQuery: query),
+    );
     _updateDisplayItems();
   }
 
   void setSortMode(LibrarySortMode sortMode) {
-    state = state.copyWith(sortMode: sortMode);
+    state = state.copyWith(
+      criteria: state.criteria.copyWith(sortMode: sortMode),
+    );
     ref.read(settingsProvider.notifier).updateLibrarySortMode(sortMode);
     _updateDisplayItems();
   }
 
+  Future<bool> removeFavorite(String providerId, String comicId) async {
+    try {
+      final interactionRepo = ref.read(userInteractionRepositoryProvider);
+      final target = state.rawFavorites.where(
+        (r) => r.providerId == providerId && r.comicId == comicId,
+      ).firstOrNull;
+
+      if (target != null) {
+        await interactionRepo.toggleFavorite(
+          providerId: providerId,
+          comicId: comicId,
+          comic: target,
+          isFavorite: false,
+        );
+        return true;
+      }
+      return false;
+    } catch (_) {
+      return false;
+    }
+  }
+
   Future<void> loadLibrary() async {
-    state = state.copyWith(isLoading: true, error: null);
+    // Only set loading indicator when there are no items displayed yet,
+    // avoiding UI unmounting or empty flickering during background updates.
+    if (state.displayItems.isEmpty) {
+      state = state.copyWith(isLoading: true, error: null);
+    }
+    
     try {
       final interactionRepo = ref.read(userInteractionRepositoryProvider);
       final records = await interactionRepo.getAllFavorites();
 
       final availableProviders = records.map((r) => r.providerId).toSet().toList();
 
+      var criteria = state.criteria;
+      if (criteria.providerId != null && !availableProviders.contains(criteria.providerId)) {
+        criteria = criteria.copyWith(clearProviderFilter: true);
+      }
+
       state = state.copyWith(
         isLoading: false,
         rawFavorites: records,
         availableProviders: availableProviders,
+        criteria: criteria,
       );
       _updateDisplayItems();
-      
-
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
 
   void _updateDisplayItems() {
-    var result = state.rawFavorites.toList();
-    
-    if (state.activeProviderFilter != null) {
-      result = result.where((f) => f.providerId == state.activeProviderFilter).toList();
-    }
-    
-    if (state.searchQuery.isNotEmpty) {
-      final q = state.searchQuery.toLowerCase();
-      result = result.where((f) => (f.title).toLowerCase().contains(q)).toList();
-    }
-    
-    result.sort((a, b) => state.sortMode.strategy.compare(a, b));
-
+    final filtered = state.criteria.apply(state.rawFavorites);
     final registry = ref.read(providerRegistryProvider);
-    final displayItems = result.map((r) {
+
+    final displayItems = filtered.map((r) {
       String providerName = r.providerId;
       try {
         providerName = registry.getProvider(r.providerId).providerName;

@@ -10,6 +10,7 @@ import 'package:mekuru/core/widgets/search_dialog.dart';
 import 'package:mekuru/core/widgets/app_bottom_sheet.dart';
 import 'package:mekuru/features/comic/data/sources/provider_registry.dart';
 import 'package:mekuru/features/library/presentation/providers/library_update_provider.dart';
+import 'package:mekuru/core/notifications/presentation/controllers/notification_controller.dart';
 
 class LibraryPage extends ConsumerStatefulWidget {
   const LibraryPage({super.key});
@@ -65,6 +66,92 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
       selectedValue: currentSortMode,
       onItemSelected: (val) {
         ref.read(libraryProvider.notifier).setSortMode(val);
+      },
+    );
+  }
+
+  void _showQuickActionBottomSheet(ComicCardData comic) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (ctx) {
+        return Container(
+          padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 48,
+                  height: 5,
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: isDark ? Colors.white24 : Colors.black12,
+                    borderRadius: BorderRadius.circular(2.5),
+                  ),
+                ),
+                Text(
+                  comic.title ?? '漫畫操作',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.info_outline_rounded, color: AppColors.primary, size: 20),
+                  ),
+                  title: const Text('查看詳情', style: TextStyle(fontWeight: FontWeight.w600)),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    context.push('/details/${comic.providerId}/${comic.comicId}');
+                  },
+                ),
+                ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.redAccent.withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.heart_broken_rounded, color: Colors.redAccent, size: 20),
+                  ),
+                  title: const Text(
+                    '從書庫移除 (取消最愛)',
+                    style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.w600),
+                  ),
+                  onTap: () async {
+                    Navigator.pop(ctx);
+                    final success = await ref.read(libraryProvider.notifier).removeFavorite(comic.providerId, comic.comicId);
+                    if (mounted) {
+                      final notif = ref.read(notificationProvider.notifier);
+                      if (success) {
+                        notif.showInfo('已從書庫移除');
+                      } else {
+                        notif.showError('移除失敗');
+                      }
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
       },
     );
   }
@@ -162,7 +249,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                   ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
                   : state.error != null
                       ? Center(child: Text('Error: ${state.error}'))
-                      : _buildGridView(state.displayItems),
+                      : _buildGridView(state),
             ),
           ],
         ),
@@ -170,22 +257,27 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
     );
   }
 
-  Widget _buildGridView(List<ComicCardData> displayItems) {
-    if (displayItems.isEmpty) {
+  Widget _buildGridView(LibraryState state) {
+    if (state.displayItems.isEmpty) {
+      if (state.rawFavorites.isNotEmpty) {
+        return const Center(child: Text('找不到符合篩選條件的漫畫'));
+      }
       return const Center(child: Text('書庫空空如也'));
     }
 
     return RefreshIndicator(
       onRefresh: () async {
-        final favorites = ref.read(libraryProvider).rawFavorites;
+        final favorites = state.rawFavorites;
         await ref.read(libraryUpdateProvider.notifier).updateAll(favorites);
       },
       color: AppColors.primary,
       child: ResponsiveComicGrid(
-        comics: displayItems,
+        scrollKey: const PageStorageKey('library_grid_scroll'),
+        comics: state.displayItems,
         onTap: (data) {
           context.push('/details/${data.providerId}/${data.comicId}');
         },
+        onLongPress: (data) => _showQuickActionBottomSheet(data),
       ),
     );
   }

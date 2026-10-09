@@ -6,8 +6,7 @@ import 'package:mekuru/features/comic/domain/models/chapter.dart';
 import 'package:mekuru/core/notifications/presentation/controllers/notification_controller.dart';
 import 'package:mekuru/features/library/domain/models/comic_record.dart';
 import 'package:mekuru/features/archive/data/providers/local_provider.dart';
-import 'package:mekuru/features/library/presentation/providers/library_provider.dart';
-import 'package:mekuru/features/settings/presentation/providers/settings_provider.dart';
+
 import 'package:mekuru/features/archive/domain/managers/local_library_manager.dart';
 import 'package:mekuru/features/archive/presentation/providers/archive_provider.dart';
 import 'package:mekuru/features/archive/domain/services/archive_backup_service.dart';
@@ -165,7 +164,6 @@ class ComicDetailsNotifier extends AutoDisposeFamilyNotifier<ComicDetailsState, 
         comicId: arg.comicId
       );
       state = state.copyWith(interaction: interaction);
-      ref.invalidate(libraryProvider);
       
       final notif = ref.read(notificationProvider.notifier);
       if (newFavoriteStatus) {

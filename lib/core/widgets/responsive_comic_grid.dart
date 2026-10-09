@@ -7,6 +7,8 @@ class ResponsiveComicGrid extends StatelessWidget {
   final bool hasNext;
   final VoidCallback? onLoadMore;
   final void Function(ComicCardData) onTap;
+  final void Function(ComicCardData)? onLongPress;
+  final Key? scrollKey;
 
   const ResponsiveComicGrid({
     super.key,
@@ -15,11 +17,14 @@ class ResponsiveComicGrid extends StatelessWidget {
     this.hasNext = false,
     this.onLoadMore,
     required this.onTap,
+    this.onLongPress,
+    this.scrollKey,
   });
 
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
+      key: scrollKey ?? key,
       controller: controller,
       slivers: [
         SliverPadding(
@@ -38,12 +43,24 @@ class ResponsiveComicGrid extends StatelessWidget {
                 if (index < comics.length) {
                   final data = comics[index];
                   return ComicCard(
+                    key: ValueKey('${data.providerId}_${data.comicId}'),
                     data: data,
                     onTap: () => onTap(data),
+                    onLongPress: onLongPress != null ? () => onLongPress!(data) : null,
                   );
                 } else {
                   return const _ShimmerComicCard();
                 }
+              },
+              findChildIndexCallback: (Key itemKey) {
+                if (itemKey is ValueKey<String>) {
+                  final keyVal = itemKey.value;
+                  final foundIndex = comics.indexWhere(
+                    (c) => '${c.providerId}_${c.comicId}' == keyVal,
+                  );
+                  return foundIndex == -1 ? null : foundIndex;
+                }
+                return null;
               },
               // Total count includes both data items and loading skeletons
               childCount: comics.length + (hasNext ? 4 : 0),

@@ -1,24 +1,27 @@
 import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:mekuru/core/cache/comic_disk_cache_manager.dart';
+import 'package:mekuru/core/cache/comic_image_pipeline.dart';
 import 'package:mekuru/core/cache/i_comic_cache_manager.dart';
 import 'package:mekuru/features/comic/data/sources/i_comic_provider.dart';
 
-/// A custom [ImageProvider] that loads image bytes from an [IComicProvider]
-/// and caches them using [IComicCacheManager].
+/// A custom [ImageProvider] that delegates image loading, caching,
+/// and deduplication to the authoritative [ComicImagePipeline].
 class ProviderImageProvider extends ImageProvider<ProviderImageProvider> {
   final String url;
   final IComicProvider provider;
-  final bool useCache;
-  final IComicCacheManager cacheManager;
+  final ComicImagePipeline pipeline;
 
   ProviderImageProvider(
     this.url,
     this.provider, {
-    this.useCache = true,
+    bool useCache = true,
     IComicCacheManager? cacheManager,
-  }) : cacheManager = cacheManager ?? ComicDiskCacheManager.instance;
+    ComicImagePipeline? pipeline,
+  }) : pipeline = pipeline ??
+            (cacheManager != null
+                ? ComicImagePipeline(cacheManager: cacheManager)
+                : ComicImagePipeline.instance);
 
   @override
   Future<ProviderImageProvider> obtainKey(ImageConfiguration configuration) {
@@ -40,33 +43,21 @@ class ProviderImageProvider extends ImageProvider<ProviderImageProvider> {
   Future<ui.Codec> _loadAsync(ProviderImageProvider key, ImageDecoderCallback decode) async {
     assert(key == this);
 
-    Uint8List? bytes;
-
-    if (useCache) {
-      try {
-        bytes = await cacheManager.getCachedBytes(provider.providerId, key.url);
-        if (bytes == null) {
-          bytes = await key.provider.fetchImageBytes(key.url);
-          await cacheManager.putBytes(provider.providerId, key.url, bytes);
-        }
-      } catch (e) {
-        // Cache read/write failed, fetch directly from network
-        bytes = await key.provider.fetchImageBytes(key.url);
-      }
-    } else {
-      bytes = await key.provider.fetchImageBytes(key.url);
-    }
+    final bytes = await pipeline.getImageBytes(
+      provider: key.provider,
+      url: key.url,
+    );
 
     try {
       final buffer = await ui.ImmutableBuffer.fromUint8List(bytes);
       return await decode(buffer);
     } catch (e) {
-      // If decoding fails, the cache might be corrupt. Remove it and re-fetch once.
-      if (useCache) {
-        await cacheManager.remove(provider.providerId, key.url);
-      }
-      bytes = await key.provider.fetchImageBytes(key.url);
-      final buffer = await ui.ImmutableBuffer.fromUint8List(bytes);
+      // If decoding fails, the cache might be corrupt. Delegate recovery cleanly to pipeline.
+      final freshBytes = await pipeline.purgeAndRefetch(
+        provider: key.provider,
+        url: key.url,
+      );
+      final buffer = await ui.ImmutableBuffer.fromUint8List(freshBytes);
       return await decode(buffer);
     }
   }
@@ -82,23 +73,13 @@ class ProviderImageProvider extends ImageProvider<ProviderImageProvider> {
   @override
   int get hashCode => Object.hash(url, provider.providerId);
 
-  /// Downloads the image and stores it to disk cache.
+  /// Downloads the image and stores it to disk cache via [ComicImagePipeline].
   static Future<void> preload(
     String url,
     IComicProvider provider, {
-    IComicCacheManager? cacheManager,
+    ComicImagePipeline? pipeline,
   }) async {
-    final cache = cacheManager ?? ComicDiskCacheManager.instance;
-    try {
-      final isCached = await cache.isCached(provider.providerId, url);
-      if (isCached) return;
-
-      final bytes = await provider.fetchImageBytes(url);
-      if (bytes.length >= 100) {
-        await cache.putBytes(provider.providerId, url, bytes);
-      }
-    } catch (e) {
-      debugPrint('[ProviderImageProvider] Preload failed for $url: $e');
-    }
+    final pipe = pipeline ?? ComicImagePipeline.instance;
+    await pipe.preloadImage(provider: provider, url: url);
   }
 }

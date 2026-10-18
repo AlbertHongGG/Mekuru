@@ -80,22 +80,19 @@ class ManwaProvider extends BaseComicProvider {
   }
 
   @override
-  Future<Result<List<Chapter>, Failure>> getChapterList(String comicId,
-      {bool isDescending = true}) async {
+  Future<Result<List<Chapter>, Failure>> getChapterList(String comicId) async {
     return handleApiCall(() async {
       final response = await _apiClient.getComicDetail(comicId, actionType: 'Chapters');
-      final chapters = response.data.chapterList.map((c) {
+      final chapters = response.data.chapterList.asMap().entries.map((e) {
+        final c = e.value;
         return Chapter(
           id: c.id.toString(),
           title: c.name,
           publishedAt: c.addtime,
-          order: response.data.chapterList.indexOf(c),
+          order: e.key + 1,
         );
       }).toList();
 
-      if (isDescending) {
-        return chapters.reversed.toList();
-      }
       return chapters;
     });
   }

@@ -60,13 +60,15 @@ class LocalProvider implements IComicProvider {
   }
 
   @override
-  Future<Result<List<Chapter>, Failure>> getChapterList(String comicId, {bool isDescending = true}) async {
+  Future<Result<List<Chapter>, Failure>> getChapterList(String comicId) async {
     try {
       final comic = await _libraryManager.getComic(comicId);
       if (comic == null) {
         return const Error(LocalComicNotFoundFailure());
       }
-      final chapters = comic.chapterIds.map((id) {
+      final List<Chapter> chapters = [];
+      for (int i = 0; i < comic.chapterIds.length; i++) {
+        final id = comic.chapterIds[i];
         final localCh = comic.chapters.where((c) => c.chapterId == id).firstOrNull;
         
         String? publishedAt;
@@ -77,13 +79,14 @@ class LocalProvider implements IComicProvider {
           }
         }
 
-        return Chapter(
+        chapters.add(Chapter(
           id: id,
           title: localCh?.title ?? 'Chapter $id',
+          order: i + 1,
           publishedAt: publishedAt,
-        );
-      }).toList();
-      return Success(isDescending ? chapters.reversed.toList() : chapters);
+        ));
+      }
+      return Success(chapters);
     } catch (e) {
       return Error(ProviderFailure(e.toString()));
     }

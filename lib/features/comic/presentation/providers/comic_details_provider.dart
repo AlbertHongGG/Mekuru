@@ -3,6 +3,7 @@ import 'package:mekuru/core/data/providers/repository_providers.dart';
 import 'package:mekuru/features/library/data/repositories/user_interaction_repository.dart';
 import 'package:mekuru/features/comic/domain/models/comic_models.dart';
 import 'package:mekuru/features/comic/domain/models/chapter.dart';
+import 'package:mekuru/features/comic/domain/models/chapter_sequence.dart';
 import 'package:mekuru/core/notifications/presentation/controllers/notification_controller.dart';
 import 'package:mekuru/features/library/domain/models/comic_record.dart';
 import 'package:mekuru/features/archive/data/providers/local_provider.dart';
@@ -14,7 +15,7 @@ import 'package:mekuru/features/archive/domain/services/archive_backup_service.d
 class ComicDetailsState {
   final bool isLoading;
   final ComicDetail? comic;
-  final List<Chapter> chapters;
+  final List<Chapter> chapters; // Invariant: Canonical Chronological Order (1..N)
   final ComicRecord? interaction;
   final String? error;
   final bool isChapterSortDescending;
@@ -27,6 +28,10 @@ class ComicDetailsState {
     this.error,
     this.isChapterSortDescending = true,
   });
+
+  /// Derived view projection based on UI sort preference without mutating the canonical sequence.
+  List<Chapter> get displayChapters =>
+      ChapterSequence(chapters).toDisplayList(isDescending: isChapterSortDescending);
 
   ComicDetailsState copyWith({
     bool? isLoading,
@@ -108,13 +113,13 @@ class ComicDetailsNotifier extends AutoDisposeFamilyNotifier<ComicDetailsState, 
       final interactionRepo = ref.read(userInteractionRepositoryProvider);
 
       final comicResult = await sourceRepo.getComic(arg.providerId, arg.comicId);
-      final chapterResult = await sourceRepo.getChapters(arg.providerId, arg.comicId, isDescending: state.isChapterSortDescending);
+      final chapterResult = await sourceRepo.getChapters(arg.providerId, arg.comicId);
 
       final comic = comicResult.getOrThrow();
       final chapters = chapterResult.getOrThrow();
 
-      // Update metadata with chapter list information
-      await interactionRepo.updateMetadata(arg.providerId, comic, chapters: chapters, isChaptersDescending: state.isChapterSortDescending);
+      // Update metadata with canonical chapter list information
+      await interactionRepo.updateMetadata(arg.providerId, comic, chapters: chapters);
 
       // Start watching the interaction stream
       final sub = interactionRepo.watchInteraction(
@@ -139,7 +144,6 @@ class ComicDetailsNotifier extends AutoDisposeFamilyNotifier<ComicDetailsState, 
   void toggleChapterSort() {
     state = state.copyWith(
       isChapterSortDescending: !state.isChapterSortDescending,
-      chapters: state.chapters.reversed.toList(),
     );
   }
 

@@ -131,7 +131,7 @@ class _ComicViewerPageState extends ConsumerState<ComicViewerPage> {
                 child: ChapterListBottomSheet(
                   providerId: widget.providerId,
                   comicId: widget.comicId,
-                  chapters: currentDetailsState.chapters,
+                  chapters: currentDetailsState.displayChapters,
                   lastReadChapterId: widget.chapterId,
                   readChapterIds: currentDetailsState.interaction?.readChapterIds ?? [],
                   isSortDescending: currentDetailsState.isChapterSortDescending,

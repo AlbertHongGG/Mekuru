@@ -48,7 +48,7 @@ class ComicDetailsPage extends ConsumerWidget {
                 child: ChapterListBottomSheet(
                   providerId: providerId,
                   comicId: comicId,
-                  chapters: bottomState.chapters,
+                  chapters: bottomState.displayChapters,
                   lastReadChapterId: bottomState.interaction?.lastReadChapterId,
                   readChapterIds: bottomState.interaction?.readChapterIds ?? [],
                   isSortDescending: bottomState.isChapterSortDescending,
@@ -505,9 +505,6 @@ class ComicDetailsPage extends ConsumerWidget {
                     onTap: () async {
                       if (state.chapters.isEmpty) return;
                       String targetChapterId = state.chapters.first.id;
-                      if (state.isChapterSortDescending) {
-                        targetChapterId = state.chapters.last.id;
-                      }
                       if (lastReadChapterId != null) {
                         targetChapterId = lastReadChapterId;
                       }

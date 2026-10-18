@@ -71,20 +71,18 @@ class GuaziProvider extends BaseComicProvider {
   }
 
   @override
-  Future<Result<List<Chapter>, Failure>> getChapterList(String comicId, {bool isDescending = true}) async {
+  Future<Result<List<Chapter>, Failure>> getChapterList(String comicId) async {
     return handleApiCall(() async {
       final rawList = await _apiClient.getChapterList(comicId, sort: 'asc');
       final List<Chapter> chapters = [];
-      for (final ch in rawList) {
+      for (int i = 0; i < rawList.length; i++) {
+        final ch = rawList[i];
         chapters.add(Chapter(
           id: ch.id.toString(),
           title: ch.name,
+          order: i + 1,
           publishedAt: _convertTimestamp(ch.addtime),
         ));
-      }
-      
-      if (isDescending) {
-        return chapters.reversed.toList();
       }
       return chapters;
     });

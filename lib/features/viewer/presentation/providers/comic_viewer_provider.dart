@@ -4,6 +4,7 @@ import 'package:mekuru/features/library/data/repositories/user_interaction_repos
 import 'package:mekuru/features/comic/domain/models/page.dart';
 import 'package:mekuru/core/notifications/presentation/controllers/notification_controller.dart';
 import 'package:mekuru/features/comic/presentation/providers/comic_details_provider.dart';
+import 'package:mekuru/features/comic/domain/models/chapter_sequence.dart';
 
 class ComicViewerState {
   final bool isLoading;
@@ -60,30 +61,6 @@ class ComicViewerNotifier extends AutoDisposeFamilyNotifier<ComicViewerState, ({
 
   int? _chronologicalIndex;
 
-  int _calculateChronologicalIndex(List<dynamic> chapters, String targetChapterId) {
-    if (chapters.isEmpty) return 1;
-    final index = chapters.indexWhere((c) => c.id == targetChapterId);
-    if (index == -1) return 1;
-
-    bool isDescending = false;
-    if (chapters.length > 1) {
-      final chaptersWithNumbers = chapters.where((c) => RegExp(r'\d+').hasMatch(c.title)).toList();
-      if (chaptersWithNumbers.length > 1) {
-        final int1 = int.parse(RegExp(r'\d+').firstMatch(chaptersWithNumbers.first.title)!.group(0)!);
-        final int2 = int.parse(RegExp(r'\d+').firstMatch(chaptersWithNumbers.last.title)!.group(0)!);
-        if (int1 > int2) {
-          isDescending = true;
-        }
-      }
-    }
-
-    if (isDescending) {
-      return chapters.length - index;
-    } else {
-      return index + 1;
-    }
-  }
-
   @override
   ComicViewerState build(({String providerId, String comicId, String chapterId}) arg) {
     Future.microtask(() => loadPages());
@@ -100,12 +77,15 @@ class ComicViewerNotifier extends AutoDisposeFamilyNotifier<ComicViewerState, ({
       final interactionRepo = ref.read(userInteractionRepositoryProvider);
       final detailsState = ref.read(comicDetailsProvider((providerId: arg.providerId, comicId: arg.comicId)));
       final comic = detailsState.comic;
-      final chapter = detailsState.chapters.firstWhere((c) => c.id == arg.chapterId);
+
+      final sequence = ChapterSequence(detailsState.chapters);
+      final currentChapter = sequence.findById(arg.chapterId);
+      final chapterTitle = currentChapter?.title ?? '載入中...';
 
       _interactionRepo = interactionRepo;
       _comic = comic;
-      _chapterTitle = chapter.title;
-      _chronologicalIndex = _calculateChronologicalIndex(detailsState.chapters, arg.chapterId);
+      _chapterTitle = chapterTitle;
+      _chronologicalIndex = sequence.getChronologicalIndex(arg.chapterId);
 
       int initAnchorIndex = 0;
       double initAnchorOffset = 0.0;
@@ -121,32 +101,8 @@ class ComicViewerNotifier extends AutoDisposeFamilyNotifier<ComicViewerState, ({
         }
       } catch (_) {}
 
-      String? prevChapterId;
-      String? nextChapterId;
-      if (detailsState.chapters.isNotEmpty) {
-        final index = detailsState.chapters.indexWhere((c) => c.id == arg.chapterId);
-        if (index != -1) {
-          bool isNativeDescending = false; 
-          if (detailsState.chapters.length > 1) {
-            final chaptersWithNumbers = detailsState.chapters.where((c) => RegExp(r'\d+').hasMatch(c.title)).toList();
-            if (chaptersWithNumbers.length > 1) {
-              final int1 = int.parse(RegExp(r'\d+').firstMatch(chaptersWithNumbers.first.title)!.group(0)!);
-              final int2 = int.parse(RegExp(r'\d+').firstMatch(chaptersWithNumbers.last.title)!.group(0)!);
-              if (int1 > int2) {
-                isNativeDescending = true;
-              }
-            }
-          }
-          final chronologicallyPrevIndex = isNativeDescending ? index + 1 : index - 1;
-          final chronologicallyNextIndex = isNativeDescending ? index - 1 : index + 1;
-          if (chronologicallyPrevIndex >= 0 && chronologicallyPrevIndex < detailsState.chapters.length) {
-            prevChapterId = detailsState.chapters[chronologicallyPrevIndex].id;
-          }
-          if (chronologicallyNextIndex >= 0 && chronologicallyNextIndex < detailsState.chapters.length) {
-            nextChapterId = detailsState.chapters[chronologicallyNextIndex].id;
-          }
-        }
-      }
+      final prevChapter = sequence.getPrevious(arg.chapterId);
+      final nextChapter = sequence.getNext(arg.chapterId);
 
       state = state.copyWith(
         isLoading: false,
@@ -154,9 +110,9 @@ class ComicViewerNotifier extends AutoDisposeFamilyNotifier<ComicViewerState, ({
         initialAnchorIndex: initAnchorIndex,
         initialAnchorOffset: initAnchorOffset,
         comicTitle: comic?.title ?? '',
-        chapterTitle: chapter.title,
-        prevChapterId: prevChapterId,
-        nextChapterId: nextChapterId,
+        chapterTitle: chapterTitle,
+        prevChapterId: prevChapter?.id,
+        nextChapterId: nextChapter?.id,
       );
 
       if (comic != null) {
@@ -166,7 +122,7 @@ class ComicViewerNotifier extends AutoDisposeFamilyNotifier<ComicViewerState, ({
           comicId: arg.comicId,
           comic: comic,
           chapterId: arg.chapterId,
-          chapterTitle: chapter.title,
+          chapterTitle: chapterTitle,
           pageIndex: packed, 
           chapterIndex: _chronologicalIndex,
         );

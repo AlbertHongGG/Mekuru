@@ -83,11 +83,11 @@ class WebtoonProvider extends BaseComicProvider {
   }
 
   @override
-  Future<Result<List<Chapter>, Failure>> getChapterList(String comicId, {bool isDescending = true}) async {
+  Future<Result<List<Chapter>, Failure>> getChapterList(String comicId) async {
     return handleApiCall(() async {
       final titleNo = int.parse(comicId);
-      final pageSize = 30;
-      final ordering = isDescending ? 'LATEST' : 'OLDEST';
+      const pageSize = 30;
+      const ordering = 'OLDEST'; // Canonical chronological order
       
       final List<Chapter> allChapters = [];
       int offset = 0;
@@ -110,6 +110,7 @@ class WebtoonProvider extends BaseComicProvider {
           allChapters.add(Chapter(
             id: ep.episodeNo.toString(),
             title: ep.episodeTitle,
+            order: allChapters.length + 1,
             publishedAt: pubTime,
           ));
         }

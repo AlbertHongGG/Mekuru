@@ -108,7 +108,7 @@ class UserInteractionRepository {
   }
 
   
-  Future<void> updateChaptersOnly(String providerId, String comicId, List<Chapter> chapters, {bool isChaptersDescending = false}) async {
+  Future<void> updateChaptersOnly(String providerId, String comicId, List<Chapter> chapters) async {
     final id = _genId(providerId, comicId);
     final existing = _metadataBox.get(id);
     if (existing == null) return;
@@ -120,7 +120,7 @@ class UserInteractionRepository {
 
     if (chapters.isNotEmpty) {
       DateTime? newestTime;
-      Chapter? latestChap = chapters.first;
+      Chapter? latestChap = chapters.last;
       for (final chap in chapters) {
         if (chap.publishedAt != null) {
           String dateStr = chap.publishedAt!.replaceAll('.', '-').replaceAll('/', '-');
@@ -172,9 +172,7 @@ class UserInteractionRepository {
       if (existingHistory != null && existingHistory.lastReadChapterId.isNotEmpty) {
         final indexInList = chapters.indexWhere((c) => c.id == existingHistory.lastReadChapterId);
         if (indexInList != -1) {
-          final int actualIndex = isChaptersDescending 
-              ? chapters.length - indexInList 
-              : indexInList + 1;
+          final int actualIndex = indexInList + 1;
           
           if (existingHistory.lastReadChapterIndex != actualIndex) {
             await _historyBox.put(id, existingHistory.copyWith(
@@ -186,7 +184,7 @@ class UserInteractionRepository {
     }
   }
 
-  Future<void> updateMetadata(String providerId, IComicItem comic, {List<Chapter>? chapters, bool isChaptersDescending = false}) async {
+  Future<void> updateMetadata(String providerId, IComicItem comic, {List<Chapter>? chapters}) async {
     final id = _genId(providerId, comic.comicId);
     final now = DateTime.now();
     final existing = _metadataBox.get(id);
@@ -206,7 +204,7 @@ class UserInteractionRepository {
     }
 
     if (chapters != null && chapters.isNotEmpty) {
-      await updateChaptersOnly(providerId, comic.comicId, chapters, isChaptersDescending: isChaptersDescending);
+      await updateChaptersOnly(providerId, comic.comicId, chapters);
     }
   }
   Future<void> markRead({

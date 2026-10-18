@@ -8,6 +8,6 @@ abstract class IComicRepository {
   Future<Result<PaginatedResult<ComicExploreResult>, Failure>> exploreComics(String providerId, int page);
   Future<Result<PaginatedResult<ComicSearchResult>, Failure>> searchComics(String providerId, String keyword, int page);
   Future<Result<ComicDetail, Failure>> getComic(String providerId, String comicId);
-  Future<Result<List<Chapter>, Failure>> getChapters(String providerId, String comicId, {bool isDescending = true});
+  Future<Result<List<Chapter>, Failure>> getChapters(String providerId, String comicId);
   Future<Result<List<ComicPage>, Failure>> getChapterImages(String providerId, String comicId, String chapterId);
 }

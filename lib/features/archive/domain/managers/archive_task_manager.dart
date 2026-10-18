@@ -141,7 +141,7 @@ class ArchiveTaskManager extends Notifier<List<ArchiveTask>> implements IArchive
     if (detailResult.isFailure) throw Exception('Failed to get comic details');
     final comicDetail = detailResult.getOrThrow();
     
-    final chaptersResult = await provider.getChapterList(comicId, isDescending: false);
+    final chaptersResult = await provider.getChapterList(comicId);
     if (chaptersResult.isFailure) throw Exception('Failed to get chapters');
     final remoteChapters = chaptersResult.getOrThrow();
 
@@ -271,7 +271,7 @@ class ArchiveTaskManager extends Notifier<List<ArchiveTask>> implements IArchive
             if (detailResult.isFailure) throw Exception('Failed to fetch comic details');
             final comicDetail = detailResult.getOrThrow();
             
-            final chaptersResult = await provider.getChapterList(task.comicId, isDescending: false);
+            final chaptersResult = await provider.getChapterList(task.comicId);
             if (chaptersResult.isFailure) throw Exception('Failed to fetch chapters');
             final chapters = chaptersResult.getOrThrow();
             

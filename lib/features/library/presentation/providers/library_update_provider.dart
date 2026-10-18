@@ -59,7 +59,7 @@ class LibraryUpdateNotifier extends Notifier<LibraryUpdateState> {
           if (provider != null) {
             final meta = await interactionRepo.getMetadata(record.providerId, record.comicId);
             if (meta != null) {
-              final result = await provider.getChapterList(record.comicId, isDescending: false);
+              final result = await provider.getChapterList(record.comicId);
               if (result.isSuccess) {
                 final chapters = result.getOrThrow();
                 if (chapters.isNotEmpty) {

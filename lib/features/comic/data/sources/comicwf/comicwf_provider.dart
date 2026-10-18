@@ -91,14 +91,14 @@ class ComicWFProvider extends BaseComicProvider {
   }
 
   @override
-  Future<Result<List<Chapter>, Failure>> getChapterList(String comicId, {bool isDescending = true}) async {
+  Future<Result<List<Chapter>, Failure>> getChapterList(String comicId) async {
     return handleApiCall(() async {
       final pageSize = 999999;
       final rawList = await _apiClient.getChapterList(
         comicId, 
         1, 
         pageSize: pageSize, 
-        order: 'asc', // ALWAYS fetch ascending first
+        order: 'asc', // ALWAYS fetch ascending
       );
       final List<Chapter> chapters = [];
       for (int i = 0; i < rawList.chapters.length; i++) {
@@ -106,12 +106,9 @@ class ComicWFProvider extends BaseComicProvider {
         chapters.add(Chapter(
           id: ch.chapterId.toString(),
           title: ch.chapterName ?? 'Chapter ${i + 1}',
+          order: i + 1,
           publishedAt: ch.createTime ?? '',
         ));
-      }
-      
-      if (isDescending) {
-        return chapters.reversed.toList();
       }
       return chapters;
     });

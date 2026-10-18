@@ -81,7 +81,7 @@ class CopyMGProvider extends BaseComicProvider {
   }
 
   @override
-  Future<Result<List<Chapter>, Failure>> getChapterList(String comicId, {bool isDescending = true}) async {
+  Future<Result<List<Chapter>, Failure>> getChapterList(String comicId) async {
     return handleApiCall(() async {
       final List<Chapter> chapters = [];
       int offset = 0;
@@ -97,6 +97,7 @@ class CopyMGProvider extends BaseComicProvider {
           chapters.add(Chapter(
             id: item.uuid,
             title: item.name,
+            order: chapters.length + 1,
             publishedAt: item.datetimeCreated ?? '',
           ));
         }
@@ -107,10 +108,6 @@ class CopyMGProvider extends BaseComicProvider {
         offset += limit;
       }
       
-      // CopyMG default is ascending. Reverse it if descending is requested.
-      if (isDescending) {
-        return chapters.reversed.toList();
-      }
       return chapters;
     });
   }
